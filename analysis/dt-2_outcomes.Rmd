@@ -1,0 +1,113 @@
+---
+title: "Dog Trainer Questionnaire vs Outcome (Fail, Success) "
+author: "Marinara Marcato"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(root.dir = "C:/Users/marinara.marcato/Project/Scripts/dog_questionnaires")
+knitr::opts_chunk$set(echo = TRUE)
+#install.packages("ggpubr")
+library(DescTools)
+library(ggplot2)
+library(cowplot)
+library(dplyr)
+library(plyr)
+library(tidyverse)
+library(rstatix)
+library(ggpubr)
+```
+
+## Introduction 
+This document tests the hypothesis that there is a difference in behaviours reported in the standardised questionnaire Monash Canine Personality Questionnaire - Revised considering dog's training outcome.
+
+## Data Exploration
+### Columns: Variables
+Below are the questionnaire items(variables) that were scored by the Trainer in a scale from 1 to 6. 
+
+```{r, echo = FALSE}
+dtq = read.csv('data//2022-05-10-DT_MCPQ-R.csv', stringsAsFactors=FALSE)
+vars = read.csv("data//questionnaire-variables-trainers.csv",stringsAsFactors=FALSE)
+
+# print all variables other than 'info'
+print(vars %>% filter(Type != 'info') %>% filter(Type != 'comments') %>% pull('Variable'))
+# print the number of variables per data type
+print(table(vars$Type))
+
+# Adding a column to df vars for Test 
+vars = vars %>% mutate(Test = case_when(Type == "ordinal" ~ "Mann-Whitney"))
+```
+
+
+### Rows: Dogs
+The number of dogs in the Dog Trainer Questionnaire dataset.
+```{r, echo = FALSE}
+dtq = dtq %>% distinct(Code, .keep_all = TRUE)
+cat('Number of unique dogs:', length(dtq$Code))
+cat('Number of dogs per Training Outcome:')
+table(dtq$Status)
+table(dtq$Outcome)
+```
+
+## Data Analysis
+Mann-Whitney test was used to investigate whether there was a statistically significant difference between the behaviours reported by trainers and the training outcome (Fail, Success) of the dogs.
+The variables that showed p_value < 0.05 are below: 
+```{r, echo = FALSE}
+stats <- function(test, var, data, group){
+  # print(var)
+  if (!is.na(test)){
+    if (test == 'Mann-Whitney'){
+      # Mann-Whitney test is performed by the function wilcox.test in R
+      r = kruskal.test(data[,var], data[,group])
+      return(r$p.value)
+    }
+    return(NA)
+  }
+  return(NA)
+}
+
+dtq$Outcome_1 = match(dtq$Outcome, c("Fail", "Success")) 
+vars = vars %>% mutate(outcome_p = mapply(FUN = stats, test = vars$Test, 
+              var = vars$Variable, MoreArgs = list(dtq, 'Outcome_1')))
+vars$outcome_sign = ifelse(vars$outcome_p<0.05, 1, 0)
+
+print(vars %>% filter(outcome_sign == 1) %>% select(Variable, outcome_p))
+```
+
+
+## Outcome
+Below are the variables that showed statistically significant differences in personality traits as described by their trainers considering different Training Outcomes ('Success', 'Fail').
+
+
+```{r, echo = FALSE}
+vars_outcome =  vars %>% filter( outcome_sign == 1 ) %>% pull('Variable')
+
+plotseries <- function(var){
+    plot1 <- ggplot(dtq, aes_string( x = var, fill = 'Outcome')) + 
+            geom_bar(position = "dodge") +
+            theme(legend.position = c(0.13,0.88)) +
+            scale_x_discrete("Rating", limits = c(1:6), breaks = c(1:6), labels = c(1:6)) +
+            expand_limits(x = c(1,6))
+
+    plot2 <- ggplot(dtq, aes_string( x = 'Outcome', y = var)) + 
+            geom_boxplot(position = "dodge", aes(colour = Outcome))  +
+            theme(legend.position = "none") +
+            scale_y_discrete("Rating", limits = c(1:6), breaks = c(1:6), labels = c(1:6)) +
+            expand_limits(y = c(1,6)) +
+            ylab("Rating")
+    plot3 <- plot_grid(plot1, plot2, rel_widths = c(2, 1), labels = "AUTO")
+    
+
+    title <- ggdraw() + 
+      draw_label(gsub("[.]", " - ", var), fontface = 'bold')
+    
+    plot <- plot_grid(title, plot3, ncol = 1, rel_heights = c(0.1, 1))
+
+    suppressMessages(ggsave(paste("output//dt-analysis//2-", gsub("[.]", "-", var), ".png", sep = "") 
+          , plot))
+    
+    plot
+}
+lapply(vars_outcome, plotseries)
+
+```

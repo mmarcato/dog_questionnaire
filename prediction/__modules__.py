@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
+import joblib
 from sklearn.metrics import confusion_matrix
 from sklearn.base import BaseEstimator, TransformerMixin
-from tqdm import tnrange
 
 # ------------------------------------------------------------------------- #
 #                                   Classes                                 #
@@ -20,6 +20,11 @@ class DataFrameSelector(BaseEstimator, TransformerMixin):
             return X_selected.astype(self.dtype).values
         return X_selected.values
 
+# ------------------------------------------------------------------------- #
+#                                  Evaluation                               #
+# ------------------------------------------------------------------------- # 
+
+
 class gs_results:
     # Storing Grid Search results
     def __init__(self, gs):
@@ -27,11 +32,7 @@ class gs_results:
         self.best_estimator_ = gs.best_estimator_
         self.best_params_ = gs.best_params_
         self.best_score_ = gs.best_score_
-
-# ------------------------------------------------------------------------- #
-#                                  Functions                                #
-# ------------------------------------------------------------------------- # 
-
+        self.best_index_ = gs.best_index_
 
 def FP(y_true, y_pred):
     # Calculate False Positive from confusion matrix
@@ -59,11 +60,11 @@ def TP(y_true, y_pred):
 
 
 def gs_output(gs):
-    print("Best Estimator (accuracy) \nTest mean: {:.3f}\t std: {:.3f}\nTrain mean: {:.3f} \t std:  {:.3f}\nparameters: {}".format(
-                gs.cv_results_['mean_test_accuracy'][gs.best_index_],
-                gs.cv_results_['std_test_accuracy'][gs.best_index_],
-                gs.cv_results_['mean_train_accuracy'][gs.best_index_],
-                gs.cv_results_['std_train_accuracy'][gs.best_index_],
+    print("Best Estimator (f1) \nTest mean: {:.3f} std: {:.3f}\nTrain mean: {:.3f} std:  {:.3f}\n\nparameters: {}".format(
+                gs.cv_results_['mean_test_f1'][gs.best_index_],
+                gs.cv_results_['std_test_f1'][gs.best_index_],
+                gs.cv_results_['mean_train_f1'][gs.best_index_],
+                gs.cv_results_['std_train_f1'][gs.best_index_],
                 gs.best_params_))
     
     tp = gs.cv_results_['mean_test_TP'][gs.best_index_]
@@ -79,10 +80,20 @@ def gs_output(gs):
     # Precision or positive predictive value
     PPV = tp/(tp+fp)
     
-    print("\nACC: {:.2f}, TPR: {:.2f}, TNR: {:.2f}, PPV: {:.2f}".format(
-        ACC, TPR, TNR, PPV))
+    print("\nACC: {:.2f}, ROC_AUC: {:.2f},\nTPR: {:.2f}, TNR: {:.2f}\nPPV: {:.2f}".format(
+            ACC, gs.cv_results_['mean_test_roc_auc'][gs.best_index_],TPR, TNR, PPV))
+
+
+    # OLD PRINTS
+    print("Best Estimator (accuracy) \nTest mean: {:.3f}\t std: {:.3f}\nTrain mean: {:.3f} \t std:  {:.3f}\nparameters: {}".format(
+                gs.cv_results_['mean_test_accuracy'][gs.best_index_],
+                gs.cv_results_['std_test_accuracy'][gs.best_index_],
+                gs.cv_results_['mean_train_accuracy'][gs.best_index_],
+                gs.cv_results_['std_train_accuracy'][gs.best_index_],
+                gs.best_params_))
+                
         
-    print("f1_macro: {:.2f}, f1_micro: {:.2f}, f1_weighted: {:.2f}".format(
-            gs.cv_results_['mean_test_f1_macro'][gs.best_index_],
-                gs.cv_results_['mean_test_f1_micro'][gs.best_index_],
-                gs.cv_results_['mean_test_f1_weighted'][gs.best_index_]))
+    # print("f1_macro: {:.2f}, f1_micro: {:.2f}, f1_weighted: {:.2f}".format(
+    #         gs.cv_results_['mean_test_f1_macro'][gs.best_index_],
+    #             gs.cv_results_['mean_test_f1_micro'][gs.best_index_],
+    #             gs.cv_results_['mean_test_f1_weighted'][gs.best_index_]))

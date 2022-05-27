@@ -5,7 +5,8 @@
 # ------------------------------------------------------------------------- #
 #                           Importing Global Modules                        #
 # ------------------------------------------------------------------------- #
-import os, sys
+import os, sys, joblib
+from shutil import rmtree
 import numpy as np
 import pandas as pd
 from time import time
@@ -46,23 +47,25 @@ dtq_feat = df_inner.columns[120:151].delete(df_inner.columns[120:151].str.contai
 feat = prq_feat.append(dtq_feat)
 
 X = df_inner.loc[:, feat]
-y = df_inner.loc[:, 'Outcome'].values
+y = df_inner.loc[:, 'Outcome'].replace({'Success' : 0, 'Fail': 1})
 
 print("Dataset size:\n{}".format(X.shape))
 print("Class imbalance:\n{}".format(df_inner.Outcome.value_counts(normalize=True)))
-# my dataset is too small to have a hold out set
-#X_train, X_test, y_train, y_test = train_test_split(X, y, stratify=y, test_size=0.2)
 
 # ------------------------------------------------------------------------- #
 #                             Machine Learning                              #
 # ------------------------------------------------------------------------- #
+
+location = "cachedir"
+memory = joblib.Memory(location=location, verbose=1)
 
 pipe = Pipeline([ 
     ('ft', DataFrameSelector(feat,'float64')),
     ('imp', SimpleImputer(missing_values=np.nan)),
     ('var', VarianceThreshold()),
     ('slt', SelectKBest()),
-    ('clf', RandomForestClassifier(n_jobs = 1, max_features = None, 
+    ('clf', RandomForestClassifier(n_jobs = 1, 
+                max_features = None, 
                 random_state = 0))
     ])
 
@@ -77,16 +80,24 @@ params = {
 cv = StratifiedShuffleSplit(n_splits = 4, test_size = 0.3, random_state = 0)
 
 start_time = time()
-gs = GridSearchCV(pipe, param_grid = params, 
+gs = GridSearchCV(pipe, params, 
         scoring ={"TP": make_scorer(TP), "TN": make_scorer(TN),
                 "FP": make_scorer(FP), "FN": make_scorer(FN),
-                "f1_macro": "f1_macro", "f1_weighted": "f1_weighted",
-                "f1_micro": "f1_micro", "accuracy" : "accuracy"},
-        refit = 'accuracy', n_jobs = -1, cv = cv, return_train_score = True)
+                "f1": "f1", "accuracy" : "accuracy", "roc_auc" : "roc_auc"},
+        refit = 'f1', n_jobs = -1, cv = cv, return_train_score = True,
+        verbose = False)
 gs.fit(X,y)
 end_time = time()
 duration = end_time - start_time
 print("--- %s seconds ---" % (duration))
-
-# print gs results
 gs_output(gs)
+
+# save gs results to pickle file
+gs_path = os.path.join(dir_model, "inner-2_outcomes.pkl" )
+# joblib.dump(gs_results(gs), gs_path, compress = 1 )
+print("Model saved to:", gs_path)
+
+# clear cache
+memory.clear(warn=False)
+rmtree(location)
+

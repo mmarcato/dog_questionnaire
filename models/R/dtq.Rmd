@@ -1,0 +1,76 @@
+---
+title: "Dog Trainer Questionnaire vs Outcome (Fail, Success) "
+author: "Marinara Marcato"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(root.dir = "C:/Users/marinara.marcato/Project/Scripts/dog_questionnaires")
+knitr::opts_chunk$set(echo = TRUE)
+#install.packages("ggpubr")
+library(DescTools)
+library(ggplot2)
+library(cowplot)
+library(dplyr)
+library(plyr)
+library(tidyverse)
+library(rstatix)
+library(ggpubr)
+```
+
+## Introduction 
+This document tests the hypothesis that there is a difference in behaviours reported in the standardised questionnaire Monash Canine Personality Questionnaire - Revised considering dog's training outcome.
+
+## Data Exploration
+### Columns: Variables
+Below are the questionnaire items (predictor variables) that were scored by the Trainer in a scale from 1 to 6. 
+The rating values are kept as numeric, rather than being converted to factors, so the information about the ordering is kept.
+The variables are selected for the Logistic Regression model and their descriptive statistics are shown below. 
+```{r, echo = FALSE}
+dtq = read.csv('data//2022-05-10-DTQ_MCPQ-R.csv')
+colnames(dtq)
+data = dtq %>% select(contains(c("Extraversion", "Motivation", "Training",
+ "Amicability", "Neuroticism", "Outcome")))  %>% select(!contains("Comments"))
+#   "PR.Sup", "Source", "Sex", "Breed"
+str(data)
+do.call(cbind, lapply(data, summary))
+```
+
+### Rows: Dogs
+The number of dogs in the Dog Trainer Questionnaire dataset.
+```{r, echo = FALSE}
+dtq = dtq %>% distinct(Code, .keep_all = TRUE)
+cat('Number of unique dogs:', length(dtq$Code))
+cat('Number of dogs per Training Outcome:')
+table(dtq$Outcome)
+```
+
+### Rows: Descriptive Statistics
+```{r, echo = FALSE}
+```
+
+
+## Principal Component Analysis
+Logistic Regression was used to investigate whether there was a statistically significant difference between the behaviours reported by trainers and the training outcome (Fail, Success) of the dogs.
+
+```{r, echo = FALSE}
+
+pca <- prcomp(data %>% select(!contains("Outcome")),
+             center = TRUE,
+            scale. = TRUE)
+attributes(pca)
+summary(pca)
+```
+
+## Data Analysis
+Logistic Regression was used to investigate whether there was a statistically significant difference between the behaviours reported by trainers and the training outcome (Fail, Success) of the dogs.
+
+```{r, echo = FALSE}
+model <- glm(formula = Outcome ~ . , data = data, family = binomial(link = logit))
+summary(model)
+
+
+pcs <- pca$x
+pca_model <- glm(formula = data$Outcome ~ pcs, family = binomial(link = logit))
+summary(pca_model)
+```

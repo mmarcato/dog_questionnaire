@@ -1,0 +1,69 @@
+---
+title: "Puppy Raiser Questionnaire vs Outcome (Success, Fail)"
+author: "Marinara Marcato"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(root.dir = "C:/Users/marinara.marcato/Project/Scripts/dog_questionnaires")
+knitr::opts_chunk$set(echo = TRUE)
+#install.packages("ggpubr")
+library(DescTools)
+library(ggplot2)
+library(cowplot)
+library(dplyr)
+library(plyr)
+library(tidyverse)
+library(rstatix)
+library(ggpubr)
+```
+
+## Introduction 
+This document tests the hypothesis that there is a difference in behaviours reported in the standardised questionnaire Canine Behavioural Assessement & Research Questionnaire (C-BARQ) considering dog's training outcome.
+
+## Data Exploration
+### Columns: Variables
+Below are the questionnaire items (variables) that were scored by the Puppy Raise in a scale from 'Never', 'Seldom', 'Sometimes', 'Usually', 'Always'. 
+
+```{r, echo = FALSE}
+prq = read.csv('data//2022-05-10-PRQ_C-BARQ.csv')
+vars = read.csv("data//questionnaire-variables-puppyraisers.csv",stringsAsFactors=FALSE)
+# print the number of variables per data type
+# print(table(vars$Type))
+
+# Adding a column to df vars for Test 
+data = prq %>% select(contains(c("X\\d", "F_", "Outcome")))
+colnames(data)
+```
+
+
+### Rows: Dogs
+The number of dogs in the Puppy Raiser Questionnaire dataset. Selection criteria: dogs with a defined training outcome.
+```{r, echo = FALSE}
+#cat('Number of dogs:', length(prq$Name))
+prq = prq %>% distinct(Code, .keep_all = TRUE)
+cat('Training Outcome:')
+table(prq$Outcome)
+```
+Analysing categorical demographic data: Sex, Breed
+```{r, echo = FALSE}
+table(prq$Sex)
+table(prq$Breed)
+```
+Analysing age at assessment:
+```{r, echo = FALSE}
+prq$Age.at.Assessment <- prq$Timestamp - prq$DOB
+cat('Age at Assessment: Mean', mean(prq$Age.at.Assessment)/30.417, 
+            'Standard Deviation', sd(prq$Age.at.Assessment)/30.417)
+```
+
+
+
+## Data Analysis
+Logistic Regression one-way analysis of variance test was used to investigate whether there was a statistically significant difference between the behaviours reported by Puppy Raisers and the Training Outcome of the dogs.
+C-BARQ Correlation with Training Outcome. 
+
+```{r, echo = FALSE}
+
+```
+

@@ -390,6 +390,7 @@ summary {
 <div id="columns-variables" class="section level3">
 <h3>Columns: Variables</h3>
 <p>Below are the questionnaire items (predictor variables) that were scored by the Trainer in a scale from 1 to 6. The rating values are kept as numeric, rather than being converted to factors, so the information about the ordering is kept. The variables are selected for the Logistic Regression model and their descriptive statistics are shown below.</p>
+<p>Other potential variables for inclusion in the model: “PR.Sup” -&gt; Alison = 5, Catherine = 6, DSM = 3, Frances = 11, Graham = 24, Mags = 3, Rose = 23, UKPR = 11 “Source” -&gt; IGDB = 60, AADI =3, Cesecah = 1, GDBUK = 16, Private breeder = 8, PRV breeder = 1</p>
 <pre><code>##  [1] &quot;Code&quot;                       &quot;Extraversion.Active&quot;       
 ##  [3] &quot;Extraversion.Energetic&quot;     &quot;Extraversion.Excitable&quot;    
 ##  [5] &quot;Extraversion.Hyperactive&quot;   &quot;Extraversion.Lively&quot;       
@@ -413,7 +414,7 @@ summary {
 ## [41] &quot;Breed&quot;                      &quot;Coat.Colour&quot;               
 ## [43] &quot;Duration&quot;                   &quot;Outcome&quot;                   
 ## [45] &quot;Label&quot;</code></pre>
-<pre><code>## &#39;data.frame&#39;:    89 obs. of  27 variables:
+<pre><code>## &#39;data.frame&#39;:    89 obs. of  29 variables:
 ##  $ Extraversion.Active       : int  5 4 4 3 3 5 3 2 3 4 ...
 ##  $ Extraversion.Energetic    : int  5 3 4 3 3 5 3 2 3 4 ...
 ##  $ Extraversion.Excitable    : int  5 5 4 3 3 6 3 2 3 3 ...
@@ -440,7 +441,11 @@ summary {
 ##  $ Neuroticism.Nervous       : int  2 4 4 1 1 2 1 4 4 2 ...
 ##  $ Neuroticism.Submissive    : int  2 3 4 1 2 2 2 5 2 2 ...
 ##  $ Neuroticism.Timid         : int  1 4 4 2 2 1 2 5 2 2 ...
+##  $ Sex                       : Factor w/ 2 levels &quot;F&quot;,&quot;M&quot;: 1 2 2 2 2 1 2 1 2 1 ...
+##  $ Breed                     : Factor w/ 5 levels &quot;GRxPoodle&quot;,&quot;GS&quot;,..: 4 4 4 3 3 3 4 4 3 5 ...
 ##  $ Outcome                   : Factor w/ 2 levels &quot;Fail&quot;,&quot;Success&quot;: 2 2 1 2 2 1 2 1 2 2 ...</code></pre>
+<pre><code>## Warning in (function (..., deparse.level = 1) : number of rows of result is not
+## a multiple of vector length (arg 28)</code></pre>
 <pre><code>##         Extraversion.Active Extraversion.Energetic Extraversion.Excitable
 ## Min.               1.000000               1.000000               1.000000
 ## 1st Qu.            3.000000               3.000000               3.000000
@@ -497,13 +502,13 @@ summary {
 ## Mean                4.674157            2.370787            2.382022
 ## 3rd Qu.             5.000000            3.000000            3.000000
 ## Max.                6.000000            6.000000            6.000000
-##         Neuroticism.Submissive Neuroticism.Timid Outcome
-## Min.                  1.000000          1.000000      18
-## 1st Qu.               2.000000          2.000000      71
-## Median                2.000000          2.000000      18
-## Mean                  2.617978          2.505618      71
-## 3rd Qu.               3.000000          3.000000      18
-## Max.                  5.000000          6.000000      71</code></pre>
+##         Neuroticism.Submissive Neuroticism.Timid Sex Breed Outcome
+## Min.                  1.000000          1.000000  44     2      18
+## 1st Qu.               2.000000          2.000000  45     1      71
+## Median                2.000000          2.000000  44    37      18
+## Mean                  2.617978          2.505618  45    16      71
+## 3rd Qu.               3.000000          3.000000  44    33      18
+## Max.                  5.000000          6.000000  45     2      71</code></pre>
 </div>
 <div id="rows-dogs" class="section level3">
 <h3>Rows: Dogs</h3>
@@ -514,133 +519,644 @@ summary {
 ##    Fail Success 
 ##      18      71</code></pre>
 </div>
-<div id="rows-descriptive-statistics" class="section level3">
-<h3>Rows: Descriptive Statistics</h3>
+<div id="data-analysis" class="section level3">
+<h3>Data Analysis</h3>
+<p>Testing if variables have a statistically significant relationship with Outcome (Fail, Success). Using Chisq test on contingency tables created with each feature and the outcome.</p>
+<pre><code>## Warning in chisq.test(table(x, data$Outcome)): Chi-squared approximation may be
+## incorrect
+
+## Warning in chisq.test(table(x, data$Outcome)): Chi-squared approximation may be
+## incorrect
+
+## Warning in chisq.test(table(x, data$Outcome)): Chi-squared approximation may be
+## incorrect
+
+## Warning in chisq.test(table(x, data$Outcome)): Chi-squared approximation may be
+## incorrect
+
+## Warning in chisq.test(table(x, data$Outcome)): Chi-squared approximation may be
+## incorrect
+
+## Warning in chisq.test(table(x, data$Outcome)): Chi-squared approximation may be
+## incorrect
+
+## Warning in chisq.test(table(x, data$Outcome)): Chi-squared approximation may be
+## incorrect
+
+## Warning in chisq.test(table(x, data$Outcome)): Chi-squared approximation may be
+## incorrect
+
+## Warning in chisq.test(table(x, data$Outcome)): Chi-squared approximation may be
+## incorrect
+
+## Warning in chisq.test(table(x, data$Outcome)): Chi-squared approximation may be
+## incorrect
+
+## Warning in chisq.test(table(x, data$Outcome)): Chi-squared approximation may be
+## incorrect
+
+## Warning in chisq.test(table(x, data$Outcome)): Chi-squared approximation may be
+## incorrect
+
+## Warning in chisq.test(table(x, data$Outcome)): Chi-squared approximation may be
+## incorrect
+
+## Warning in chisq.test(table(x, data$Outcome)): Chi-squared approximation may be
+## incorrect
+
+## Warning in chisq.test(table(x, data$Outcome)): Chi-squared approximation may be
+## incorrect
+
+## Warning in chisq.test(table(x, data$Outcome)): Chi-squared approximation may be
+## incorrect
+
+## Warning in chisq.test(table(x, data$Outcome)): Chi-squared approximation may be
+## incorrect
+
+## Warning in chisq.test(table(x, data$Outcome)): Chi-squared approximation may be
+## incorrect
+
+## Warning in chisq.test(table(x, data$Outcome)): Chi-squared approximation may be
+## incorrect
+
+## Warning in chisq.test(table(x, data$Outcome)): Chi-squared approximation may be
+## incorrect
+
+## Warning in chisq.test(table(x, data$Outcome)): Chi-squared approximation may be
+## incorrect
+
+## Warning in chisq.test(table(x, data$Outcome)): Chi-squared approximation may be
+## incorrect
+
+## Warning in chisq.test(table(x, data$Outcome)): Chi-squared approximation may be
+## incorrect
+
+## Warning in chisq.test(table(x, data$Outcome)): Chi-squared approximation may be
+## incorrect
+
+## Warning in chisq.test(table(x, data$Outcome)): Chi-squared approximation may be
+## incorrect
+
+## Warning in chisq.test(table(x, data$Outcome)): Chi-squared approximation may be
+## incorrect
+
+## Warning in chisq.test(table(x, data$Outcome)): Chi-squared approximation may be
+## incorrect</code></pre>
+<pre><code>##                            df  X.squared p_value significant_0.05
+## Training.Reliable           4 26.3177799  0.0000             TRUE
+## Training.Trainable          5 19.8513037  0.0013             TRUE
+## Neuroticism.Fearful         5 18.6994331  0.0022             TRUE
+## Amicability.Easy.going      5 17.3340637  0.0039             TRUE
+## Neuroticism.Nervous         5 14.9682401  0.0105             TRUE
+## Amicability.Relaxed         5 13.6871550  0.0177             TRUE
+## Extraversion.Hyperactive    5 13.3112043  0.0206             TRUE
+## Amicability.Friendly        5 13.2077353  0.0215             TRUE
+## Training.Attentive          5 11.6868649  0.0393             TRUE
+## Neuroticism.Timid           5 11.3450322  0.0450             TRUE
+## Training.Biddable           4  8.9561882  0.0622            FALSE
+## Training.Obedient           4  8.8700520  0.0644            FALSE
+## Amicability.Sociable        5  9.0334188  0.1077            FALSE
+## Motivation.Persevering      4  6.9619815  0.1379            FALSE
+## Extraversion.Excitable      5  7.4895148  0.1867            FALSE
+## Amicability.Non.aggressive  4  5.6019461  0.2309            FALSE
+## Neuroticism.Submissive      4  5.4939699  0.2403            FALSE
+## Extraversion.Active         5  6.5662663  0.2549            FALSE
+## Motivation.Independent      4  5.0449565  0.2827            FALSE
+## Extraversion.Restless       5  6.0097707  0.3053            FALSE
+## Extraversion.Lively         5  5.0857962  0.4055            FALSE
+## Motivation.Determined       4  3.9730143  0.4097            FALSE
+## Motivation.Tenacious        5  5.0222196  0.4132            FALSE
+## Breed                       4  3.7782907  0.4368            FALSE
+## Training.Intelligent        4  3.6709203  0.4524            FALSE
+## Sex                         1  0.5451709  0.4603            FALSE
+## Extraversion.Energetic      5  4.3996300  0.4934            FALSE
+## Motivation.Assertive        5  4.1119248  0.5334            FALSE
+##                            significant_0.1 significant_0.2
+## Training.Reliable                     TRUE            TRUE
+## Training.Trainable                    TRUE            TRUE
+## Neuroticism.Fearful                   TRUE            TRUE
+## Amicability.Easy.going                TRUE            TRUE
+## Neuroticism.Nervous                   TRUE            TRUE
+## Amicability.Relaxed                   TRUE            TRUE
+## Extraversion.Hyperactive              TRUE            TRUE
+## Amicability.Friendly                  TRUE            TRUE
+## Training.Attentive                    TRUE            TRUE
+## Neuroticism.Timid                     TRUE            TRUE
+## Training.Biddable                     TRUE            TRUE
+## Training.Obedient                     TRUE            TRUE
+## Amicability.Sociable                 FALSE            TRUE
+## Motivation.Persevering               FALSE            TRUE
+## Extraversion.Excitable               FALSE            TRUE
+## Amicability.Non.aggressive           FALSE           FALSE
+## Neuroticism.Submissive               FALSE           FALSE
+## Extraversion.Active                  FALSE           FALSE
+## Motivation.Independent               FALSE           FALSE
+## Extraversion.Restless                FALSE           FALSE
+## Extraversion.Lively                  FALSE           FALSE
+## Motivation.Determined                FALSE           FALSE
+## Motivation.Tenacious                 FALSE           FALSE
+## Breed                                FALSE           FALSE
+## Training.Intelligent                 FALSE           FALSE
+## Sex                                  FALSE           FALSE
+## Extraversion.Energetic               FALSE           FALSE
+## Motivation.Assertive                 FALSE           FALSE</code></pre>
+<pre><code>## [1] &quot;Number of variables considering each level of significance using Chisq test&quot;</code></pre>
+<pre><code>##   significant_0.05 significant_0.1 significant_0.2 freq
+## 1            FALSE           FALSE           FALSE   13
+## 2            FALSE           FALSE            TRUE    3
+## 3            FALSE            TRUE            TRUE    2
+## 4             TRUE            TRUE            TRUE   10</code></pre>
+<p>Using univariate Logistic Regression models where each feature is used individually to predict the outcome.</p>
+<pre><code>##                            p_value deviance significant_0.05 significant_0.1
+## Training.Trainable          0.0002 71.46652             TRUE            TRUE
+## Training.Reliable           0.0006 74.25964             TRUE            TRUE
+## Neuroticism.Fearful         0.0011 77.65662             TRUE            TRUE
+## Amicability.Easy.going      0.0017 77.05252             TRUE            TRUE
+## Amicability.Relaxed         0.0021 78.10853             TRUE            TRUE
+## Neuroticism.Nervous         0.0024 79.36437             TRUE            TRUE
+## Amicability.Friendly        0.0036 80.01027             TRUE            TRUE
+## Neuroticism.Timid           0.0060 81.31114             TRUE            TRUE
+## Amicability.Sociable        0.0100 82.49350             TRUE            TRUE
+## Training.Obedient           0.0194 83.88161             TRUE            TRUE
+## Neuroticism.Submissive      0.0256 84.50949             TRUE            TRUE
+## Training.Attentive          0.0262 84.42831             TRUE            TRUE
+## Motivation.Persevering      0.0479 85.41797             TRUE            TRUE
+## Training.Biddable           0.0681 86.10504            FALSE            TRUE
+## Extraversion.Hyperactive    0.0682 86.25919            FALSE            TRUE
+## Motivation.Determined       0.0974 86.79562            FALSE            TRUE
+## Training.Intelligent        0.1320 87.33623            FALSE           FALSE
+## Motivation.Independent      0.2017 87.92593            FALSE           FALSE
+## Sex                         0.3193 88.61143            FALSE           FALSE
+## Extraversion.Restless       0.3542 88.77242            FALSE           FALSE
+## Extraversion.Active         0.3769 88.83190            FALSE           FALSE
+## Amicability.Non.aggressive  0.4276 89.02044            FALSE           FALSE
+## Extraversion.Excitable      0.4468 89.04705            FALSE           FALSE
+## Motivation.Tenacious        0.4488 89.03581            FALSE           FALSE
+## Extraversion.Energetic      0.5359 89.23865            FALSE           FALSE
+## Motivation.Assertive        0.7220 89.49580            FALSE           FALSE
+## Extraversion.Lively         0.9786 89.62263            FALSE           FALSE
+## Breed                       0.9915 85.77209            FALSE           FALSE
+##                            significant_0.2
+## Training.Trainable                    TRUE
+## Training.Reliable                     TRUE
+## Neuroticism.Fearful                   TRUE
+## Amicability.Easy.going                TRUE
+## Amicability.Relaxed                   TRUE
+## Neuroticism.Nervous                   TRUE
+## Amicability.Friendly                  TRUE
+## Neuroticism.Timid                     TRUE
+## Amicability.Sociable                  TRUE
+## Training.Obedient                     TRUE
+## Neuroticism.Submissive                TRUE
+## Training.Attentive                    TRUE
+## Motivation.Persevering                TRUE
+## Training.Biddable                     TRUE
+## Extraversion.Hyperactive              TRUE
+## Motivation.Determined                 TRUE
+## Training.Intelligent                  TRUE
+## Motivation.Independent               FALSE
+## Sex                                  FALSE
+## Extraversion.Restless                FALSE
+## Extraversion.Active                  FALSE
+## Amicability.Non.aggressive           FALSE
+## Extraversion.Excitable               FALSE
+## Motivation.Tenacious                 FALSE
+## Extraversion.Energetic               FALSE
+## Motivation.Assertive                 FALSE
+## Extraversion.Lively                  FALSE
+## Breed                                FALSE</code></pre>
+<pre><code>## [1] &quot;Number of variables considering each level of significance using Logistic test&quot;</code></pre>
+<pre><code>##   significant_0.05 significant_0.1 significant_0.2 freq
+## 1            FALSE           FALSE           FALSE   11
+## 2            FALSE           FALSE            TRUE    1
+## 3            FALSE            TRUE            TRUE    3
+## 4             TRUE            TRUE            TRUE   13</code></pre>
+<p>Checking the intersection and difference between chisq and logistic regression</p>
+<pre><code>## Chisq p_value &lt; 0.2
+##  Extraversion.Excitable Extraversion.Hyperactive Motivation.Persevering Training.Attentive Training.Biddable Training.Obedient Training.Reliable Training.Trainable Amicability.Easy.going Amicability.Friendly Amicability.Relaxed Amicability.Sociable Neuroticism.Fearful Neuroticism.Nervous Neuroticism.Timid</code></pre>
+<pre><code>## Logistic Regression p_value &lt; 0.2
+##  Extraversion.Hyperactive Motivation.Determined Motivation.Persevering Training.Attentive Training.Biddable Training.Intelligent Training.Obedient Training.Reliable Training.Trainable Amicability.Easy.going Amicability.Friendly Amicability.Relaxed Amicability.Sociable Neuroticism.Fearful Neuroticism.Nervous Neuroticism.Submissive Neuroticism.Timid</code></pre>
+<pre><code>## intersection lr and chi:
+##  Extraversion.Hyperactive Motivation.Persevering Training.Attentive Training.Biddable Training.Obedient Training.Reliable Training.Trainable Amicability.Easy.going Amicability.Friendly Amicability.Relaxed Amicability.Sociable Neuroticism.Fearful Neuroticism.Nervous Neuroticism.Timid</code></pre>
+<pre><code>## difference lr - chi:
+##  Motivation.Determined Training.Intelligent Neuroticism.Submissive</code></pre>
+<pre><code>## difference chi - lr:
+##  Extraversion.Excitable</code></pre>
+</div>
+<div id="multicollinearity" class="section level3">
+<h3>Multicollinearity</h3>
+<p>Calculate Variance Inflation Factor (VIF) to avoid multicollinearity. VIF larger than 5 or 10 is large and indicate a high level of multicollinearity.</p>
+<pre><code>##   Extraversion.Excitable Extraversion.Hyperactive   Motivation.Persevering 
+##                 4.984723                 4.146668                 2.183106 
+##       Training.Attentive        Training.Biddable        Training.Obedient 
+##                 3.369793                 3.470093                 4.349506 
+##        Training.Reliable       Training.Trainable   Amicability.Easy.going 
+##                 3.823567                 4.378311                 3.520275 
+##     Amicability.Friendly      Amicability.Relaxed     Amicability.Sociable 
+##                 2.211693                 2.969597                 3.158714 
+##      Neuroticism.Fearful      Neuroticism.Nervous        Neuroticism.Timid 
+##                 3.213774                 4.177494                 2.223793</code></pre>
+<pre><code>## Extraversion.Hyperactive    Motivation.Determined   Motivation.Persevering 
+##                 2.235368                 2.424515                 2.371413 
+##       Training.Attentive        Training.Biddable     Training.Intelligent 
+##                 3.372663                 4.249374                 2.452307 
+##        Training.Obedient        Training.Reliable       Training.Trainable 
+##                 4.759402                 4.649173                 5.562489 
+##   Amicability.Easy.going     Amicability.Friendly      Amicability.Relaxed 
+##                 3.242593                 2.300233                 3.028324 
+##     Amicability.Sociable      Neuroticism.Fearful      Neuroticism.Nervous 
+##                 3.360208                 3.337755                 4.670390 
+##   Neuroticism.Submissive        Neuroticism.Timid 
+##                 3.389178                 3.878041</code></pre>
+</div>
+<div id="principal-component-analysis-pca" class="section level3">
+<h3>Principal Component Analysis (PCA)</h3>
+<p>Principal component analysis will be used to combine features that showed high multicollinearity. VIF = 1 no correlation, 5 &lt; VIF &lt; 10 moderate correlation, VIF &gt;10 high multicollinearity. No variables showed VIF &gt; 5, therefore no PCA was performed.</p>
 </div>
 </div>
-<div id="principal-component-analysis" class="section level2">
-<h2>Principal Component Analysis</h2>
-<p>Logistic Regression was used to investigate whether there was a statistically significant difference between the behaviours reported by trainers and the training outcome (Fail, Success) of the dogs.</p>
-<pre><code>## $names
-## [1] &quot;sdev&quot;     &quot;rotation&quot; &quot;center&quot;   &quot;scale&quot;    &quot;x&quot;       
+<div id="recursive-feature-elimination-rfe" class="section level2">
+<h2>Recursive Feature Elimination (RFE)</h2>
+<p>Use Logistic Regression and Recursive Feature Elimination using Leave One Subject Out Cross Validation. Caret RFE</p>
+<pre><code>## Warning: package &#39;mlbench&#39; was built under R version 3.6.3</code></pre>
+<pre><code>## Warning: package &#39;caret&#39; was built under R version 3.6.3</code></pre>
+<pre><code>## Loading required package: lattice</code></pre>
+<pre><code>## 
+## Attaching package: &#39;caret&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:purrr&#39;:
 ## 
-## $class
-## [1] &quot;prcomp&quot;</code></pre>
-<pre><code>## Importance of components:
-##                           PC1    PC2    PC3     PC4     PC5     PC6     PC7
-## Standard deviation     2.5118 2.2881 1.8558 1.47179 1.36866 0.94478 0.92480
-## Proportion of Variance 0.2427 0.2014 0.1325 0.08331 0.07205 0.03433 0.03289
-## Cumulative Proportion  0.2427 0.4440 0.5765 0.65979 0.73184 0.76617 0.79907
-##                            PC8     PC9    PC10    PC11    PC12    PC13    PC14
-## Standard deviation     0.83639 0.73929 0.68065 0.66153 0.63011 0.60020 0.57167
-## Proportion of Variance 0.02691 0.02102 0.01782 0.01683 0.01527 0.01386 0.01257
-## Cumulative Proportion  0.82597 0.84699 0.86481 0.88164 0.89691 0.91077 0.92334
-##                           PC15    PC16    PC17    PC18    PC19    PC20    PC21
-## Standard deviation     0.54713 0.50918 0.48223 0.47638 0.42325 0.40611 0.38204
-## Proportion of Variance 0.01151 0.00997 0.00894 0.00873 0.00689 0.00634 0.00561
-## Cumulative Proportion  0.93485 0.94482 0.95377 0.96250 0.96939 0.97573 0.98134
-##                           PC22    PC23    PC24   PC25    PC26
-## Standard deviation     0.37014 0.35540 0.29908 0.2840 0.22726
-## Proportion of Variance 0.00527 0.00486 0.00344 0.0031 0.00199
-## Cumulative Proportion  0.98661 0.99147 0.99491 0.9980 1.00000</code></pre>
-</div>
-<div id="data-analysis" class="section level2">
-<h2>Data Analysis</h2>
-<p>Logistic Regression was used to investigate whether there was a statistically significant difference between the behaviours reported by trainers and the training outcome (Fail, Success) of the dogs.</p>
+##     lift</code></pre>
+<pre><code>## The following objects are masked from &#39;package:DescTools&#39;:
+## 
+##     MAE, RMSE</code></pre>
+<pre><code>## 
+## Attaching package: &#39;reshape2&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:tidyr&#39;:
+## 
+##     smiths</code></pre>
+<p>Considering features selected with univariate chisq test pvalue.</p>
+<pre><code>## 
+## Recursive feature selection
+## 
+## Outer resampling method: Leave-One-Out Cross-Validation 
+## 
+## Resampling performance over subset size:
+## 
+##  Variables    ROC   Sens   Spec Selected
+##          0 0.6526 0.2778 0.9718         
+##          1 0.6526 0.2778 0.9718         
+##          2 0.7214 0.2778 0.9437         
+##          3 0.6886 0.2778 0.9296         
+##          4 0.6854 0.2778 0.9014         
+##          5 0.7003 0.2778 0.8873         
+##          6 0.7074 0.3333 0.9014         
+##          7 0.7254 0.3889 0.9437         
+##          8 0.7394 0.3889 0.9296        *
+##          9 0.7355 0.3889 0.9296         
+##         10 0.7183 0.3889 0.9296         
+##         11 0.7152 0.3333 0.9296         
+##         12 0.6956 0.3333 0.9296         
+##         13 0.6925 0.3333 0.9155         
+##         14 0.6878 0.3333 0.9155         
+##         15 0.6847 0.3333 0.9155         
+## 
+## The top 5 variables (out of 8):
+##    Training.Trainable, Extraversion.Hyperactive, Amicability.Easy.going, Motivation.Persevering, Amicability.Friendly</code></pre>
+<p><img src="data:image/png;base64,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" width="672" /></p>
+<pre><code>## Features in the model that delivered the best ROC Training.Trainable Extraversion.Hyperactive Amicability.Easy.going Motivation.Persevering Amicability.Friendly Training.Biddable Extraversion.Excitable Amicability.Sociable</code></pre>
 <pre><code>## 
 ## Call:
-## glm(formula = Outcome ~ ., family = binomial(link = logit), data = data)
+## glm(formula = Class ~ ., family = &quot;binomial&quot;, data = tmp)
 ## 
 ## Deviance Residuals: 
-##      Min        1Q    Median        3Q       Max  
-## -1.96192   0.00947   0.12915   0.33898   2.82059  
+##     Min       1Q   Median       3Q      Max  
+## -2.1106   0.0933   0.2270   0.4482   3.3292  
 ## 
 ## Coefficients:
-##                             Estimate Std. Error z value Pr(&gt;|z|)  
-## (Intercept)                -12.40398    6.39198  -1.941   0.0523 .
-## Extraversion.Active          0.02645    1.34457   0.020   0.9843  
-## Extraversion.Energetic      -0.10396    1.03136  -0.101   0.9197  
-## Extraversion.Excitable       0.56699    1.16077   0.488   0.6252  
-## Extraversion.Hyperactive    -1.65523    1.07534  -1.539   0.1237  
-## Extraversion.Lively          0.39561    0.98233   0.403   0.6872  
-## Extraversion.Restless        1.08274    0.72178   1.500   0.1336  
-## Motivation.Assertive        -1.93903    1.25564  -1.544   0.1225  
-## Motivation.Determined       -0.10574    0.92561  -0.114   0.9091  
-## Motivation.Independent       1.17262    0.99952   1.173   0.2407  
-## Motivation.Persevering      -0.39350    0.84460  -0.466   0.6413  
-## Motivation.Tenacious         1.64371    1.06032   1.550   0.1211  
-## Training.Attentive          -0.10851    0.97572  -0.111   0.9115  
-## Training.Biddable           -1.48160    0.98865  -1.499   0.1340  
-## Training.Intelligent         0.17462    0.71778   0.243   0.8078  
-## Training.Obedient            0.11337    0.99518   0.114   0.9093  
-## Training.Reliable            0.56070    1.27205   0.441   0.6594  
-## Training.Trainable           2.71244    1.32596   2.046   0.0408 *
-## Amicability.Easy.going       1.40136    0.87643   1.599   0.1098  
-## Amicability.Friendly         0.80020    0.74142   1.079   0.2805  
-## Amicability.Non.aggressive   0.12491    0.52398   0.238   0.8116  
-## Amicability.Relaxed         -0.66648    0.84904  -0.785   0.4325  
-## Amicability.Sociable        -0.52500    1.04322  -0.503   0.6148  
-## Neuroticism.Fearful         -0.66259    0.81001  -0.818   0.4134  
-## Neuroticism.Nervous         -0.16993    0.89351  -0.190   0.8492  
-## Neuroticism.Submissive      -0.97908    1.01017  -0.969   0.3324  
-## Neuroticism.Timid            1.20354    1.03481   1.163   0.2448  
+##                          Estimate Std. Error z value Pr(&gt;|z|)   
+## (Intercept)               -9.7410     3.8209  -2.549  0.01079 * 
+## Training.Trainable         1.7882     0.6308   2.835  0.00459 **
+## Extraversion.Hyperactive  -0.9234     0.5427  -1.702  0.08882 . 
+## Amicability.Easy.going     0.9289     0.4401   2.110  0.03482 * 
+## Motivation.Persevering     0.9651     0.4643   2.079  0.03764 * 
+## Amicability.Friendly       0.7627     0.4935   1.545  0.12224   
+## Training.Biddable         -0.8696     0.5444  -1.597  0.11020   
+## Extraversion.Excitable     0.7797     0.6304   1.237  0.21611   
+## Amicability.Sociable      -0.7223     0.5461  -1.323  0.18599   
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## (Dispersion parameter for binomial family taken to be 1)
 ## 
 ##     Null deviance: 89.623  on 88  degrees of freedom
-## Residual deviance: 40.778  on 62  degrees of freedom
-## AIC: 94.778
+## Residual deviance: 52.181  on 80  degrees of freedom
+## AIC: 70.181
 ## 
-## Number of Fisher Scoring iterations: 8</code></pre>
+## Number of Fisher Scoring iterations: 6</code></pre>
+<p>Considering features selected with univariate logistic regression pvalue.</p>
+<pre><code>## 
+## Recursive feature selection
+## 
+## Outer resampling method: Leave-One-Out Cross-Validation 
+## 
+## Resampling performance over subset size:
+## 
+##  Variables    ROC   Sens   Spec Selected
+##          0 0.6839 0.2778 0.9718         
+##          1 0.6839 0.2778 0.9718         
+##          2 0.6768 0.2222 0.9296         
+##          3 0.6721 0.2222 0.9155         
+##          4 0.6315 0.2778 0.8873         
+##          5 0.7113 0.3333 0.9296         
+##          6 0.7590 0.2778 0.9437        *
+##          7 0.7207 0.2778 0.9014         
+##          8 0.7379 0.2778 0.8873         
+##          9 0.7214 0.2778 0.8592         
+##         10 0.7144 0.2778 0.9014         
+##         11 0.7113 0.2778 0.8873         
+##         12 0.7097 0.2778 0.8592         
+##         13 0.6987 0.2778 0.8732         
+##         14 0.6721 0.2778 0.8732         
+##         15 0.6612 0.2778 0.8732         
+##         16 0.6573 0.2778 0.8732         
+##         17 0.6557 0.2778 0.8732         
+## 
+## The top 5 variables (out of 6):
+##    Training.Trainable, Amicability.Friendly, Motivation.Persevering, Training.Biddable, Extraversion.Hyperactive</code></pre>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABUAAAAPACAMAAADDuCPrAAABU1BMVEUAAAAAADoAAGYAAP8AOjoAOmYAOpAAZrYzMzM6AAA6OgA6Ojo6OmY6OpA6ZmY6ZpA6ZrY6kJA6kLY6kNtNTU1NTW5NTY5Nbm5Nbo5NbqtNjshmAABmADpmOgBmOjpmOpBmZjpmZmZmZpBmkGZmkJBmkLZmkNtmtttmtv9uTU1ubk1ubo5ujqtujshuq+SOTU2Obk2Obm6Oq6uOyOSOyP+QOgCQOjqQZjqQZmaQZpCQkGaQkLaQtraQttuQ2/+rbk2rjm6ryOSr5P+2ZgC2Zjq2Zma2kDq2kGa2tpC2tra2ttu229u22/+2///Ijk3Ijm7Iq27IyKvI5P/I///bkDrbkGbbtmbbtpDbtrbbttvb27bb29vb2//b///kq27kyI7kyKvk5Mjk///r6+v/tmb/yI7/25D/27b/29v/5Kv/5Mj/5OT//7b//8j//9v//+T///9dCp5rAAAACXBIWXMAAB2HAAAdhwGP5fFlAAAgAElEQVR4nO29/Zsc1XmuW2MjyCAC7MPggBURRMxGirFJTqzAdmwgHmIsg+UcLEOCgOxjfWuLUf//P+2u/pr+qO5atep9a71P931fl9FMT3fXM8+svl2fq6oRAABkUZUOAACgCgIFAMgEgQIAZIJAAQAyQaAAAJkgUACATBAoAEAmCBQAIBMECgCQCQIFAMgEgQIAZIJAAQAyQaAAAJkMKtC/AgCQpqRAs151545xDAcUIipkLB2gFVo0QbdGBOqCQkSFjKUDtEKLJujWiEBdUIiokLF0gFZo0QTdGhGoCwoRFTKWDtAKLZqgWyMCdUEhokLG0gFaoUUTdGtEoC4oRFTIWDpAK7Rogm6NCNQFhYgKGUsHaIUWTdCtEYG6oBBRIWPpAK3Qogm6NSJQFxQiKmQsHaAVWjRBt0YE6oJCRIWMpQO0Qosm6NaIQF1QiKiQsXSAVmjRBN0aEagLChEVMpYO0AotmqBbIwJ1QSGiQsbSAVqhRRN0a0SgLihEVMhYOkArtGiCbo0I1AWFiAoZSwdohRZN0K0RgbqgEFEhY+kArdCiCbo1IlAXFCIqZCwdoBVaNEG3RgTqgkJEhYylA7RCiybo1ohAXVCIqJCxdIBWaNEE3RoRqAsKERUylg7QCi2aoFsjAnVBIaJCxtIBWqFFE3RrRKAuKERUyFg6QCu0aIJujQjUBYWIChlLB2iFFk3QrRGBuqAQUSFj6QCt0KIJujUiUBcUIipkLB2gFVo0QbdGE4E+/fjaycm7X5x//9HJnB/9qf7+j+Of/80/by48Z2HCZYeCGi2gRRN0a7QQ6PfvnbtywppAH09/fvKzjYVnLEy57FBQowW0aIJujRYCvXny+hejxx+dvP6XtR88uvbqbyY6fe2L0dP/OKm/WV14xsKUyw4FNVpAiybo1mgg0EfXJuue37+3LsixOX8+/ufebN30u5Mfry+8+8JGymWHghotoEUTdGs0EOhcjN9NdLnyg3qddKzRX2x5JQItSN8af1hjE2Ur8WtkMJqgW6OBQG/OBHlvbQ3z+/cmP/j+vfOdo+sL776wkXLZoehX4w/nWMVpJH6NDEYTdGvsL9CnH8023R9dW90JOlszrR/+7384OXnt35YWOuMOSPLDZUqHASiHn0Dn+0THD388PQq/2MJHoNr88IcYFKDGVKAr2+r3Zkfl79UnMP1l9PSPHIUPRY8a1wRqGGqN+DUyGE3QrdFtDXRx7OjefNXzJkfhI5Ff4w/XsYy1QvwaGYwm6NboJtDF+uj0ZNCNn08W3nlhNbplhwKBWsBgNEG3Rrej8Ivvlky6fjgegRYku8YNf/oZNH6NDEYTdGs0OQ/05yv/Trk5/26xhnpv41IlBFoQBGoBg9EE3Rq9rkRaaPN83+fN9RPtEWhJEKgFDEYTdGs0EOj0Wve1a+GXTp9/dK2eqYmj8MFAoBYwGE3QrdFiMpHHS7MxzQ8ZLR8xundt8vNXN67oRKAFQaAWMBhN0K3RZD7Qx/WZ8u9OhDkX6MoOz8f1fKE//WLjdQi0IByFt4DBaIJujcxI74JCRARqAIPRBN0aEagLChG5EskABqMJujUiUBcUIiJQAxiMJujWiEBdUIjYI+NA/hSokcFogm6NCNQFhYjMB2oAg9EE3RoRqAsKEftlrCb6dB4u8WtkMJqgWyMCdUEhYk+BVvP/OBK/RgajCbo1IlAXFCKaCNR3vMSvkcFogm6NCNQFhYgGAvVeBY1fI4PRBN0aEagLChERqAEMRhN0a0SgLihE7JWxmgvUdcDEr5HBaIJujQjUBYWIPQW6+q8P8WtkMJqgWyMCdUEhIgI1gMFogm6NCNQFhYgI1AAGowm6NSJQFxQi9slYnQvUc8TEr5HBaIJujQjUBYWI/QS6+ZUD8WtkMJqgWyMCdUEhIgI1gMFogm6NCNQFhYgI1AAGowm6NSJQFxQiWgnUccjEr5HBaIJujQjUBYWIPTIuWxOBRkchokLGxkcRqAsKEXsJtPlra+LXyGA0QbdGBOqCQkQzgfqNmfg1MhhN0K0RgbqgENFIoJ6roPFrZDCaoFsjAnVBIWJ+xgqBzmEwmqBbIwJ1QSFiH4Fu/86U+DUyGE3QrRGBuqAQ0U6gboMmfo0MRhN0a0SgLihEtBKo4ypo/BoZjCbo1ohAXVCIiEANYDCaoFsjAnVBIWJ2xvVtdgQaG4WIChkbH0WgLihE7CHQ9e+9Rk38GhmMJujWiEBdUIhoJlC/VdD4NTIYTdCtEYG6oBARgRrAYDRBt0YE6oJCxNyMm1vsbtvw8WtkMJqgWyMCdUEhYr5AUx4yIX6NDEYTdGtEoC4oRESgBjAYTdCtEYG6oBARgRrAYDRBt0YE6oJCRFOB+oyb+DUyGE3QrRGBuqAQMTNjoywRaGAUIipkbHwUgbqgEDFboKkP9id+jQxGE3RrRKAuKES0FajLwIlfI4PRBN0aEagLChEtBeq0Chq/RgajCbo1IlAXFCLmZdyyrolA46IQUSFj46MI1AWFiLkC7fJwT+LXyGA0QbdGBOqCQkRjgXqMnPg1MhhN0K0RgbqgENFUoD6roPFrZDCaoFsjAnVBISICNYDBaIJujQjUBYWIWRm3bqoj0LAoRFTI2PgoAnVBIWKmQLf+wGHoxK+RwWiCbo0I1AWFiLYCdVkFjV8jg9EE3RoRqAsKERGoAQxGE3RrRKAuKETMybhjQ91jGz5+jQxGE3RrRKAuKETME2jezzKJXyOD0QTdGhGoCwoREagBDEYTdGtEoC4oRESgBjAYTdCtEYG6oBDRXqDmgyd+jQxGE3RrRKAuKETMyLjbkQg0JgoRFTI2PopAXVCImCXQ/J/mEL9GBqMJujUiUBcUIjoI1Hr0xK+RwWiCbo0I1AWFiOYCtV8FjV8jg9EE3RoRqAsKEbtnbFvFRKAhUYiokLHxUQTqgkLEHIH2+3ln4tfIYDRBt0YE6oJCRA+BGg+f+DUyGE3QrRGBuqAQ0V6g5qug8WtkMJqgWyMCdUEhIgI1gMFogm6NCNQFhYidM7ZvoSPQiChEVMjY+CgCdUEhYoZA259hO37i18hgNEG3RgTqgkJEB4Far4LGr5HBaIJujQjUBYWICNQABqMJujUiUBcUInbNmLJ9brwNH79GBqMJujUiUBcUInYXqNWTkolfI4PRBN0aEagLChERqAEMRhN0a0SgLihERKAGMBhN0K0RgbqgENFJoJYjKH6NDEYTdGtEoC4oROyYMVGNCDQcChEVMjY+ikBdUIjYWaCWT0sjfo0MRhN0a0SgLihERKAGMBhN0K0RgbqgENFLoIZDKH6NDEYTdGtEoC4oROyWMVmMCDQaChEVMjY+ikBdUIjYVaDWT0wgfo0MRhN0a0SgLihEdBOo3RiKXyOD0QTdGhGoCwoRnQRquQoav0YGowm6NSJQFxQiIlADGIwm6NaIQF1QiNgpY4cNcwQaDIWIChkbH0WgLihE7CjQDk81G0Txa2QwmqBbIwJ1QSGil0ANV0Hj18hgNEG3RgTqgkJEBGoAg9EE3RoRqAsKEbtk7LRZbrcNH79GBqMJujUiUBcUInYTaJe3RqChUIiokLHxUQTqgkJEBGoAg9EE3RoRqAsKERGoAQxGE3RrRKAuKET0FKjRMIpfI4PRBN0aEagLChE7ZOxqRAQaCYWIChkbH0WgLihE7CTQbu+NQCOhEFEhY+OjCNQFhYgI1AAGowm6NSJQFxQiugrUZhzFr5HBaIJujQjUBYWI6Rm7+xCBBkIhokLGxkcRqAsKEbsItOubI9BAKERUyNj4KAJ1QSGir0BNBlL8GhmMJujWiEBdUIjoKVCjVdD4NTIYTdCtEYG6oBARgRrAYDRBt0YE6oJCxOSMOdvjCDQOChEVMjY+ikBdUIjYQaDd391mJ2j8GhmMJujWiEBdUIjoKlCbVdD4NTIYTdCtEYG6oBARgRrAYDRBt0YE6oJCxNSMeVvjJtvw8WtkMJqgWyMCdUEhYrpAs94fgUZBIaJCxsZHEagLChERqAEMRhN0a0SgLihERKAGMBhN0K0RgbqgENFdoP3HUvwaGYwm6NaIQF1QiJiYMVuECDQIChEVMjY+ikBdUIiYLNDMBSDQIChEVMjY+CgCdUEhIgI1gMFogm6NCNQFhYj+Au09mOLXyGA0QbfGsgK9A9EZazD/pZZBAALCGqgLChHTMvZYjWQNNAYKERUyNj6KQF1QiDiAQPuOpvg1MhhN0K0RgbqgENFdoP1XQePXyGA0QbdGBOqCQkQEagCD0QTdGhGoCwoRkzL22gxHoCFQiKiQsfFRBOqCQsREgfZYRO+doPFrZDCaoFsjAnVBIaK/QHuvgsavkcFogm6NCNQFhYj6Aq2Mbj/fAwajCbo1IlAXFCKmZOxpKF+BVlV5gzIYTdCtEYG6oBAxTaC9ltHXbzsjVlUAgzIYTdCtEYG6oBBxAIH2ff2uiFUVwaAMRhN0a0SgLihERKAGMBhN0K0RgbqgEHEYgfZ6AwRqgUJEhYyNjyJQFxQiJmTsbycEWh6FiAoZGx9FoC4oREwSaN+l+AmUg0ipKERUyNj4KAJ1QSGiukA5jSkRhYgKGRsfRaAuKEQcSKB93iJFoKyBtqEQUSFj46MI1AWFiO0ZLezkKdD+C+gNg9EE3RoRqAsKEVME2n8xfgKdvzMCbUEhokLGxkcRqAsKEYcSaI832X0Ufv2LEjAYTdCtEYG6oBBxGIH2epOdAjVZQl8YjCbo1ohAXVCIqC3Q5bdFoDtRiKiQsfFRBOqCQsTWjDZHuH0EuvKuBVdBGYwm6NaIQF1QiJggUIvl9NHwDoHu+G5IGIwm6NaIQF1QiDiQQPu8zdaIa+9ZbhWUwWiCbo0I1AWFiNICtVtGPxiMJujWiEBdUIjYltHqIh8HgW6+JQLdjkJEhYyNj3YR6O053xhFQqAFSRCozYJ6iHhLxIY3LLUKymA0QbfGVIE+eP98+rDqB3+wiYRACzKYQHu80TaBmi6kFwxGE3RrTBTok0sVAu2AQkRZgTa/HwLdhkJEhYyNjyYK9FZVXfjJjTm//9YmEgItyJACzX2nxohb3q3MKiiD0QTdGtMEena9es46zwiBFqWtRsOJ4owFar2UPjAYTdCtMU2gTy4dfWidZ4RAi9IuULNFmQp0+5sh0GYUIipkbHw0VaBWuz1XF571Kt2yQyEq0B3vVWIVlMFogm6NqZvwrIF2QiHikALNfK8mge5cTt5iesBgNEG3xuSDSK8Yx5ksPOtVumWHoqVG03tl2Al09zsh0CYUIipkbHw0UaDjVdB3jPOMEGhRWgVquCxDgbosJx8Gowm6NSZuwn/wZlUdvXhlxlucxtSCQsRBBZr3bhsR295ncIMyGE3QrTH1IFLFifRdUIg4oEBz3209YvvbINBNFCIqZGx8FIG6oBBRUaBeC8qGwWiCbo3MxuSCQsSdGY3vt24j0JR3GdigDEYTdGtEoC4oRGwRqOnCMn28GjHtPRDoOgoRFTI2PopAXVCIOKRAM99vTaCOS8qFwWiCbo3pAn346cWqOrr4ttVkoCMEWhQ5gaa+BQJdQyGiQsbGR5MFemtxCMnulHoEWpCdNRrvArURqOuiMmEwmqBbY6pAa38+8+KVN5+3NCgCLUiLQI2Xlmfk5YjpbzCkQRmMJujWmCjQ+8fVs59PvnpwvTK7Lh6BFmRYgea941LELq9HoCsoRFTI2PhookBPq2fnVx8Zzg2KQAuiJlDvZeXBYDRBt8aM2ZjuHz/LpZwtKEQcWqAZb3kesdurhzMog9EE3Roz5gO1mxwUgRZkV43mx5BGeVJbROz6YgS6hEJEhYyNjyJQFxQi7hSo/fL6CXSAhWXBYDRBt8bkeyJdXXxzt2ITvg2FiEIC7f7aoQzKYDRBt0YOIrmgEHFwgXZ/04VAMxbX/SU5MBhN0K0x/TSmC59Nvvr6MqcxtaMQcXtGj12gWVa+k/3KoVZBGYwm6NbY5UT66uLFi6aXIiHQguwUqMcCswWaF2cYgzIYTdCtMflSzi+PZ1dyGt7bA4EWREigmcvLe1k3GIwm6NaYPpnI2VdvjtdAX/y10QGkycKzXqVbdigKCLTz296Zvi53eXmv6wSD0QTdGpnOzgWFiEMLNONt72S9Kn953WEwmqBbIwJ1QSHi1ow+x5CyBdpjgfkvTYXBaIJujW0CPfugvgfn+L/LcFfONhQi7hCozxK7i/lOvzADrIIyGE3QrbFNoE8u1beQ46ZyHVGIOLhAu7/xnZ5rkf4GZTCaoFsjAnVBIaKEQHtmQaAj8cEYB/aBDohCxG0ZvXaB5gi0bxT3VVAGowm6NSJQFxQibheo1yI7q/lO7ygIVHswBqLXZCIfLB03uv/mX3MQqQWFiMMLtPusdP0F6mxQBqMJujUynZ0LChHjC9QiibNBGYwm6NaYIdD7xwi0DYWIRQTabWJ5ixoRqEJEhYyNj7YKdO0A/ATmA21DIeKWjH7HkEYd5VzZCNTVoAxGE3RrbF8Dvbsp0KsbT8oDgRZku0AdF9rp3pqVTY2uvxCD0QTdGtsFevbvV668eXz04uI6pJ98ZhUJgRYkvkCtakSg4dGtMWMfqB0ItCCFBJr87pWdQB1/IwajCbo1ZpzGZAcCLciWGl13gXaRWf1EoxodfyUGowm6NXIivQsKEbcJ1HWpyW9fGQrUcVQzGE3QrbGDQM9uz/jq7ziNqQWFiKEFOn2emUDdfikGowm6NaYK9MH7TCbSAYWIhQSa9v7TZ5nV6PZbMRhN0K0xUaCrZ4M+i0BbUIhYRKCJ718ZC9RtI57BaIJujYkCvVVVRy/WJzO9eWx4VzkEWpDmGp2PISUKdP4kQ4E6/VoMRhN0a0w8Cn+9vvpo/N+rtUutLkRCoCXZJlDnxSYZev4UwxqdfjEGowm6NaaeB3r04ah2Z31L+FOuRGpFIWIZgaYsoXIQqNNGPIPRBN0aO51If7d6bvFfCxBoQSILdP6FqUBdfjMGowm6NXYUaL31/uQSk4m0oRCxKaP7LtAUkVUuAvUxKIPRBN0aU/eBTjbhpxPZMR9oOwoRmwXqvtxWRy/93LZGBBoW3RoTj8KfTvZ+TneFMh9oOwoRCwm0dRlLPzYWqMMvx2A0QbfGRIHeP65e+rw+DP9KLVM24dtQiBhUoJWbQD1WQRmMJujWmHol0unk+qO7VXV0XE3WRi1AoAUpKNBdC1n5obVA7X87BqMJujUmXwv/53rD/ezUckJ6BFqSphoHOIY0avHYys+sa7T/9RiMJujW2GEykf8ae/Psy4sX3zab2Q6BFqRZoEMseddSKleB2m/EMxhN0K2R6excUIgYU6Ar39kL1PoXZDCaoFsjAnVBIWJBgW5dTOUsUPPfkMFogm6NrQJ9eHuTb4wiIdCCNNQ4zC7QHRZb/4FDjQg0Iro1tgm06a7GzAfaikLEJoEOs+jtAl373kOgtr8jg9EE3RoRqAsKEeMJdONxjxptf0kGowm6NbYJ9Ow/b0z4bVUdvfWrGzd++Xx19PbvOZG+BYWIJQXauKDNR11qRKDx0K0xfUb6+dnzX5qtgCLQkhQU6JYFbT7oI1DL35LBaIJujZ2uhZ9yi+nsWlGIuJFxqGNIWxzW8KBPjZa/JoPRBN0aO83GNOX+MdfCt6EQsUGgQy27UdUNDznViECjoVtjp/lAG77pBQItSEmBNi2qaeleArX7RRmMJujW2OmWHlOYzq4dhYixBNq4cK8a7X5TBqMJujUm7wN9rvHrfiDQgmzUONwu0EaBNj3NrUYEGgvdGhMFereqXp7u+Dz7pOKmcq0oRNwU6HAL35B188L9BGr1uzIYTdCtscN8oNULV65ceX7878tWkRBoQYoKdH1hW5btV6PVL8tgNEG3xlSB1iueM6ymU0agRYkl0OZnOdaIQCOhW2P6bEwPP63XPp9522omkRECLUokgW5btKdAbX5bBqMJujUynZ0LChHXMg55DGltaVuX7FkjAg2Ebo0I1AWFiBsCHXTxKwLd9iRXgZr8vgxGE3RrbJ1M5IMrb31b/3eZt7gSqQWFiGEEun3JrjWa/MIMRhN0a0yYzu4Hf1if1I4T6dtQiFhaoIvlbV+wb40INAy6NSJQFxQirmYcdhfoaEnYOxbsLNAJ/d6DwWiCbo3sA3VBIeK6QAde/nyBuxbsXKOBQRmMJujWiEBdUIgYRaA7njPEGmi/X5zBaIJujQjUBYWIxQVatS7X+SCSgUEZjCbo1phwFH4TjsK3oRCxsECnS9y9WARqgUJEhYyNj3JTORcUIq5kHPwY0lRgLVs8CNQChYgKGRsfRaAuKERcE+jQy0+RFwK1QCGiQsbGR032gT79+NrJybtfnH//0cmcH/1p/P3//qeTk1eXfr5YeM7ChMsORWGBJslrmINIfX53BqMJujVaCPT7985dOWFNoH+cfvnqbzYWnrEw5bJDUVagafIa5DSmXgZlMJqgW6OFQG+evP7F6PFHJ6//Ze0Hj67V0rx38uo/j+qfnxt2vvCMhSmXHYqVGgucRh9AoKPZ8nsolMFogm6NHQR6dnvGV3+3sg/00bWJGb9/b30Vc7wi+vPJf38xmvx8+u/ywpOCr6NbdijWBDrw0mMIdDlN3isZjCbo1pgq0Afvbz2I9N3Jj2f//nz1Nd9N1km/f2+25nlz/ecItCQIdJlchTIYTdCtMVGgqwfjn10R6M3ZmuW9mUjnrK9yItBQlBVohINIK2QalMFogm6NiQK9VVVHL755XP+vOnpn5UdPP5ptuj+6troT9LtVoS5t4v/VnDsQg6oqsMiawRe7nWBxQII0gZ5dr579tv7v1dqlz65ciLRNoOv7RJd8ikCDUUQd4YQVLhDEJ02gTy4dfTiq3VnfUO509bbGSwJdOcx+b/Wo/D1OY4rFco3Db8GnMXSN3bfjGYwm6NaYKtDJcaO71XOL/y7YsgY6P/g+4961V9ePwSPQoiDQBjoblMFogm6NHQVab70/ubSyDb9FoKvro981rH8i0KIg0EY6KpTBaIJujan7QCeb8PePa4/ObLqg+Sj8ynd/bPQnAi3JUo2Dn0afSokauxmUwWiCbo2JR+FPJ3s/p7tCpxo9Z37+5+p5oEsnLT29efLa+kVI04W3ZW5Et+xQrAi0YI5dlKmxi0IZjCbo1pgo0PvH1Uuf14fhX6llunoYvvFKpMWG/Whyqef6RZ6zhSfE3kS37FAg0K10MCiD0QTdGlOvRDqdXH90t6qOjqvJ2ug5Tz86eW3jWvjF9UfzC5IaF96eugHdskOBQHeQrFAGowm6NSZfC//nesP97HRyIdLahPSPl2Zjms4fsnxEaTZXU82P194TgRYEge4i1aAMRhN0a+wwmch/jb159uXFi29v3NDj8cdjO747EeZcoOdngd47QaAROa8x7DGkojWmKZTBaIJuja33RPrGJ8104Vmv0i07FMsCLZljF0VrTDIog9EE3Rrbb+nxzDtGt5BrWHjWq3TLDgUCbSVBoQxGE3RrTLon0kuf+0RCoAVBoO20G5TBaIJuja2b8J9MJs3xWQ1FoAVZ1Bh3F2iAGltnLC0fsRWFiAoZGx9NOIj01eWJQx1WQxFoQZYEWjTHLgLU2GJQBqMJujUmHYU/+/TYZTUUgRYEgSayU6EMRhN0a0w9jenr9x1WQxFoQRBoKrsMymA0QbfG9PNAz6ab8paroQi0IAg0ne0KZTCaoFtjp9saP5xuyputhiLQgsxrDHwMKU6NWw3KYDRBt8au94WfbMqvzsaUDwItyLlAy+bYRaAatyiUwWiCbo1dBTo6+/R5BNqKQkQE2olmgzIYTdCtsZtAZ/tBn0WgLShERKAdaVIog9EE3Rq7CPSrN4yPxCPQgsxqjLwLNFqNDQZlMJqgW2OyQB+8PzmAdOHXhpEQaEEWAi2cYxfhatxQKIPRBN0a0wQ6O/x+9LLt3EwItCAINId1gzIYTdCtMUGgZ18+X5mvfE4XnvUq3bJDgUDzWFUog9EE3RpbBTrb8Xm0OY1yfxBoQRBoJisGZTCaoFtj0nR21QufuURCoAWZ1hj6GFLUGpcUymA0QbfGBIG6rHxOF571Kt2yQzEXaOkcu4ha47lBGYwm6NbYKtD/5bPyOV141qt0yw4FAu3DTKFdbiFfjLgtLtD9THe+EskSBFoQBNqLiTonhwdCN1gTuMU5up/pTgJ98sYLRtcgzRae9SrdskMxqTH4xz90jdWC0klaCN3iFN3PdDeBXrK6Cn628KxX6ZYdiplAS8fYSewaVQwau8UJup9pBOqCQkQE2hMEaobuZxqBuqAQEYH2BIGaofuZRqAuKEREoD2pKg2Fxm5xgu5nGoG6oBDxTvhjSNFrrCoJhwZvsUb3M41AXVCIeCf8Cmj4Gs/NGVmi0VscKX+mEagLChERaH+WpRnWoeFbVP5McyK9CwoREagBa4MxpEPjtyj8mUagLihEvBN+F6hAjZuDMd6KaPwWhT/THQV69p83fm+UZ4RAizIRaOkQLcSvsXEwBnNo/BaFP9Ppt/T4X9+ORk/qe8pd+NAqEgItCAK1YOtgDOTQ+C0Kf6ZTBXprci/j08moMDuShEALgkAt2DUYozg0fovCn+lEgd6daPP+cfXstw8uVa8YRUKgBUGgFrQMxhAb8/FbFP5MJwr0dGzOWqNHH9b/fdZohmUEWpA7d4p/sluJX2P7YCzv0PgtCn+m0wR6dr0250yjdmeDItCC1AItnaGN+DWmDcayDo3fovBnOk2gU2c+uVQ9N0KgKShERKAGJA/Ggiui8VsU/kx3Eej94+rqCIGmoBARgRrQZTCWcmj8FoU/01024W9NdoGyDzSB+BFL75hLIn6NXQfjhkMH+DPEb1H4M518EOm5+vB7bU6OwicQPmLxIxtJhK8xZzCurIgO8XeI36LwZzr9NKaaq6Oz96vpeqgFCLQU4adgmxK9xtzBuGh/kL9D/O/OlgMAACAASURBVBaFP9PpJ9KPeW56n/irVpEQaCEEJrGcELzGUZ/BWK1gmWmd+C0Kf6bTL+X84K1fj/958rcvfW4WCYEWAoFa0WswItA5up9pZmNyIXhEBGpFv8E4zEpo/BaFP9MI1IXgERGoFYYCdfuLxG9R+DPNdHYuRI+o4c/wNfYejMt/BzePxm9R+DPNdHYuhI8o4c/4NfYejJt/B3uPxm9R+DPNdHYuxI+o4E+BGnsPxm1/h+QN+/Y/ZPwWhT/TTGfngkBEAX8K1Og9GFs9mrCiGr9F4c8009m5IBARgVow1GDc5tGUTf34LQp/ppnOzgWBiAjUgoEH47pHk3aWxm9R+DPNdHYuxI9YVfEzCtRYZjBWm+x4dvwWhT/TTGfnQvyICNSEooMRgQ4J09kNSPyICNSEwoMRgQ4H09kNSPyICNSE0oORg0iDwXR2AxI/IgI1ofhgZA10KJjObkDiR0SgJpQfjBN77jRo8YjtlK+xHaazG5D4ERGoCVEG4y6DBom4iyg17oLZmAYkfMSxP8NnFKgxzmDcYdAoEXcQpsYdINABCR8RgdoQp8XtBg0TcTtxatxOX4E+/PRiVR1dfPsbu0gItBgI1IZALW41aJyIWwlU41Z6CvTW4owzq5OYEGhBEKgNkVrcZtBAEbcRqcZt9D8K/8yLV9583tKgCLQYCNSGUC1uMWikiFsIVeMWegm0nshuevT9wXXOA20nfEQEakOsFpsNGipiM7FqbMZgOrsJZ9cnU4pYgECLgUBtCNZio0FjRWwkWI2NGExnN+X+MdfCtxE+IgK1IVqLTQYNFrGJaDU20X82pqZveoFASzH+mFGjBeFabDBotIgNhKuxAQQ6INEjIlAj4rW4adBwETeJV+Mm/Tbhq/ML4JnOrp3oERGoEQFbRKA+cBBpQKJHRKBGRGxx3aABI64TscZ1+p7GdOGzyVdfX+Y0pnaiR0SgRkRscX0jPmDEdSLWuI7BdHYXL140vRQJgZYCgRoRssU1g0aMuEbIGtfoeSnnl8ezKzmP3jGLhEBLgUCNiNniqkFDRlwlZo2r9J1M5OyrN8droC/+2ugA0mThWa/SLTsM9eeLGi0I2uKKQWNGXCFojSswnd2ABI+IQK2I2uKyQYNGXCZqjcv0OwpvOA/90sKzXqVbdhgQqBVhW1wyaNSIS4StcYl+J9IvnQdqBwItBAK1Im6L5wYNG/GcuDWeY3Ylkh0ItBAI1IrALS4MGjfigsA1LjCbTMQOBFoIBGpF5BbnBg0ccU7kGuf02gd6az4dqCkItBAI1IrQLc4MGjnijNA1zugl0Ie/nUxIP+MtroVvIXbEyeeKGi2I3eLUoKEjTold45SeB5GWYTamNmJHRKBmBG9xYtDYEScEr3ECAh2Q2BERqBnRW6wNGjxiTfQaaziRfkBiR0SgZoRvcWzQ6BFHAjWOEOigxI6IQM2I3+LW28VHIn6NCHRQYkdEoGYItKhgUIEaewn04TfTf++/YDmXCAItBAI1Q6FFAYMq1Jgv0AeX51OA3jKdzQ6BFgKBmiHRYnyDStTY+GiCQOuZQGc38fit6XzKCLQMs9OrQ2ecEj+iRovhDapRYxPtAr07bn92O4/R6OyT8Xdm84og0CIgUDtEWoxuUJEaG2gVaH0K6PI65y2700ARaBkQqB0qLQY3qEqNm7QKdCzMlbsYn12324hHoEVAoHbItBjboDI1btAm0NqXq5vsdyvuC99K6IgI1A6dFkMbVKfGddoEOt6CX5vJ7v4xl3K2EjoiArVDqMXIBhWqcY0Ega7pcvORbBBoERCoHUotBjaoUo2rIFAXIkecT7MbOeOM+BGlWoxrUKkaV0jYB7q5Cc8+0DYiR0Sghmi1GNagWjUu03oU/nT9oPutxWn1vUGgJUCghoi1GNWgYjUu0SrQ9YPunMaUQuSICNQQtRaDGlStxnM6n0h/yon0CUSOiEANkWsxpkHlalyQdinny/N10AfvW14Mj0BLgEAN0WsxpEH1apyTMJnIrXoGkQv/euPGjU8v119a7QFFoGVAoIYIthjRoII1zkiZzu7Px0v3Qzr6n3aREGgJEKghii0i0CzyBTrdcJ/q8+VvDCMh0ALMPz7UaIFki/EMKlnjhNRbenz9uw+u/OSGpT1HCLQICNQSyRbjbcRL1jiBeyK5EDgiArVEs8VwBtWssQaBuhA4IgK1RLTFaAYVrXGEQJ0IHBGBWqLaYjCDqtaIQJ0IHBGBWiLbYiyDytaIQH0IHBGBWqLbYiiD6taIQF2IG3HxsaFGC4RbjGRQ3RoRqAtxIyJQU5RbDGRQ3RrLCvQODE1VlU4AUagYDL1hDdSFuBFZAzVFu8Uw66C6NaYJ9OyDt87nBL3/5l8zI30LcSMiUFPEW6wNWgXQqG6NaQJ9cmlpDtCVb3qBQIcHgZqi3uJ8kovBwjSjW2OGQO8fI9A24kZEoKbItxjDoLo1Js1Ivw43lWsjbMTzTwo1WqDe4vmHerA4TejWmDYj/RpXjSIh0MFBoLaot4hAk8kV6Nm/X7ny5vHRi1fm/OQzq0gIdHAQqC3qLSLQZMz2gdqBQAcHgdqi3iICTcbsNCY7EOjgIFBb5FsM4U/hGjmR3oWwERGoLfotRvCncI2JAn14exmrO3sg0MFBoLbsQYsINI1++0BXjsJzHmgbYSMiUFv2o8XiBtWtEYG6EDXi0geFGi3YkxYRaDu9DiL9540Zv7xcHf3q95xI30LUiAjUmD1pEYG2Y3UQ6f6x1YVICHRwEKgxe9Ji6W143RozjsLfql4xiDNZeNardMsuDwI1Zl9aRKCtmAnUbhUUgQ4NAjVmX1osvAqqW2OGQJnOrp2oERGoMXvTIgJtw3ANFIG2ETUiAjVmb1pEoG1YCfTslOnsWgkacflTQo0W7E2LZbfhdWtMvRZ+MRfTm8cVB5FaCRoRgVqzPy0i0BbsTqTnNKZWgkZEoNbsT4tFV0F1a+wu0GfeNpuYCYEODAK1Zo9aRKC7YTamAQkaEYFas0ctItDdINABCRoRgVqzRy2W3IbXrRGBuhA0IgK1Zp9aRKA76SnQs9u3b1vPSo9ABwaBWrNPLRZcBdWtMU2gD94/nh5Beulzy0gIdFhWPiDUaMFetYhAd5Ev0LP3l85hslQoAh0WBGrOXrWIQHeRLdD7k7XPi1euXHmj/uLoQ7NICHRYEKg5e9ViuW143RrbBVqfA3r0zmz355fHdvPRI9ChQaDm7FeLCHQHuQI9HSvzfLP9wVinz1lFQqDDgkDN2a8Wi62C6tbYKtDxBvzKRvv6931AoMOCQM3ZsxYR6HYyBXprfY3zlMlE2okZEYGas2ctItDt5An07HpVXV155K7dbCIIdFBWPx3UaMGetVhqG163xjaBPrm0ftBo85FsEOigIFB79q1FBLoVBDogISMiUHv2rcVCq6C6NSJQF0JGRKD27F2LCHQb2ftA1w663z9mH2grISMiUHv2rkUEuo3Mo/AbB903Dsvng0AHBYHas3ctltmG162xVaB31y49qi9Murr+pEwQ6KAgUHv2r0UEuoVMgdbnMS2tcZ6dck+kBCJGXPtkUKMF+9dikVVQ3RrbL+Ws5xJ5ea7MB9ctZxNBoEOCQB3YwxYRaDPZszHdqudgevFXn92+/bvJvHbvmEVCoEOCQB3YwxYRaDP584F+ebw0H+iRnT8R6KAgUAf2sMUS2/C6NSbNSH/2yVyhR3b3NB4h0GFBoA7sY4sItJEeAh3z8MYvr7z1q29sIyHQIUGgDuxjiwVWQXVr5K6cLkSMiEAd2MsWEWgTCHRAIkZEoA7sZYsItAkDgT554wWz23lMFp71Kt2yi7L+qaBGC/ayxeG34XVr7CbQS3b3Q5osPOtVumUXBYF6sJ8tItAGEOiABIyIQD3YzxYHXwXVrRGBuhAwIgL1YE9bRKCbINABCRgRgXqwpy0i0E0Q6IAEjIhAPdjTFofehtetEYG6EDAiAvVgX1tEoBsg0AGJF3HjE0GNFuxriwOvgurWyIn0LsSLiEBd2NsWEeg6BgI941r4ROJFRKAu7G2LCHSdvgL96o365h5P/tZwPiYEOhwI1IW9bXHYbXjdGlMFevZJPZvdWKCXqgtm+0ER6HAgUBf2t0UEukY/gZ5W1YW/P/7BH87+hXsiJRAvIgJ1YX9bHHQVVLfGRIHere/kMT0I/+Uxd+VsJV5EBOrCHreIQFfpJdDT+ubws7OYbnFf+FbiRUSgLuxxiwh0lT4CPbte34pzJtD7x1ZngyLQwdj8NFCjBXvc4pDb8Lo1pgl0qs6ZQO1Op0egg4FAfdjnFhHoCgh0QMJFRKA+7HOLA66C6taYuglfHziamfOu2WF4BDoYCNSHvW4RgS7T6yDS5MDRVKBjmXIQqY1wERGoD3vdIgJdppdA7x9XL387EeiDy1V9QMkEBDoYCNSHvW5xuG143RpTT6S/NS7z4vHRi8+P/33FKhICHQwE6sN+t4hAl+h5Lfyfj6sZZv5EoIPR8EmgRgv2u8XBVkF1a0yfTOThpxfHfT7z0ud2kRDoUCBQJ/a8RQR6DvOBDki0iAjUiT1vEYGeg0AHJFpEBOrEnrc41Da8bo1dBHp7jtW8ygh0KBCoE/veIgJd0E+gD96vzuFKpDaiRUSgTux7iwOtgurWmCjQJ5cqBNqBaBERqBN73yICndPzSqTqwk9uzPk9l3K2ECxi06eAGi3Y+xYR6Jye18JbXb65svCsV+mWXQwE6sXetzjMNrxujamzMZldvrmy8KxX6ZZdDATqxf63iEBn9J/OzhwEOhAI1Iv9b3GQVVDdGrvMSG8OAh0IBOrFAbSIQKf0PIhkdwX80sKzXqVbdjEQqBcH0CICndJLoONV0HeM84wQ6GAgUC8OoMUhtuF1a0zchP/gzao6evHKjLc4jamFYBERqBeH0CICndDvIFLFifRdiBWx8RNAjRYcQosDrILq1ohAXYgVEYG6cRAtItAaZmMakFgREagbB9EiAq1BoAMSKyICdeMgWvTfhtetEYG6ECsiAnXjMFpEoKPeAj27ffu20cH384VnvUq37FIgUDcOo0X3VVDdGtME+uD92S3lLO+IlCnQqu9fs/cbJBBrPCBQNw6kRQTaR6Bny5Mpl76p3DRFj4X2foMUQo2H5t9Wd8xG4kBaRKA9BHp/svZ58cqVK2/UXxheFZ8h0LnHs5fZ+w2SCDUeEKgfB9Ki9wdGt8Z2gdbngB69M9v9+eWx3VmgOQI9XxPOXGTvN0gj1HhAoH4cSosINFugp2Nlnm+2Pxjr1Gxu5T4C7Y3VL9FIqPGAQP04lBadPzC6NbYKdLwBv7LRvv59HxDoICBQPw6mRQSaKdBb62uc4zVSq6nt2IQfBATqx8G0iEDzBHp2vaqurjxyt6qeLTcbU2/9DWPQUOMBgfpxMC36fmB0a2wT6JNL6weNNh/JpuBpTM4GDTUeEKgfh9MiAm18VE6gZifSuyo00njY8mvqjtlIHE6LrmscujXqCdSsbE+DRhoPCNSRA2oRgTaRsA907aD7/eOS+0BHlmX7KTTSeECgjhxQiwi0idaj8BsH3TcOy+dTWqB+Bo00HhCoIwfUousuL9kaWwV6d+3So/rCpKvrT8qkuEDdFBppPCBQRw6pRQTaQKtA6/OYltY4z07tzmKKIFAng0YaDwjUkUNq0fOYgWyN7Zdy1nOJvDxX5oPrlrOJRBCoj0IjjQcE6shBtYhAN0mYjelWbZgXf/XZ7du/m8xrZ3eD+BgC9TBooPGw7XfTHbOROKgWEegmKfOBfnm8dAn5kZ0/owjUQaGBxgMC9eSgWvTbhtetMWlG+rNP5go9etvyth5hBGpu0EDjAYF6clgtItANUu+J9PDGL6+89atvbCPFEai1QgONBwTqyWG16HfetGyN3JVzjunl8YHGAwL15MBaRKDrINBzDA0aaDwgUE8OrEUEuk4ngT5544XGq+Cffnzt5OTdL1Ye+uP4ob/55+k3j//pZP3n04XvWthWHMs2U2ig8YBAPTmwFt2u3JOtsZtALzVOI/L9eyc1P/rT+UOPpw+d/Kz+5tG1ydev/mZj4W2ZG/Es28qgccbD1t9Hd8xG4tBaRKBrWAj05snrX4wef3Ty+l/mjzz96OS1L0ZP/2MizfE36z+fLzwp+Dq+ZdsoNM54QKCuHFqLTqugujUaCPTRtcm65/fvna9i3putjn538uPGn88X3p66AeeyTQwaZzwgUFcOrkUEuoqBQCeWnPz789kj43XOX5z//N7056sPThe+a2FbcS/bQKFxxgMCdeXgWkSgqxgI9OZMjDNRjuqVzeX9oWJroCMLg8YZDwjUlYNr0Wn2Mtka+wv06UczMT66Nt/JWX/13/9wcvLav02fMNsHOvfreKEz7kSlVmjpDDbsy+8BQWBAreAl0I+nR+EnG/VP/zg9Ir84hhRfoPtj0D35NSAK+/LBMKL/ifRLAp1vuN+b6nIszsmPHv3jRKCvbZwIGnUTfkKv7fg4WyRswrtygC26zJ8rW2MngZ41XQvfsAZ6b7bqObo5PQq/bNOVhbeGbmKosvsYNMx42P4r6I7ZSBxgiwh0mXSBfvVGfXOPJ3+7Ph9T4yb88kM3l226uvC05GsMV3a+QsOMBwTqywG26HEYSbfGVIGefVLbZCzQS9WFtf2gm0fhFxvz9RcNgl0sPDX7CgOWnT3BSJjxgEB9OcQWEegSqQI9raoLf3/8gz+c/cvGPZHm538unwc6c+a9k9f/oizQ7JXQMOMBgfpyiC163AJHtsZEgd6t7+QxPQj/5fHaXTkbzvOcb61Ptt51N+EnZCk0zHhAoL4cZIsI9JxEgZ7WN4efncV0a+2+8NML31eudX90rZ58aXbc6N6J5kGkOTkGDTMeEKgvB9kiAj0nTaBn1+tbcc4Eev947WzQx0uzMc2OH92bTcA02Tv63cnSSaErC+/+W4xKlN1doWHGAwL15SBbdLgJo2yNaQKdqnMm0M3T6R/Xp82/O1n/nB+Af1xPEfrT2Zmf/389H+hPBeYD3UZng0YZDzti647ZSBxmiwh0gYlAc5ERaGeFRhkPCNSZw2zRfBVUt8bUTfj6wNHMnHfXD8NnIyTQjgaNMh4QqDMH2iICnZN4EGly4Ggq0LFMn2t+UmeUBNpNoVHGAwJ15kBbRKBzEgV6/7h6+duJQB9cruoDSiZoCbSLQaOMBwTqzIG2aL0Nr1tj6on0t8aVXTw+evH58b+vWEUSE+hCoe0mjTIeEKgzh9oiAp2RfC38n4+rGWb+1BPoVJ1V+xWeUcYDAnXmUFs0XgXVrTF9MpGHn14ct/bMS5/bRdIT6Ozy+FaDRhkPCNSZg20RgU7pPx9oDxQFmmbQIONhV0bdMRuJg20RgU5BoF1BoMMRP+LBtmi7Da9bY+qJ9JZb7ucLz3oVAk0GgXpzuC0i0AmpAq2qo/WZlPuDQJ1BoN4cboumq6C6NSZeifTJ5Bj8C7+2jSQp0CWD7pipY8hA20Gg3hxwiwi0JnkfaH1Hj/FqqOmmvKZA56cx7VJo6YgzEKg3B9wiAq3pcBDp7Mv6LPrqmXfMNuVFBXp+Iv1WhRaPOAWBenPALVpuw+vW2O0o/MNPJ5vyf32Ak4lsYYtCY0TcvZs2RsadxI94yC0i0FHGaUwP3q/vLWeSaB8EOmreko8REYG6c8gtGq6C6tbYUaBnnz5fIdA1GhQaIyICdeegW0Sg3QR69tVl252geyLQ0eaWfIyICNSdg24RgXYRqMNh+P0R6LpCY0REoO4cdIt22/C6NSYKtN7zOeaC7Ymg+yTQ1S35GBERqDuH3SIC7XAlksOlSPsl0GWFxoiIQN057BbNVkF1a0wW6EufWQfaP4GOFlvyISK2zLgXIuNu4kc88BYRaOKlnL83vw5+svCsVwUve6LQEBERqD8H3iICZTo7exJmrB8ox66fhq9xhEBtcBWozTjXrbHLpZy3Z3z1d5wHupsYCkWg/hx6iwg0UaCzw/BTOJG+jTvbL5MfDgTqz6G3aDTIdWtMFOjkMPyCZxFoC3XE4gpFoP4cfIsIdPX7LXXcqqqjF988rv9XHb1jFWm/BVp8Sx6B+nPwLSLQ1e+3HIW/Xj37bf3fq7VLn+VSzjbmEYsqFIH6c/At2gxv3RpTzwM9+nBUu7O+J/xprVET9l+go4Jb8m23rteqMSi0iEBX2CbQyXGju9Vzi/9acBACLaZQBDoAtGgytnVr7CjQeuv9ySWrbfgDEWihLXkEOgC0aLIKqltj6j7QySb8/ePaozObGnAwAi2iUAQ6ALSIQFfYUsbpZO/ndFfoVKMWHJBARytb8oPIFIEOAC2a7KHSrTFRoPePq5c+rw/Dv1LLlE34NpojzofaMKujCHQAaNFkNOvWmHol0unk+qO7VXV0XE3WRi04NIGu3lPe26AIdABo0WQ069aYfC38n+sN97PTyYVInAfaxvaIgxm07e21a4zCwbdoM5p1a+wwmch/fVvfG/7iRbt5lQ9RoFZDrhUEOgQH3yICXf2e6exMQKAmxI948C0i0NXvd9Zw9o1ZmunCs16lW/YUBJpM/IgH3yICXf1+9105f/CHJ39reGekwxSozW73VhDoENAiB5FW2NbD2Sd1SWOBXqouGJ0FerACHeY0JgQ6BLRoYlDdGjucxnTh749/8Iezf+EofAItERFoGvEj0uLsspB+A1q3xkSB3q2qd2bXcH55zGxMrbRHLL0Fvyc1loYW5/QyqG6NXS7lnF0Ef4vZmFpBoCbEj0iLC/oYVLfGLpOJzATKtfDtIFAT4kekxXN6GFS3xi7T2c0EymxM7aQItOxZTHtSY2locYn8Ma1bIwJ1ISEiAm0nfkRaXCbboLo1Jt8T6eratMoWIFA/EOgg0OIKuQbVrTH5rpzPzQU6likHkdpIEqirQRHoINDiKpmjWrfG9PlAX/52ItAHl6vJ7PQWHLRAnVdBEegg0OIaeQbVrTH1RPpb42IuHh+9+HxlNx0oAvWj/c33pcay0OI6WQbVrbHDfKDzS7bM/IlA/UCgw0CLG+QYVLfG9MlEHn56cVzNMy99bhfp0AXqaFAEOgy0uEnGwNatkflAXUiKiEDbiB+RFhvoblDdGjME+vC21bSgCNQNBDoMtNhEZ4Pq1thdoE8uVZxI3wYCNSF+RFpspKtBdWtEoC4kCtTPoAh0GGixmY5jW7dGBOpCWkQ/gSa88/7UWBJa3EI3g+rWiEBdQKAmxI9Ii9voZFDdGhGoCwjUhPgRaXErXQyqWyMCdSFVoF4GRaADQYvb6TC8dWtEoC4kRkSgu4kfkRZ3kG5Q3RoRqAsI1IT4EWlxF8kG1a0RgbqAQE2IH5EWd5JqUN0aEagLyQJ1MigCHQha3E3iCNetsU2gY11ugkDbSI3oJNCUt92nGstBiy2kGVS3RgTqAgI1IX5EWmwjyaC6NbYJ9OyDK5u8xT2RWkCgJsSPSIutpBhUt0ams3MhXaAuhSPQoaDFdhIGuW6NCNSF5IgIdBfxI9JiAu0G1a0RgbqAQE2IH5EWU0CgPiBQp214BDoUtJhE24DUrRGBupAe0UOge37mSCRoMYm29QTdGhGoCwjUhPgRaTGNFoPq1ohAXUCgJsSPSIuJ7Daobo0I1IUuArWvHIEOBi2msnOg69aIQF3oEBGBbid+RFpMZpdBdWtEoC4gUBPiR6TFdHYYVLdGBOoCAjUhfkRa7MB2g+rWmCbQh99M/73/wq+NLoOfLjzrVbplN2K/E3TfZxCLBC12YetY160xRaAPLlevTL+6VVVH79hFQqA1CHQr8SPSYie2GVS3xgSBfnlcVc9Nv/xtPZndK2aREGgNAt1K/Ii02I0tBtWtsV2gd8e/84XPZt+cfTL+7qpVJARag0C3Ej8iLXak2aC6NbYKtJ5ReXmd85bdfMoIdIL5TlAEOhy02JXG4a5bY6tAx8J8dvnA0dl1u414BDoBgW4jfkRa7EyTQXVrbJ2R/vr6JvvdNaP2AIFOQKDbiB+RFrvTYFDdGhPuiXT04coj94+5J1IrCNSE+BFpMYNNg+rWmCDQNV1yW+MEOgrU1KB7fyvuSNBiDhsjXrdGBOpCt4gIdAvxI9JiFusG1a0xYR/o5iY8+0DbQKAmxI9Ii3msGVS3xtaj8KfrB91vLU6r7w0CnYJAtxA/Ii1msmpQ3RpbBbp+0J3TmFLoKlBLgyLQAaHFXFYGvW6NnU+kP+VE+gQ6RkSgzcSPSIvZLBtUt8a0Szlfnq+DPnjf8mJ4BDoDgTYTPyIt5rNkUN0aEyYTuVXPIHLhX2/cuPHp5fpLqz2gCHSB5TZ86lvtYY0FoMUenA973RpTprP783F1ztH/tIuEQOcg0EbiR6TFPiwMqltj0oTKkw33qT5f/sYwEgKdg0AbiR+RFnsxN6hujam39Pj6dx9c+ckNS3uOEOg5CLSR+BFpsR8zg+rWyD2RXOguULPiEeiQ0GJPpiNft0YE6kLniAi0ifgRabEvtUEr+xuD2dNToGe3b9+2vKHcZOFZr9rLMYtAm4gfkRZ7Mz++UjpHG30E+uD92YH4lz63jIRAFyDQJuJHpMX+iBg0X6Bni4PwxgpFoAvMxk/y++xljYNDi705d0vpJLvJFuj9ydrnxStXrrwxOZPpw82nZIJAz0GgDcSPSIu92XeB1hfDH70z2/1Z3+LY7FJ4BLoEAm0gfkRa7M2+C7SePeR8s/3BJcNrORHoOQi0gfgRabE3lYhBMwU63oBf2Whf/74PCPQcq+GDQAeFFvtTVRIOzRToxvzJGzMs54NAl0Cgm8SPSIsGzNUZ26F5AuW2xlkgUBPiR6RFC861GdiheQLlpnJZFBNo+rvsaY0DQ4smLNcYVaEIdECyBGoxaBDosNCiCWs1hnQoAh2QnIgIdIP4EWnRhI0aA27KZ+8Ddbyt8R04p6qivAlAeaYKLZ2iDW5r7AJroCbEJqowBwAAFTlJREFUj0iLJmypMdRqaOZpTHfXLj2qL0y6uv6kTBDoMiZDBYEOCy2asLXGQJvymQKtz2NaWuM8O7U7iwmBroJA14kfkRZN2FVjFIXmXspZzyVyflvj65aziSDQFQxGSYe32NsaB4UWTWipMYRDs2djmtzW+MVffXb79u8m89q9YxYJga5gMEYQ6MDQogmtNQbYlM+fD/TLldsa2/kTga6BQNeIH5EWTUipsbRDe8xIf/bJXKFHb1ve1gOBroJA14gfkRZNSKyxqEJ7CHTMwxu/vPLWr7itcSII1IT4EWnRhPQayzm0n0BdQKCr9B8ZCHRgaNGELjWW2pQ3FOh/MRtTC5kREegq8SPSogkdayyiUDOBnn3CtfBtIFAT4kekRRO617jq0CF8mi/Qr964ePGFX8+/u3+ZyURaKSTQLq/f4xoHhBZNyKlxaVN+kDXSXIE+uDyNN73+6OyTyu62cgh0jb6jAIEODS2akFljtYpxqDUyBVpf+35u0IlNL3BPpDZyIyLQFeJHpEUT8msczqCZAr01vfao/ufq9BbxL5udCopA10GgK8SPSIsm9KoxtEDruUQm09mdVtVztT/NVj9HCHQTBLpC/Ii0aIKRQF0V2nNC5bE8L1y2XP0cIdBNeg4BBDo0tGiCmUAdNZon0MUNPCb7Qi0vhB8h0AYQ6DLxI9KiCf1qXPKmo0cNBGo3kd1s4Vmv2usx2+uv3unFe13jYNCiCT1rXPeli0YNBPrKyBYEugECXSZ+RFo0oW+NzaK09Wh/gVqd/nm+8KxX7fWY7fWXRqCDQ4smeNaYpNEExSLQAcmPiECXiB+RFk0YoMadHk1ZSUWgA4JATYgfkRZNGKzGZo0mbeYj0AFBoCbEj0iLJgxd46pH03aUItAB6SPQfIMi0MGhRRPK1NjtBNJsgW7CZCJt9IiIQM+JH5EWTShaIwKNRxGBdnvlntc4ELRoQtkaPQV69sGVTd5iRvoWegk016AIdHho0YTCNToeRHIFgTaBQBfEj0iLJpSu0e80JlcQaBMIdEH8iLRoQvEa2/2JQIcEgZoQPyItmqBbIwJ1oefsXLkv7PLsfa9xGGjRBN0aEagLPWfnGuJ1e1/jINCiCbo1IlAXSgi048v2vsZBoEUTdGtEoC4gUBPiR6RFE3RrRKAu9BRo1l8BgRaAFk3QrRGButAvIgKdET8iLZqgWyMCdQGBmhA/Ii2aoFsjAnUBgZoQPyItmqBbIwJ1oa9Ac/4MCLQAtGiCbo0I1IWeEXME2vU1B1DjANCiCbo1IlAXEKgJ8SPSogm6NSJQFxCoCfEj0qIJujUiUBd6C7T73wGBloAWTdCtEYG60DciAp0QPyItmqBbIwJ1AYGaED8iLZqgWyMCdQGBmhA/Ii2aoFsjAnWhv0A7/yEQaAlo0QTdGhGoC70jdhZo5xccRI3u0KIJujUiUBcQqAnxI9KiCbo1IlAXDATa8S+BQItAiybo1ohAXegfEYGOFD76tGiCbo0I1AUEakL8iLRogm6NCNQFBGpC/Ii0aIJujQjUBQuBdvtTINAi0KIJujUiUBcMInYzYvfzRg+kRmdo0QTdGhGoCwjUhPgRadEE3RoRqAsI1IT4EWnRBN0aEagLJgLt8rdAoGWgRRN0a0SgLlhERKACH31aNEG3RgTqAgI1IX5EWjRBt0YE6gICNSF+RFo0QbdGBOqCjUA7/DEQaBlo0QTdGhGoCyYRO0gxYwLmg6nRFVo0QbdGBOoCAjUhfkRaNEG3RgTqAgI1IX5EWjRBt0YE6oKRQJP/Ggi0ELRogm6NCNQFm4gItHSAVmjRBN0aEagLCNSE+BFp0QTdGhGoCwjUhPgRadEE3RoRqAtWAk38c2T484Bq9IQWTdCtEYG6YBQRgUaHFk3QrRGBuoBATYgfkRZN0K0RgbpgJtC0vwcCLQUtmqBbIwJ1wSoiAg0OLZqgWyMCdQGBmhA/Ii2aoFsjAnUBgZoQPyItmqBbIwJ1wU6gKX+QHH8eVI1+0KIJujUiUBfMIiLQ2NCiCbo1IlAXEKgJ8SPSogm6NSJQFxCoCfEj0qIJujUiUBcMBZrwF0GgxaBFE3RrRKAu2EVEoKGhRRN0a0SgLiBQE+JHpEUTdGtEoC4gUBPiR6RFE3RrRKAuWAq09U+S5c8Dq9ELWjRBt0YE6oJhRAQaGVo0QbdGBOoCAjUhfkRaNEG3RgTqAgI1IX5EWjRBt0YE6oKpQNv+Jgi0HLRogm6NCNQFy4gINDC0aIJujQjUBQRqQvyItGiCbo0I1IUhBZrnz4Or0QdaNEG3RgTqgq1Ad/9REGhBaNEE3RoRqAumERFoXGjRBN0aEagLCNSE+BFp0QTdGhGoC8YC3flXQaAFoUUTdGtEoC7YRkSgYaFFE3RrRKAuIFAT4kekRRN0a0SgLiBQE+JHpEUTdGtEoC5YC3THnyXTnwdYowe0aIJujQjUBeOICDQqtGiCbo0I1AUEakL8iLRogm6NCNQFBGpC/Ii0aIJujQjUBXOBbv+7INCS0KIJujUiUBesIyLQoNCiCbo1IlAXEKgJ8SPSogm6NSJQF4YTaK4/D7JGe2jRBN0aEagL9gLd9odBoEWhRRN0a0SgLphHRKAxoUUTdGtEoC4gUBPiR6RFE3RrRKAuIFAT4kekRRN0a0SgLjgIdMtfBoEWhRZN0K0RgbpgHxGBhoQWTdCt0USgTz++dnLy7hcrD/1x/NDf/PP5A4+uvf6XjYXnLEy47D5sEWW2Pw+0Rmto0QTdGi0E+v17JzU/+tP5Q4+nD538bP7A049OEGgfEGhIaNEE3RotBHrz5PUvRo+XDTnW5WtfjJ7+x8mrv5k98t0JAu3Flp2gCLQstGiCbo0GAn10bbLu+f17C1uO7s1WR787+fH8OQi0Jwg0IrRogm6NBgKdW/K7k5/PHhmvgP5i5SnjB/5f9oH2A4FGhBZN0K3RQKA3Z7a8N1/dHK+MLu8PnTzlxxxE6knzNjwCLQstmqBbY3+BPv1otul+rsj6q//+h5OT1/5t+v298eb7skD/as4dSKeqUh8EgGHwEujH06Pwk436yd5RBNoXBAoQDVOBzjfc79UnMP1l9PSP06PwN2uPsgnfl6at9fwt+IOt0RZaNEG3Rpc10HuzVc9632d9cKl+HIH2pWknKAItDC2aoFuj0yb80kOzbxBobxBoPGjRBN0aXY7CLzbm6y++O1mwdmwegXYDgcaDFk3QrdHkPNCfr/y7tFJaH35HoFYg0HjQogm6NfpciXRztjJ6c+FUNuH707ATFIEWhhZN0K3RQKDTC99XroV/dK2enGl+FH72EALtCwINBy2aoFujxWQij5dmY5odMrp3bfLQq+dXdCLQ/mzosoc/D7hGS2jRBN0aTeYDfVyfNv/uxI/zA/CP6ylCf7o0RSgC7Q8CDQctmqBbIzPSu+Al0Gr9gfw3O9waLaFFE3RrRKAuOEVEoNGgRRN0a0SgLiBQE+JHpEUTdGtEoC4gUBPiR6RFE3RrRKAuuAm0Wvs+/70OuEZDaNEE3RoRqAteERFoMGjRBN0aEagLwwi0jz8PukY7aNEE3RoRqAsI1IT4EWnRBN0aEagLfgKtVr7r8VaHXKMdtGiCbo0I1AW3iAg0FrRogm6NCNQFBGpC/Ii0aIJujQjUBUeBVsvf9Hing67RDFo0QbdGBOqCX0QEGgpaNEG3RgTqwiAC7eXPA6/RClo0QbdGBOoCAjUhfkRaNEG3RgTqgqdAq/Mv+7zRYddoBS2aoFsjAnXBMSICjQQtmqBbIwJ1AYGaED8iLZqgWyMCdQGBmhA/Ii2aoFsjAnXBVaDV4qs+73PgNRpBiybo1ohAXfCMOPdmP38efI020KIJujUiUBcQqAnxI9KiCbo1IlAXEKgJ8SPSogm6NSJQF3wFWs3+7fU2h16jDbRogm6NCNQF14gINA60aIJujQjUBQRqQvyItGiCbo0I1AUEakL8iLRogm6NCNQFZ4FW0396vcvB12gCLZqgWyMCdcE34kSdPf1JjSbQogm6NSJQFxCoCfEj0qIJujUiUBcQqAnxI9KiCbo1IlAXvAVaIdAY0KIJujUiUBecIyLQKNCiCbo1IlAXEKgJ8SPSogm6NSJQF9wFWiHQENCiCbo1IlAXvCNWVV9/UqMJtGiCbo0I1AUEakL8iLRogm6NCNQFBGpC/Ii0aIJujQjUBf99oL0NSo0W0KIJujUiUBfczwPtb1BqtIAWTdCtEYG64D2ZiIFBD75GE2jRBN0aEagLCNSE+BFp0QTdGhGoCwjUhPgRadEE3RoRqAsI1IT4EWnRBN0aEagLHEQyIX5EWjRBt0YE6gKnMZkQPyItmqBbIwJ1gRPpTYgfkRZN0K0RgbqgEFEhY+kArdCiCbo1IlAXFCIqZCwdoBVaNEG3RgTqgkJEhYylA7RCiybo1ohAXVCIqJCxdIBWaNEE3RoRqAsKERUylg7QCi2aoFsjAnVBIaJCxtIBWqFFE3RrRKAuKERUyFg6QCu0aIJujQjUBYWIChlLB2iFFk3QrRGBuqAQUSFj6QCt0KIJujUiUBcUIipkLB2gFVo0QbdGBOqCQkSFjKUDtEKLJujWiEBdUIiokLF0gFZo0QTdGhGoCwoRFTKWDtAKLZqgWyMCdUEhokLG0gFaoUUTdGtEoC4oRFTIWDpAK7Rogm6NCNQFhYgKGUsHaIUWTdCtEYG6oBBRIWPpAK3Qogm6NSJQFxQiKmQsHaAVWjRBt0YE6oJCRIWMpQO0Qosm6NaIQF1QiKiQsXSAVmjRBN0aEagLChEVMpYO0AotmqBbIwJ1QSGiQsbSAVqhRRN0a0SgLihEVMhYOkArtGiCbo0I1AWFiAoZSwdohRZN0K0RgbqgEFEhY+kArdCiCbo1IlAXFCIqZCwdoBVaNEG3RgTqgkJEhYylA7RCiybo1ohAXVCIqJCxdIBWaNEE3RoRqAsKERUylg7QCi2aoFsjAnVBIaJCxtIBWqFFE3RrRKAuKERUyFg6QCu0aIJujQjUBYWIChlLB2iFFk3QrRGBuqAQUSFj6QCt0KIJujWWFSgAgDQIFAAgk4ICzWM9MmRBjRbQogn7UyMCPRSo0QJaNGF/akSghwI1WkCLJuxPjQj0UKBGC2jRhP2pEYEeCtRoAS2asD81ItBDgRotoEUT9qdGBHooUKMFtGjC/tQoIFAAgJggUACATBAoAEAmCBQAIBMECgCQCQIFAMgEgQIAZIJAAQAyiS7Qpx9fOzl594vSMcT5/r2TCT/6U+kkunz/3o9nXzEme7CocU/GZHCBzloWL7k4j67txWAtys2T1U8+XWaxqHFPxmRwgd48ef2L0eOPTl7/S+kk0tybj1rI5OnNk3mHjMl8lmrckzEZW6CPrk3+/+n79179Teko0tw8+XnpCNr87388mX/yGZP5LNW4L2MytkC/m7X93X6UXYqnH/Fh78V3Jyc/++/FWGRMZrJc476MydgCvXnyi8m/e7K6X4rv33v9/xv/f/9POe6RyXev/dtiDDIms1mucV/GZGiBLv5f6tE1djj1YL6/fvbRhxxmn3zGZD/uLfaE7MeYRKAHwL3xptNfRv/n45P92GoqAwI1YS7QfRmTKgIVP9mhLN8ttj7ZbZfNpkAZkxncW9uVrD4mVQTK/9sbcI9Tb/JhDdSE9V3H6mMSgR4QrDT1AIGasC5Q9TEZWqAc8bSFz3wPOApvwqZAtcdkbIHOz7XjnLs+PP2Iz3x/7q2d/8mYzGKxIr8nYzK2QLnqw4Sba4MWMrjHlUgWnK/I78eYjC3Qcb2vcd1xbx5dq08ZefyP1NiDe4tLaBiTPVg6D3QvxmRsgY4eM/ONBd/NJr5Rv+yjJIttTcZkHxY17smYDC7Q0eOPxyW/q/1/UgF4/E8nJ6/+jBp7cL6zjjHZg6Ua92JMRhcoAEBYECgAQCYIFAAgEwQKAJAJAgUAyASBAgBkgkABADJBoAAAmSBQAIBMECgAQCYIFAAgEwQKAJAJAgUAyASBQixOq+rq0rdPLlU/+MPOpz/77eaj41e9kvA0gJ4gUIjF3ap6bvXbV7Y+d4RAoSwIFGJxdn1llfO0Ovpw19MRKJQEgUIwbi2vc45NmGM+BArDgEAhGPePl2R3d3WPaCoIFIYBgUI0lrfaT3cfQtoGAoVhQKAQjaXjRuO10dkRpa/fP66q6uLbEw2eXa+ufnW5qp758NyMK0+oBXr2yfiBF349ffniaQ/qpx299PlsAZNvF88C6AgChWgs7fe8NVsZPfukmnGhXiEdC/RK/c147XRmxrUnjN/ipUvT76dvNRforfnTXp68/5crrwLoCgKFcMy1WYty4b2Xx188uDw9x2n8eP2UB79emHHtCU9qe44fqL06WYU9f1q98vnwk6lB692t42/Pfrt66hRAKggUwrHYcB9/MdmYH/tw+sBs5bQW6OzY0tSM60+oBTrdDTCT8fRp53sEpg/fmu9hzdzVCgcPAoVwLE4FnQvu7tIqaf3I0rmiUzOuP+H8+qWZWqdPWwizft5zS6u6AHkgUIjH7OSlqeVWOJ0LdL6XdP3w+ulcoM+Nlp8w+e/y+00euFsfT/rM8ReBfQeBQjxm/ls9CfTh1zc+eL6aC3TVj+tPWDqNaWrUydOeXKqWqB+eHnp65u1vhvvdYK9AoBCQW+fWm/Ll88veaxDo6hPGqry6+VabAh199cbsKDwnMkEOCBQCcv94LMDz1cj6oFFVXbzyr9+cNgt0/Qlb10AbDrZ//cHEvTkXPMHBg0AhIJOdnIsjQ/OTlEZL+0BXBbr+hBWBLu8Dbb4eqT6PiSuVIAMEChGp5Xk6t+S5+GZH19cFuvGE83PxZyqda3Su5MkrVt6G85ggAwQKERl7738s9mOe+/FW8z7QjSfUezuvzn6+eh7o7HnT41ObZ+wDdAKBQkhO54d5amZb6F9friZXIG3dhF88YXK46P/5dvTg/dkJ9edXItWHi+ab7OOnHb1TX8B0nX2gkAUChZCMVxbPJ1R6cnl25Pyl305MtyHQ9SdMV2CXLnrfuBZ++m29lCk7p70H2AIChZCMHbl0ldDZp89Pz3mfHkjfPI1p7QnnszF9tvK0evql55enXzr79GJ9IujLnAgKWSBQAIBMECgAQCYIFAAgEwQKAJAJAgUAyASBAgBkgkABADJBoAAAmSBQAIBMECgAQCYIFAAgEwQKAJAJAgUAyASBAgBkgkABADJBoAAAmSBQAIBMECgAQCYIFAAgEwQKAJDJ/wXyNbEr9fBaawAAAABJRU5ErkJggg==" width="672" /></p>
+<pre><code>## Features in the model that delivered the best ROC Training.Trainable Amicability.Friendly Motivation.Persevering Training.Biddable Extraversion.Hyperactive Amicability.Easy.going</code></pre>
 <pre><code>## 
 ## Call:
-## glm(formula = data$Outcome ~ pcs, family = binomial(link = logit))
+## glm(formula = Class ~ ., family = &quot;binomial&quot;, data = tmp)
 ## 
 ## Deviance Residuals: 
-##      Min        1Q    Median        3Q       Max  
-## -1.96192   0.00947   0.12915   0.33898   2.82059  
+##     Min       1Q   Median       3Q      Max  
+## -1.9912   0.1065   0.2702   0.5040   3.1461  
 ## 
 ## Coefficients:
-##              Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)  3.239388   0.953262   3.398 0.000678 ***
-## pcsPC1      -0.316220   0.199152  -1.588 0.112324    
-## pcsPC2      -1.002179   0.317818  -3.153 0.001614 ** 
-## pcsPC3       0.194214   0.250984   0.774 0.439044    
-## pcsPC4      -0.120515   0.404977  -0.298 0.766020    
-## pcsPC5      -0.002442   0.365255  -0.007 0.994665    
-## pcsPC6       0.186196   0.515804   0.361 0.718113    
-## pcsPC7       0.407145   0.607758   0.670 0.502913    
-## pcsPC8       1.378465   0.771218   1.787 0.073875 .  
-## pcsPC9       1.049176   0.871176   1.204 0.228465    
-## pcsPC10     -0.016779   0.676819  -0.025 0.980222    
-## pcsPC11     -1.383372   0.896929  -1.542 0.122990    
-## pcsPC12     -0.991751   1.019513  -0.973 0.330668    
-## pcsPC13      1.234507   0.897780   1.375 0.169111    
-## pcsPC14      1.205006   0.918008   1.313 0.189307    
-## pcsPC15     -0.292912   0.866699  -0.338 0.735391    
-## pcsPC16     -1.380872   1.167360  -1.183 0.236848    
-## pcsPC17      0.881728   1.110733   0.794 0.427297    
-## pcsPC18     -1.255627   1.213784  -1.034 0.300915    
-## pcsPC19      1.690442   1.368599   1.235 0.216770    
-## pcsPC20      2.491185   1.308312   1.904 0.056894 .  
-## pcsPC21      1.715782   1.426040   1.203 0.228907    
-## pcsPC22      1.151477   1.797012   0.641 0.521670    
-## pcsPC23     -1.596977   1.571320  -1.016 0.309473    
-## pcsPC24      1.706998   1.843685   0.926 0.354518    
-## pcsPC25      1.092477   1.593969   0.685 0.493103    
-## pcsPC26     -0.806539   1.864366  -0.433 0.665300    
+##                          Estimate Std. Error z value Pr(&gt;|z|)   
+## (Intercept)               -8.3112     3.2053  -2.593  0.00952 **
+## Training.Trainable         1.4774     0.5454   2.709  0.00675 **
+## Amicability.Friendly       0.4538     0.3492   1.300  0.19375   
+## Motivation.Persevering     0.8714     0.4181   2.084  0.03714 * 
+## Training.Biddable         -0.6746     0.5104  -1.322  0.18624   
+## Extraversion.Hyperactive  -0.3536     0.3397  -1.041  0.29793   
+## Amicability.Easy.going     0.6333     0.3614   1.752  0.07973 . 
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## (Dispersion parameter for binomial family taken to be 1)
 ## 
 ##     Null deviance: 89.623  on 88  degrees of freedom
-## Residual deviance: 40.778  on 62  degrees of freedom
-## AIC: 94.778
+## Residual deviance: 55.334  on 82  degrees of freedom
+## AIC: 69.334
 ## 
-## Number of Fisher Scoring iterations: 8</code></pre>
+## Number of Fisher Scoring iterations: 6</code></pre>
+<div id="multivariate-logistic-regression-model" class="section level3">
+<h3>Multivariate Logistic Regression Model</h3>
+<pre><code>## 
+## deviance difference:  37.44256
+## df difference:  8
+## level of significance:  0.9999905</code></pre>
+<pre><code>## 
+## deviance difference:  34.28983
+## df difference:  6
+## level of significance:  0.9999941</code></pre>
+<p>The best Logistic Regression model is used to investigate the effect of each variable on the training outcome.</p>
+<pre><code>## Waiting for profiling to be done...</code></pre>
+<pre><code>##                              OR  2.5 %  97.5 %
+## (Intercept)              0.0001 0.0000  0.0451
+## Training.Trainable       5.9789 2.0093 24.8687
+## Extraversion.Hyperactive 0.3971 0.1215  1.0755
+## Amicability.Easy.going   2.5317 1.1345  6.5207
+## Motivation.Persevering   2.6250 1.1349  7.2887
+## Amicability.Friendly     2.1441 0.8649  6.2928
+## Training.Biddable        0.4191 0.1294  1.1503
+## Extraversion.Excitable   2.1809 0.6494  8.0610
+## Amicability.Sociable     0.4857 0.1479  1.3223</code></pre>
+<pre><code>## Waiting for profiling to be done...</code></pre>
+<pre><code>##                              OR  2.5 %  97.5 %
+## (Intercept)              0.0002 0.0000  0.0692
+## Training.Trainable       4.3816 1.6744 14.8027
+## Amicability.Friendly     1.5742 0.8016  3.2316
+## Motivation.Persevering   2.3903 1.1196  5.9804
+## Training.Biddable        0.5094 0.1720  1.3361
+## Extraversion.Hyperactive 0.7022 0.3424  1.3339
+## Amicability.Easy.going   1.8838 0.9581  4.0683</code></pre>
+</div>
+</div>
+<div id="diagnostics-for-binomial-data" class="section level2">
+<h2>Diagnostics for Binomial Data</h2>
+<ol style="list-style-type: decimal">
+<li>Index plot: residuals vs case number</li>
+<li>Leverage cases</li>
+<li>Influence cases</li>
+</ol>
+<pre><code>##    data.Outcome        phat           h       rpear        rdev            D
+## 28      Success 0.003919091 0.015409365 16.06670295  3.35518376 2.010236e+00
+## 2       Success 0.477581687 0.245101830  1.20376352  1.39926163 2.104660e-01
+## 41      Success 0.495041308 0.210295446  1.13651425  1.33442931 1.571285e-01
+## 68      Success 0.589498671 0.175511373  0.91901698  1.13223897 8.370599e-02
+## 52      Success 0.635063528 0.258060437  0.88006710  1.10630054 1.195107e-01
+## 24      Success 0.688275849 0.211784170  0.75802126  0.97358942 7.046601e-02
+## 88      Success 0.697134252 0.169266865  0.72316284  0.93197404 4.977011e-02
+## 29      Success 0.734796569 0.240401117  0.68930884  0.90076623 6.746867e-02
+## 67      Success 0.735844747 0.241780143  0.68808003  0.89949734 6.767864e-02
+## 25      Success 0.748091208 0.239931135  0.66560705  0.87389641 6.276520e-02
+## 1       Success 0.736774709 0.186363962  0.66264567  0.86653560 4.655816e-02
+## 9       Success 0.759103049 0.183132830  0.62328914  0.82147218 4.038721e-02
+## 22      Success 0.791757439 0.107942979  0.54299067  0.72353962 1.714917e-02
+## 54      Success 0.802184370 0.155825409  0.54047681  0.72263870 2.535540e-02
+## 20      Success 0.847678235 0.175969576  0.46697523  0.63331470 2.167541e-02
+## 31      Success 0.867636609 0.248761728  0.45063628  0.61481330 3.001170e-02
+## 17      Success 0.854341753 0.134719844  0.44388795  0.60321492 1.457146e-02
+## 81      Success 0.885397966 0.080384443  0.37516624  0.51450470 5.981190e-03
+## 83      Success 0.888418670 0.105172029  0.37464259  0.51423299 7.938976e-03
+## 84      Success 0.886433667 0.052946803  0.36780234  0.50455624 3.715158e-03
+## 74      Success 0.897654240 0.109083041  0.35773528  0.49232124 7.528146e-03
+## 73      Success 0.897763345 0.080111466  0.35184775  0.48423371 5.241918e-03
+## 65      Success 0.904428255 0.078604690  0.33865282  0.46695167 4.759817e-03
+## 26      Success 0.909433396 0.075641088  0.32823000  0.45321520 4.293926e-03
+## 34      Success 0.909772673 0.051499926  0.32335823  0.44653062 2.790278e-03
+## 59      Success 0.914057079 0.076040753  0.31900096  0.44103927 4.078411e-03
+## 16      Success 0.921807861 0.092665069  0.30575779  0.42363580 4.618874e-03
+## 38      Success 0.924695757 0.067381311  0.29550051  0.40974862 3.082547e-03
+## 30      Success 0.925965320 0.081042710  0.29496642  0.40915016 3.729284e-03
+## 64      Success 0.932903281 0.066371306  0.27755256  0.38572319 2.676829e-03
+## 49      Success 0.935750987 0.074636795  0.27239364  0.37884551 2.915982e-03
+## 66      Success 0.942318299 0.102882596  0.26121347  0.36393854 3.769414e-03
+## 7       Success 0.941461362 0.083832195  0.26051489  0.36288185 3.014963e-03
+## 78      Success 0.944095686 0.059446899  0.25091290  0.34975349 1.950026e-03
+## 4       Success 0.944601395 0.049420134  0.24838812  0.34628093 1.577657e-03
+## 32      Success 0.947138594 0.091377719  0.24783971  0.34575032 2.989920e-03
+## 61      Success 0.949739856 0.077583111  0.23952228  0.33437825 2.348464e-03
+## 46      Success 0.951771485 0.075077747  0.23406312  0.32693322 2.166446e-03
+## 77      Success 0.953654041 0.040052825  0.22500224  0.31443377 1.042399e-03
+## 15      Success 0.955586020 0.036869288  0.21967586  0.30714688 9.126372e-04
+## 11      Success 0.957816730 0.027427914  0.21279823  0.29770547 6.329296e-04
+## 42      Success 0.960117549 0.031774842  0.20712882  0.28994902 6.967864e-04
+## 79      Success 0.963402014 0.059496726  0.20097621  0.28157816 1.252168e-03
+## 12      Success 0.972212484 0.041910298  0.17271942  0.24254330 6.435605e-04
+## 47      Success 0.974555176 0.030273150  0.16408610  0.23055917 4.161830e-04
+## 45      Success 0.975981716 0.040914093  0.16018483  0.22516011 5.400103e-04
+## 82      Success 0.976710173 0.025069938  0.15639164  0.21986948 3.119587e-04
+## 21      Success 0.978644132 0.037664375  0.15058542  0.21181168 4.383336e-04
+## 40      Success 0.979941531 0.047205060  0.14657135  0.20623407 5.239223e-04
+## 62      Success 0.983851909 0.033788435  0.13033457  0.18357124 2.937843e-04
+## 56      Success 0.984330097 0.018291141  0.12734193  0.17937807 1.501965e-04
+## 37      Success 0.986697431 0.018812440  0.11721947  0.16521867 1.309416e-04
+## 89      Success 0.989799202 0.013817562  0.10222683  0.14420015 7.289382e-05
+## 58      Success 0.990333632 0.017997051  0.09969756  0.14065139 9.056451e-05
+## 27      Success 0.990624803 0.014525901  0.09799705  0.13826253 7.045500e-05
+## 76      Success 0.990752641 0.017963430  0.09749052  0.13755232 8.643539e-05
+## 75      Success 0.991152687 0.011039048  0.09500486  0.13405878 5.020147e-05
+## 19      Success 0.991377125 0.015891695  0.09401240  0.13266587 7.100590e-05
+## 86      Success 0.991587650 0.019949145  0.09303981  0.13130036 8.754618e-05
+## 48      Success 0.991935788 0.023109638  0.09122551  0.12875129 9.771301e-05
+## 60      Success 0.992042343 0.012543152  0.09012981  0.12720829 5.139128e-05
+## 87      Success 0.992687736 0.010320807  0.08627250  0.12178395 3.868435e-05
+## 53      Success 0.993380817 0.013005047  0.08216500  0.11600598 4.429661e-05
+## 51      Success 0.993781964 0.013680191  0.07964750  0.11246298 4.380510e-05
+## 44      Success 0.995038515 0.014598762  0.07113435  0.10047409 3.731122e-05
+## 72      Success 0.995561038 0.020381255  0.06746495  0.09530376 4.704276e-05
+## 5       Success 0.995660126 0.010573353  0.06637297  0.09376350 2.346108e-05
+## 43      Success 0.996922167 0.006593837  0.05574789  0.07877868 1.029319e-05
+## 10      Success 0.997228688 0.007425922  0.05291318  0.07477863 1.044921e-05
+## 57      Success 0.999348848 0.002772254  0.02556145  0.03614347 9.074205e-07
+## 71      Success 0.999359494 0.003782139  0.02536434  0.03586485 1.219813e-06
+## 33         Fail 0.003835497 0.019515359 -0.06266498 -0.08853654 3.883927e-05
+## 8          Fail 0.006938842 0.029548933 -0.08485329 -0.11979184 1.085786e-04
+## 50         Fail 0.025154434 0.056577630 -0.16538125 -0.23239638 8.046720e-04
+## 85         Fail 0.028830520 0.091814271 -0.18079707 -0.25381799 1.599196e-03
+## 70         Fail 0.184662297 0.464449900 -0.65030980 -0.87315775 1.355073e-01
+## 13         Fail 0.298610528 0.239071479 -0.74799898 -0.96553658 7.893461e-02
+## 18         Fail 0.352640110 0.160453445 -0.80550932 -1.01780315 5.817836e-02
+## 36         Fail 0.382979297 0.314484605 -0.95154466 -1.18689889 1.770505e-01
+## 63         Fail 0.492479831 0.094890867 -1.03542131 -1.22419174 5.432423e-02
+## 3          Fail 0.476178890 0.276233418 -1.12071274 -1.33670410 2.100823e-01
+## 35         Fail 0.526724343 0.164080698 -1.15385818 -1.33784578 1.223843e-01
+## 69         Fail 0.581324348 0.143867551 -1.27350286 -1.42616083 1.288965e-01
+## 55         Fail 0.579872280 0.181451539 -1.29853395 -1.45563189 1.734841e-01
+## 14         Fail 0.604368113 0.470070539 -1.69783740 -1.87072230 9.384920e-01
+## 39         Fail 0.718248406 0.127771789 -1.70957863 -1.70428362 2.040076e-01
+## 23         Fail 0.741815043 0.200909197 -1.89620062 -1.84093707 4.151625e-01
+## 6          Fail 0.800738982 0.289755102 -2.37864841 -2.13131147 1.002044e+00
+## 80         Fail 0.892189718 0.104072923 -3.03922032 -2.22985202 5.166081e-01</code></pre>
+<pre><code>##        Code Extraversion.Active Extraversion.Energetic Extraversion.Excitable
+## 28 07-14-LG                   2                      2                      3
+##    Extraversion.Hyperactive Extraversion.Lively Extraversion.Restless
+## 28                        3                   3                     3
+##    Extraversion.Comments Motivation.Assertive Motivation.Determined
+## 28                                          1                     1
+##    Motivation.Independent Motivation.Persevering Motivation.Tenacious
+## 28                      2                      1                    2
+##    Motivation.Comments Training.Attentive Training.Biddable
+## 28                                      1                 3
+##    Training.Intelligent Training.Obedient Training.Reliable Training.Trainable
+## 28                    2                 2                 2                  2
+##    Training.Comments Amicability.Easy.going Amicability.Friendly
+## 28     Anxious, type                      2                    3
+##    Amicability.Non.aggressive Amicability.Relaxed Amicability.Sociable
+## 28                          3                   1                    2
+##    Amicability.Comments Neuroticism.Fearful Neuroticism.Nervous
+## 28                                        2                   2
+##    Neuroticism.Submissive Neuroticism.Timid
+## 28                      3                 2
+##                                                            Neuroticism.Comments
+## 28 Anxious, not nervous. High body sensitivity, does affect overall demeanour. 
+##           DOA   Name    PR.Sup        DOB Sex Source Status   End.Date Breed
+## 28 2019-07-21 Gretel Catherine 2018-04-15   F   IGDB     AD 2019-11-29 LRxGR
+##    Coat.Colour Duration Outcome Label
+## 28          NA 131 days Success     1</code></pre>
+<pre><code>##    data.Outcome        phat           h       rpear        rdev            D
+## 28      Success 0.003919091 0.015409365 16.06670295  3.35518376 2.010236e+00
+## 2       Success 0.477581687 0.245101830  1.20376352  1.39926163 2.104660e-01
+## 41      Success 0.495041308 0.210295446  1.13651425  1.33442931 1.571285e-01
+## 68      Success 0.589498671 0.175511373  0.91901698  1.13223897 8.370599e-02
+## 52      Success 0.635063528 0.258060437  0.88006710  1.10630054 1.195107e-01
+## 24      Success 0.688275849 0.211784170  0.75802126  0.97358942 7.046601e-02
+## 88      Success 0.697134252 0.169266865  0.72316284  0.93197404 4.977011e-02
+## 29      Success 0.734796569 0.240401117  0.68930884  0.90076623 6.746867e-02
+## 67      Success 0.735844747 0.241780143  0.68808003  0.89949734 6.767864e-02
+## 25      Success 0.748091208 0.239931135  0.66560705  0.87389641 6.276520e-02
+## 1       Success 0.736774709 0.186363962  0.66264567  0.86653560 4.655816e-02
+## 9       Success 0.759103049 0.183132830  0.62328914  0.82147218 4.038721e-02
+## 22      Success 0.791757439 0.107942979  0.54299067  0.72353962 1.714917e-02
+## 54      Success 0.802184370 0.155825409  0.54047681  0.72263870 2.535540e-02
+## 20      Success 0.847678235 0.175969576  0.46697523  0.63331470 2.167541e-02
+## 31      Success 0.867636609 0.248761728  0.45063628  0.61481330 3.001170e-02
+## 17      Success 0.854341753 0.134719844  0.44388795  0.60321492 1.457146e-02
+## 81      Success 0.885397966 0.080384443  0.37516624  0.51450470 5.981190e-03
+## 83      Success 0.888418670 0.105172029  0.37464259  0.51423299 7.938976e-03
+## 84      Success 0.886433667 0.052946803  0.36780234  0.50455624 3.715158e-03
+## 74      Success 0.897654240 0.109083041  0.35773528  0.49232124 7.528146e-03
+## 73      Success 0.897763345 0.080111466  0.35184775  0.48423371 5.241918e-03
+## 65      Success 0.904428255 0.078604690  0.33865282  0.46695167 4.759817e-03
+## 26      Success 0.909433396 0.075641088  0.32823000  0.45321520 4.293926e-03
+## 34      Success 0.909772673 0.051499926  0.32335823  0.44653062 2.790278e-03
+## 59      Success 0.914057079 0.076040753  0.31900096  0.44103927 4.078411e-03
+## 16      Success 0.921807861 0.092665069  0.30575779  0.42363580 4.618874e-03
+## 38      Success 0.924695757 0.067381311  0.29550051  0.40974862 3.082547e-03
+## 30      Success 0.925965320 0.081042710  0.29496642  0.40915016 3.729284e-03
+## 64      Success 0.932903281 0.066371306  0.27755256  0.38572319 2.676829e-03
+## 49      Success 0.935750987 0.074636795  0.27239364  0.37884551 2.915982e-03
+## 66      Success 0.942318299 0.102882596  0.26121347  0.36393854 3.769414e-03
+## 7       Success 0.941461362 0.083832195  0.26051489  0.36288185 3.014963e-03
+## 78      Success 0.944095686 0.059446899  0.25091290  0.34975349 1.950026e-03
+## 4       Success 0.944601395 0.049420134  0.24838812  0.34628093 1.577657e-03
+## 32      Success 0.947138594 0.091377719  0.24783971  0.34575032 2.989920e-03
+## 61      Success 0.949739856 0.077583111  0.23952228  0.33437825 2.348464e-03
+## 46      Success 0.951771485 0.075077747  0.23406312  0.32693322 2.166446e-03
+## 77      Success 0.953654041 0.040052825  0.22500224  0.31443377 1.042399e-03
+## 15      Success 0.955586020 0.036869288  0.21967586  0.30714688 9.126372e-04
+## 11      Success 0.957816730 0.027427914  0.21279823  0.29770547 6.329296e-04
+## 42      Success 0.960117549 0.031774842  0.20712882  0.28994902 6.967864e-04
+## 79      Success 0.963402014 0.059496726  0.20097621  0.28157816 1.252168e-03
+## 12      Success 0.972212484 0.041910298  0.17271942  0.24254330 6.435605e-04
+## 47      Success 0.974555176 0.030273150  0.16408610  0.23055917 4.161830e-04
+## 45      Success 0.975981716 0.040914093  0.16018483  0.22516011 5.400103e-04
+## 82      Success 0.976710173 0.025069938  0.15639164  0.21986948 3.119587e-04
+## 21      Success 0.978644132 0.037664375  0.15058542  0.21181168 4.383336e-04
+## 40      Success 0.979941531 0.047205060  0.14657135  0.20623407 5.239223e-04
+## 62      Success 0.983851909 0.033788435  0.13033457  0.18357124 2.937843e-04
+## 56      Success 0.984330097 0.018291141  0.12734193  0.17937807 1.501965e-04
+## 37      Success 0.986697431 0.018812440  0.11721947  0.16521867 1.309416e-04
+## 89      Success 0.989799202 0.013817562  0.10222683  0.14420015 7.289382e-05
+## 58      Success 0.990333632 0.017997051  0.09969756  0.14065139 9.056451e-05
+## 27      Success 0.990624803 0.014525901  0.09799705  0.13826253 7.045500e-05
+## 76      Success 0.990752641 0.017963430  0.09749052  0.13755232 8.643539e-05
+## 75      Success 0.991152687 0.011039048  0.09500486  0.13405878 5.020147e-05
+## 19      Success 0.991377125 0.015891695  0.09401240  0.13266587 7.100590e-05
+## 86      Success 0.991587650 0.019949145  0.09303981  0.13130036 8.754618e-05
+## 48      Success 0.991935788 0.023109638  0.09122551  0.12875129 9.771301e-05
+## 60      Success 0.992042343 0.012543152  0.09012981  0.12720829 5.139128e-05
+## 87      Success 0.992687736 0.010320807  0.08627250  0.12178395 3.868435e-05
+## 53      Success 0.993380817 0.013005047  0.08216500  0.11600598 4.429661e-05
+## 51      Success 0.993781964 0.013680191  0.07964750  0.11246298 4.380510e-05
+## 44      Success 0.995038515 0.014598762  0.07113435  0.10047409 3.731122e-05
+## 72      Success 0.995561038 0.020381255  0.06746495  0.09530376 4.704276e-05
+## 5       Success 0.995660126 0.010573353  0.06637297  0.09376350 2.346108e-05
+## 43      Success 0.996922167 0.006593837  0.05574789  0.07877868 1.029319e-05
+## 10      Success 0.997228688 0.007425922  0.05291318  0.07477863 1.044921e-05
+## 57      Success 0.999348848 0.002772254  0.02556145  0.03614347 9.074205e-07
+## 71      Success 0.999359494 0.003782139  0.02536434  0.03586485 1.219813e-06
+## 33         Fail 0.003835497 0.019515359 -0.06266498 -0.08853654 3.883927e-05
+## 8          Fail 0.006938842 0.029548933 -0.08485329 -0.11979184 1.085786e-04
+## 50         Fail 0.025154434 0.056577630 -0.16538125 -0.23239638 8.046720e-04
+## 85         Fail 0.028830520 0.091814271 -0.18079707 -0.25381799 1.599196e-03
+## 70         Fail 0.184662297 0.464449900 -0.65030980 -0.87315775 1.355073e-01
+## 13         Fail 0.298610528 0.239071479 -0.74799898 -0.96553658 7.893461e-02
+## 18         Fail 0.352640110 0.160453445 -0.80550932 -1.01780315 5.817836e-02
+## 36         Fail 0.382979297 0.314484605 -0.95154466 -1.18689889 1.770505e-01
+## 63         Fail 0.492479831 0.094890867 -1.03542131 -1.22419174 5.432423e-02
+## 3          Fail 0.476178890 0.276233418 -1.12071274 -1.33670410 2.100823e-01
+## 35         Fail 0.526724343 0.164080698 -1.15385818 -1.33784578 1.223843e-01
+## 69         Fail 0.581324348 0.143867551 -1.27350286 -1.42616083 1.288965e-01
+## 55         Fail 0.579872280 0.181451539 -1.29853395 -1.45563189 1.734841e-01
+## 14         Fail 0.604368113 0.470070539 -1.69783740 -1.87072230 9.384920e-01
+## 39         Fail 0.718248406 0.127771789 -1.70957863 -1.70428362 2.040076e-01
+## 23         Fail 0.741815043 0.200909197 -1.89620062 -1.84093707 4.151625e-01
+## 6          Fail 0.800738982 0.289755102 -2.37864841 -2.13131147 1.002044e+00
+## 80         Fail 0.892189718 0.104072923 -3.03922032 -2.22985202 5.166081e-01</code></pre>
 </div>
 
 

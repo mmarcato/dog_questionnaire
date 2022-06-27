@@ -140,11 +140,11 @@ df_dogs = import_dog(df_dir)
 # merging dataframes based on the code, to add columns for status, DOA and end date
 df = df_pr.merge(df_dogs, left_index = True, right_index = True, how = 'left')
 
-print('\n\nDogs with duplicated answers for the PR Questionnaire:', df.index.duplicated().sum())
-print('These dogs had two answers: ', df.loc[df.index.duplicated() == True, 'Name'])
-print('I deleted duplicates')
+print('\n\nNumber of dogs with two answers for the PR Questionnaire:', df.index.duplicated().sum())
+print('Dogs with duplicated answers: ', df.loc[df.index.duplicated() == True, 'Name'])
+print('The first instance of a duplicate was DROPPED\nThe last instance of a duplicate was KEPT')
 df.drop_duplicates('Name', keep = 'last', inplace = True)
-print('Dataset size', df.shape)
+print('\n\nDataset size: ', df.shape)
 
 
 # save the dataframe

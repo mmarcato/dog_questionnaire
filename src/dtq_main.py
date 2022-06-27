@@ -21,14 +21,14 @@ def import_dt(base_dir):
     'Amicability-Comments', 
     'Neuroticism-Fearful',   'Neuroticism-Nervous', 'Neuroticism-Submissive', 'Neuroticism-Timid', 'Neuroticism-Comments']
     # import questionnaire raw data as dataframe and rename columns
-    df = pd.read_csv(("%s\\DT-Questionnaire-Raw.csv" % base_dir), names = cols, header = 0, parse_dates = ['Timestamp'])
+    df = pd.read_csv(("%s\\DTQ-Raw.csv" % base_dir), names = cols, header = 0, parse_dates = ['Timestamp'])
     # setting the code as new index to make merge easier
     
     df.set_index('Code', inplace = True)
     df.index = df.index.str.strip()
 
     # droping the timestamp and consent columns 
-    df.drop(['Timestamp','Consent'], axis = 1, inplace = True)
+    df.drop(['Consent'], axis = 1, inplace = True)
     
     return df
 
@@ -82,15 +82,18 @@ df_dogs = import_dog(df_dir)
 df = df_dt.merge(df_dogs, left_index = True, right_index = True, how = 'left')
 
 
+# duplicate statistics and handling
 print('\n\nNumber of dogs with at least one answer for the DT Questionnaire:', len(df.index.unique()))
 print('\n\nNumber of dogs with two answers for the DT Questionnaire:', df.index.duplicated().sum())
 print('Dogs with duplicated answers\n\n', df.loc[df.index.duplicated() == True, 'Name'])
 df.drop_duplicates('Name', keep = 'last', inplace = True)
 print('\nThe first instance of a duplicate was DROPPED')
 print('The last instance of a duplicate was KEPT')
-print('\n\nDataset size', df.shape)
+
+# dataset and training outcome statistics 
+print('\n\nDataset size: ', df.shape)
 print('Status: \n{}'.format(df.Status.value_counts()))
 
 # save the dataframe
-df.to_csv('%s\\2022-05-10-DTQ_MCPQ-R.csv' % df_dir)
+df.to_csv('%s\\2022-06-27-DTQ_MCPQ-R.csv' % df_dir)
 print('New DTQ_MCPQ-R Dataset available at: ', df_dir)

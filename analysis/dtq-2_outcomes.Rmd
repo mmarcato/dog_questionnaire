@@ -29,8 +29,7 @@ Below are the questionnaire items(variables) that were scored by the Trainer in 
 dtq = read.csv('data//2022-05-10-DT_MCPQ-R.csv', stringsAsFactors=FALSE)
 vars = read.csv("data//questionnaire-variables-trainers.csv",stringsAsFactors=FALSE)
 
-# print all variables other than 'info'
-print(vars %>% filter(Type != 'info') %>% filter(Type != 'comments') %>% pull('Variable'))
+# print all variables other than 'info'data[,1:28]
 # print the number of variables per data type
 print(table(vars$Type))
 

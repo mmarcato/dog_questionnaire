@@ -1,0 +1,41 @@
+
+### Correlation
+Correlation matrix and heatmap for all the variables in the Dog Trainer Questionnaire. 
+Items within the same canine personality subscale typically have a higher correlation.
+
+```{r, echo = FALSE}
+# calculate correlation matrix
+correlationMatrix <- round(cor(data[,1:26]),2)
+# summarize the correlation matrix
+print(correlationMatrix)
+# find attributes that are highly corrected (ideally >0.75)
+highlyCorrelated <- findCorrelation(correlationMatrix, cutoff=0.6, names = TRUE, exact = TRUE)
+# print indexes of highly correlated attributes
+print(highlyCorrelated)
+ggplot(data = melt(correlationMatrix), aes(x=Var1, y=Var2,
+                                   fill=value)) + geom_tile()
+write.table(correlationMatrix, file = "models/R/dtq-correlation.csv")
+```
+
+```{r, echo = FALSE}
+# I think this is not valid because for binary data, only the difference in deviance follows a chisq distribution
+dev_critical <- function(model){
+    critical = qchisq(0.95, model$df.residual, lower.tail = TRUE)
+    residual = model$deviance
+    cat('critical deviance: ', critical, '\nresidual deviance: ', residual)
+    cat('\nmodel is a good fit: ', residual < critical)
+}
+# dev_critical(model)
+```
+
+```{r, echo = FALSE}
+
+# option 2 for univariate logistic regression using one predictor and outcome
+# I didn't use this as I preferred using a two step approach so I could have
+# 1 variable = list of model output for each feature
+# 1 variable = dataframe with the model results pulled (p_value and deviance)
+lr_test <- lapply(data[-length(data)], function(x){
+    model <- summary(glm(formula = Outcome ~ x, data = data, family = binomial(link = logit), na.action = na.exclude))
+    c(coef(model)), model$deviance) })
+lr_test
+```

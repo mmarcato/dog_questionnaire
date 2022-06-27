@@ -11,66 +11,253 @@ knitr::opts_chunk$set(echo = TRUE)
 library(DescTools)
 library(ggplot2)
 library(cowplot)
-library(dplyr)
 library(plyr)
+library(dplyr)
 library(tidyverse)
 library(rstatix)
 library(ggpubr)
+library(car) # multicollinearity
 ```
 
 ## Introduction 
 This document tests the hypothesis that there is a difference in behaviours reported in the standardised questionnaire Monash Canine Personality Questionnaire - Revised considering dog's training outcome.
 
 ## Data Exploration
-### Columns: Variables
+### Columns: Features
 Below are the questionnaire items (predictor variables) that were scored by the Trainer in a scale from 1 to 6. 
 The rating values are kept as numeric, rather than being converted to factors, so the information about the ordering is kept.
 The variables are selected for the Logistic Regression model and their descriptive statistics are shown below. 
+
+Other potential variables for inclusion in the model:
+"PR.Sup" -> Alison = 5, Catherine = 6, DSM = 3, Frances = 11, Graham = 24, Mags = 3, Rose = 23, UKPR = 11
+"Source" -> IGDB = 60, AADI =3, Cesecah = 1, GDBUK = 16, Private breeder = 8, PRV breeder = 1
+
 ```{r, echo = FALSE}
-dtq = read.csv('data//2022-05-10-DTQ_MCPQ-R.csv')
+dtq = read.csv('data//2022-06-27-DTQ_MCPQ-R.csv')
 colnames(dtq)
-data = dtq %>% select(contains(c("Extraversion", "Motivation", "Training",
- "Amicability", "Neuroticism", "Outcome")))  %>% select(!contains("Comments"))
-#   "PR.Sup", "Source", "Sex", "Breed"
-str(data)
-do.call(cbind, lapply(data, summary))
+# converting date types
+dtq$Timestamp = as.Date(dtq$Timestamp, format= "%Y-%m-%d")
+dtq$DOB = as.Date(dtq$DOB, format= "%Y-%m-%d")
+dtq$DOA = as.Date(dtq$DOA, format= "%Y-%m-%d")
+dtq$End.Date = as.Date(dtq$End.Date, format= "%Y-%m-%d")
+dtq$Duration  = as.Date(dtq$End.Date, format= "%Y-%m-%d")
 ```
 
 ### Rows: Dogs
 The number of dogs in the Dog Trainer Questionnaire dataset.
 ```{r, echo = FALSE}
-dtq = dtq %>% distinct(Code, .keep_all = TRUE)
-cat('Number of unique dogs:', length(dtq$Code))
+cat('Number of dogs:', length(dtq$Code))
 cat('Number of dogs per Training Outcome:')
 table(dtq$Outcome)
 ```
 
-### Rows: Descriptive Statistics
+Analysing categorical demographic data: Sex, Breed. There was only one German Shepherd and Golden Doodle in the sample, their breeds were relabeled as "Other" for the data analysis.
 ```{r, echo = FALSE}
+print(table(dtq$Sex))
+print("Original classes")
+table(dtq$Breed)
+# merging breed categories
+levels(dtq$Breed)[levels(dtq$Breed) == "LRx"] <- "LRxGR"
+levels(dtq$Breed)[levels(dtq$Breed) =="GS" | levels(dtq$Breed) =="GRxPoodle"] <- "Other"
+print("Processed classes")
+table(dtq$Breed)
+```
+
+Analysing age at assessment:
+```{r, echo = FALSE}
+dtq$Age.at.Assessment <- dtq$Timestamp - dtq$DOB
+cat('Age at Assessment: Mean', round(mean(dtq$Age.at.Assessment)/30.417,2), 
+            'Standard Deviation', round(sd(dtq$Age.at.Assessment)/30.417, 2))
+```
+
+## Descriptive Statistics
+Calculate and save the descritive statist of the features selected for hypothesis testing the association with training outcome. 
+
+```{r, echo = FALSE}
+# selecting predictive features
+data = dtq %>% select(contains(c("Extraversion", "Motivation", "Training",
+ "Amicability", "Neuroticism", "Sex", "Breed","Outcome")))  %>% select(!contains("Comments"))
+
+dim(data)
+str(data)
+# calculate descriptive statistics on the dataset
+stats <- data.frame(do.call(rbind, lapply(data, summary)))
+print(stats)
+# save descriptive statistics of the dataset to csv
+write.csv(stats, "models/R/dtq-stats.csv") 
+```
+### Data Analysis
+Testing if variables have a statistically significant relationship with Outcome (Fail, Success). 
+Using Chisq test on contingency tables created with each feature and the outcome.
+
+```{r, echo = FALSE}
+# chisq test between predictors and outcome on contingency tables
+chi_test <- lapply(data[-length(data)], function(x) chisq.test(table(x, data$Outcome)))
+chi_results <- data.frame(do.call(rbind, lapply(chi_test, function(x) c( x$parameter, x$statistic, round(x$p.value,4)))))
+colnames(chi_results)[3] <- "p_value"
+chi_results$significant_0.05 <- (chi_results$p_value < 0.05)
+chi_results$significant_0.1 <- (chi_results$p_value < 0.1)
+chi_results$significant_0.2 <- (chi_results$p_value < 0.2)
+chi_results[order(chi_results$p_value),]
+print("Number of variables considering each level of significance using Chisq test")
+print(count(chi_results[,4:6]))
+feat_chi = rownames(chi_results[chi_results$p_value < 0.2,])
+
+data_chisq <- data %>% select(all_of(feat_chi), Outcome)
+```
+
+Using univariate Logistic Regression models where each feature is used individually to predict the outcome.
+```{r, echo = FALSE}
+# univariate logistic regression using one predictor and outcome
+lr_models <- lapply(data[-length(data)], function(x) glm(formula = Outcome ~ x, data = data, family = binomial(link = logit), na.action = na.omit))
+lr_results <- data.frame(do.call(rbind, lapply(lr_models, function(x) c(round(coef(summary(x))[2,4],4), x$deviance))))
+colnames(lr_results) <- c("p_value", "deviance")
+lr_results$significant_0.05 <- (lr_results$p_value < 0.05)
+lr_results$significant_0.1 <- (lr_results$p_value < 0.1)
+lr_results$significant_0.2 <- (lr_results$p_value < 0.2)
+lr_results[order(lr_results$p_value),]
+print("Number of variables considering each level of significance using Logistic test")
+print(count(lr_results[,3:5]))
+
+feat_lr = rownames(lr_results[lr_results$p_value < 0.2,])
+data_lr <- data %>% select(all_of(feat_lr), Outcome)
+```
+
+Checking the intersection and difference between chisq and logistic regression 
+```{r, echo = FALSE}
+cat("Chisq p_value < 0.2\n", feat_chi)
+cat("Logistic Regression p_value < 0.2\n", feat_lr)
+cat("intersection lr and chi:\n", intersect(feat_lr, feat_chi))
+cat("difference lr - chi:\n", setdiff(feat_lr, feat_chi))
+cat("difference chi - lr:\n", setdiff(feat_chi, feat_lr))
+```
+
+### Multicollinearity
+Calculate Variance Inflation Factor (VIF) to avoid multicollinearity. 
+VIF larger than 5 or 10 is large and indicate a high level of multicollinearity.
+
+```{r, echo = FALSE}
+# including all features selected by chisq test
+model_chi <- glm(Outcome ~ ., data=data_chisq, family = binomial(link = logit)) 
+print(VIF(model_chi))
+
+# including all features selected by lr test
+model_lr <- glm(Outcome ~ ., data=data_lr, family = binomial(link = logit)) 
+print(VIF(model_lr))
 ```
 
 
-## Principal Component Analysis
-Logistic Regression was used to investigate whether there was a statistically significant difference between the behaviours reported by trainers and the training outcome (Fail, Success) of the dogs.
+### Principal Component Analysis (PCA)
+Principal component analysis will be used to combine features that showed high multicollinearity.
+VIF = 1 no correlation, 5 < VIF < 10 moderate correlation, VIF >10 high multicollinearity. 
+No variables showed VIF > 5, therefore no PCA was performed.
+
+
+## Recursive Feature Elimination (RFE) + Multivariate Logistic Regression (LR)
+Use Logistic Regression and Recursive Feature Elimination using Leave One Subject Out Cross Validation.
+[Caret RFE](https://search.r-project.org/CRAN/refmans/caret/html/rfe.html), [RFE Control](https://search.r-project.org/CRAN/refmans/caret/html/rfeControl.html), [example with RF](https://towardsdatascience.com/effective-feature-selection-recursive-feature-elimination-using-r-148ff998e4f7), [ROC as metric](https://stackoverflow.com/questions/18242692/r-package-caret-rfe-function-how-to-customize-metric-to-use-auc).
+```{r, echo = FALSE}
+# feature selection using recursive feature elimination (RFE)
+library(mlbench)
+library(caret)
+library(reshape2)
+
+# Setting ROC as the metric for the Logistic Regression function
+lrFuncs$summary <- twoClassSummary
+
+ctrl <- rfeControl(functions = lrFuncs,     # logistic regression
+                    method = "LOOCV",       # Leave One Out Cross Validation
+                    verbose = FALSE)
+```
+Considering features selected with univariate chisq test pvalue.
+```{r, echo = FALSE}
+# Recursive Feature Elimination with feat_chisq
+rfe_chi <- rfe(Outcome ~ . ,                 # predict Outcome using all other variables
+            data = data_chisq,              # selecting the features from chisq
+                   sizes = c(1:length(data_chisq)-1),
+                   rfeControl = ctrl,
+                   metric = "ROC")
+                
+warnings()   
+print(rfe_chi)
+ggplot(data = rfe_chi, metric = "ROC") + theme_bw()
+cat("Features in the model that delivered the best ROC", predictors(rfe_chi))
+
+model_chi <- rfe_chi$fit
+summary(model_chi)
+```
+Considering features selected with univariate logistic regression pvalue.
 
 ```{r, echo = FALSE}
+# Recursive Feature Elimination with feat_lr
+rfe_lr <- rfe(Outcome ~ . ,                 # predict Outcome using all other variables
+            data = data_lr,                 # selecting the features from univariate lr
+                   sizes = c(1:length(data_lr)-1),
+                   rfeControl = ctrl,
+                   metric = "ROC")
 
-pca <- prcomp(data %>% select(!contains("Outcome")),
-             center = TRUE,
-            scale. = TRUE)
-attributes(pca)
-summary(pca)
+warnings()
+print(rfe_lr)
+ggplot(data = rfe_lr, metric = "ROC") + theme_bw()
+cat("Features in the model that delivered the best ROC", predictors(rfe_lr))
+
+model_lr <- rfe_lr$fit
+summary(model_lr)
 ```
 
-## Data Analysis
-Logistic Regression was used to investigate whether there was a statistically significant difference between the behaviours reported by trainers and the training outcome (Fail, Success) of the dogs.
+### Model Analysis
 
 ```{r, echo = FALSE}
-model <- glm(formula = Outcome ~ . , data = data, family = binomial(link = logit))
-summary(model)
+dev_null_residual <- function(model){
+    dev = model$null.deviance - model$deviance
+    df = model$df.null - model$df.residual
+    cat('\ndeviance difference: ', dev)
+    cat('\ndf difference: ', df)
+    cat('\nlevel of significance: ', 1 - pchisq(dev, df, lower.tail = FALSE))
+}
+dev_null_residual(model_chi)
+dev_null_residual(model_lr)
+```
 
+The best Logistic Regression model is used to investigate the effect of each variable on the training outcome.
 
-pcs <- pca$x
-pca_model <- glm(formula = data$Outcome ~ pcs, family = binomial(link = logit))
-summary(pca_model)
+```{r, echo = FALSE}
+# exponentiate the coefficentes to get the odd ratio and their confidence intervals
+## odds ratios and 95% CI using profiled log-likelihood
+round(exp(cbind(OR = coef(model_chi), confint(model_chi, level = 0.95))),4)
+
+round(exp(cbind(OR = coef(model_lr), confint(model_lr, level = 0.95))),4)
+
+```
+
+## Diagnostics for Binomial Data
+1. Index plot: residuals vs case number
+2. Leverage cases
+3. Influence cases
+
+```{r, echo = FALSE}
+diagnostics <- function(model){
+    h <- lm.influence(model)$hat
+    rpear <- residuals(model, "pearson")/sqrt(1-h)
+    rdev <- residuals(model, "deviance")/sqrt(1-h)
+    phat <- model$fitted.values
+    D <- rpear*rpear*h/(2**(1-h))
+    diagnostic <- data.frame(data$Outcome, phat, h, rpear, rdev, D)
+    return(diagnostic)
+
+    plot(rpear, main="Index Plot of Pearson Residuals")
+    plot(model$linear.predictors, rpear, main = "Plot of Pearson Residuals vs Linear Predictor")
+}
+
+diag_chi <- diagnostics(model_chi)
+diag_chi[order(diag_chi$rpear, decreasing = TRUE),]
+dtq[28,1:5]
+diag_lr <- diagnostics(model_lr)
+diag_chi[order(diag_chi$rpear, decreasing = TRUE),]
+```
+
+## Feature Importance
+```{r, echo = FALSE}
+importance <- data.frame(feature = row.names(varImp(rfe_lr))[1:8],
+                          importance = varImp(rfe_lr)[1:8, 1])
 ```

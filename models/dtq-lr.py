@@ -92,3 +92,7 @@ gs_output(gs)
 gs_path = os.path.join(dir_model, "dtq-lr.pkl" )
 joblib.dump(gs_results(gs), gs_path, compress = 1 )
 print("Movel saved to:", gs_path)          
+
+
+gs_loaded = joblib.load(os.path.join(dir_model, "dtq-pca-lr.pkl" ))
+gs_output(gs_loaded)

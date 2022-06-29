@@ -39,3 +39,195 @@ lr_test <- lapply(data[-length(data)], function(x){
     c(coef(model)), model$deviance) })
 lr_test
 ```
+
+
+recipes + caret rfe  -> I do NOT understand why this is not working, 
+
+WTF is 
+```{r, echo = FALSE}
+df = data_lr_0.05_reduced
+df = data_lr_0.05_full
+str(df)
+
+model_recipe <- recipe(Outcome ~ ., data = df ) 
+
+model_steps <- model_recipe %>%
+        step_impute_mean(all_numeric()) %>%
+        step_normalize(all_numeric()) %>%
+        step_pca(all_numeric(), threshold = .95)
+
+prep(model_recipe, training = df, retain = TRUE) %>% 
+  juice(all_predictors()) %>% 
+  ncol()
+
+
+ctrl <- rfeControl(functions = lrFuncs,     # logistic regression
+                    method = "LOOCV",       # Leave One Out Cross Validation
+                    verbose = FALSE,
+                    number = 1)
+                    
+# Setting ROC as the metric for the Logistic Regression function
+lrFuncs$summary <- twoClassSummary
+set.seed(42)
+# Recursive Feature Elimination with feat_lr
+rfe_lr <- rfe(model_recipe ,                 # predict Outcome using all other variables
+                data = df,                 # selecting the features from univariate lr
+                sizes = c(2:7),# length(df)-2),
+                rfeControl = ctrl,
+                metric = "ROC",
+                maxime = TRUE)
+
+warnings()
+print(rfe_lr)
+ggplot(data = rfe_lr, metric = "ROC") + theme_bw()
+print("Features in the model that delivered the best ROC")
+print(predictors(rfe_lr))
+
+model_lr <- rfe_lr$fit
+summary(model_lr)
+```
+
+
+
+
+### Principal Component Analysis (PCA)
+Principal component analysis was used to combine features that showed high multicollinearity.
+VIF = 1 no correlation, 5 < VIF < 10 moderate correlation, VIF >10 high multicollinearity. 
+All variables from both the full and reduced features sets had VIF > 5, therefore PCA was performed.
+PCA can be implemented using prcomp function, however, it deletes all the row with NAs.
+Therefore PCA will be implemented in the RFE cross validation loop as a preprocessing method after missing value imputation.
+
+## Recursive Feature Elimination (RFE) + Multivariate Logistic Regression (LR)
+
+
+I tried giving the recipe for preprocessing to the rfe function, but it did not work for some reason!
+LOOCV did not work, I did some research (keywords: Caret rfeControl with loocv Num_Resamples) but there isn't much out there.
+I managed to make it run, but I needed to change the method to be repeatedCV 
+I ran the models with df = data_0.05_full only because it gave the best 
+Best model PC01            ROC = 0.8712 (with repeats = 2, size = 1:3)
+Best model PC01, PC05       ROC = 0.8394 (with repeats = 5, size = 1:3)
+Best model PC01, PC05       ROC = 0.8394 (with repeats = 5, size = 1:10)
+
+Conclusion
+changing size variable, i.e. adding more features to the RFE does not yield a better model, as it will choose a small set
+
+```{r, echo = FALSE}
+
+impute_pca_rfe_lr <- function(df){
+
+    print("Dimensions of original dataset:")
+    print(dim(df))
+
+    model_pca <- recipe(formula =  Outcome ~ ., data = df) %>%
+                    step_normalize(all_numeric()) %>%
+                    # step_impute_mean(all_numeric()) %>%
+                    step_impute_knn(all_numeric(), neighbors = 3) %>%
+                    step_pca(all_numeric(), threshold = .95)
+
+    prep(model_pca, training = df, retrain = TRUE) %>% 
+    juice(all_predictors()) %>% 
+    ncol()
+
+    # Setting ROC as the metric for the Logistic Regression function
+    lrFuncs$summary <- twoClassSummary
+    set.seed(36)    
+
+    ctrl <- rfeControl(functions = lrFuncs,     # logistic regression
+                        # method = "LOOCV",       # Leave One Out Cross Validation
+                        method = "repeatedCV",       # Leave One Out Cross Validation
+                        repeats = 2,
+                        verbose = FALSE,
+                        returnResamp = "final")
+
+    # Recursive Feature Elimination with feat_lr
+    model <- rfe(model_pca,                     # predict Outcome using all other variables
+                    data = df,                  # selecting the features from univariate lr
+                    sizes = 1:10,
+                    rfeControl = ctrl,
+                    metric = "ROC") 
+    
+    # Printing outputs
+    warnings()
+    print(model)
+    print(summary(model$fit))
+    
+    return(model)
+}
+
+impute_pca_rfe_lr(data_0.05_full)
+
+
+```
+
+
+
+
+
+
+
+### Model Analysis
+
+The best Logistic Regression model is used to investigate the effect of each variable on the training outcome.
+Odds ratio calculation, consider using Bon Ferroni correction
+
+```{r definition, echo = FALSE}
+dev_null_residual <- function(model){
+    dev = model$null.deviance - model$deviance
+    df = model$df.null - model$df.residual
+    cat('\ndeviance difference: ', dev)
+    cat('\ndf difference: ', df)
+    cat('\nlevel of significance: ', pchisq(dev, df, lower.tail = FALSE))
+    cat('\nthe model is a good fit: ', pchisq(dev, df, lower.tail = FALSE) < 0.05)
+}
+```
+
+```{r, echo = FALSE}
+print('Best model summary')
+print(summary(model$fit))
+
+print('Best model fit analysis (difference in deviance considering the degrees of freedom')
+dev_null_residual(summary(model$fit))
+
+# exponentiate the coefficentes to get the odd ratio and their confidence intervals
+## odds ratios and 95% CI using profiled log-likelihood
+round(exp(cbind(OR = coef(model$fit), confint(model$fit, level = 0.95))),4)
+```
+After exponentiating the Odds Ratio and 95% CI 
+            OR      2.5%    97.5%
+(Intercept) 0.1327 0.0458 0.2988
+PC01        0.6167 0.4223 0.7976
+PC05        0.6057 0.3100 1.1220
+
+
+## Feature Importance
+Principal Component Analysis output. Considering that the best model chose 
+
+```{r, echo = FALSE}
+model_pca <- recipe(formula =  ~ ., data = data_0.05_full) %>%
+                step_normalize(all_numeric()) %>%
+                # step_impute_mean(all_numeric()) %>%
+                step_impute_knn(all_numeric(), neighbors = 3) %>%
+                step_pca(all_numeric(), threshold = .95)
+
+model_prep <- prep(model_pca, training = data_0.05_full)
+
+# model prep is th receipe steps, for the pca, number = 3, because it's the 3rd step
+df_pca <- as.data.frame(tidy(model_prep, number = 3))
+df_pc1 <- df_pca %>% filter(component == 'PC1') %>% select(terms,value)
+df_pc5 <- df_pca %>% filter(component == 'PC5') %>% select(value)
+df_pcs <- cbind(df_pc1, df_pc5)
+colnames(df_pcs)[2:3] <- c('PC1', 'PC5')
+colnames(df_pca)
+ggplot(aes(x = )) + geom_col
+
+df_pcs <- df_pca %>% filter(component == 'PC1' | component == 'PC5') %>% select(terms, value, component)
+
+ggplot(df_pcs, aes(x=unlist(lapply(strsplit(terms,"[.]"), function(x) x[1])), y=value, fill=component)) +
+    geom_bar(stat='identity', position='dodge', width = 0.8) +
+    xlab("C-BARQ items or factors") +
+    ylab("Principal components") +
+    theme(axis.text.x = element_text(angle = 45), legend.position = "top")
+```
+
+## Conclusion
+Results with the original dataset.

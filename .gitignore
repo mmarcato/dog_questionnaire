@@ -3,5 +3,5 @@ venv/
 **/__pycache__/
 **/cachedir/
 models/2nd/prq-dt-1.txt
+models/2nd/prq-rf-1.txt
 models/2nd/dtq-rf-1.txt
- 

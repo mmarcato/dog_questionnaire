@@ -105,6 +105,9 @@ def factor(df):
         'Energy' score = (items 91 + 92)/2
 
     If more than 25% of the items in a subscale are missing values, the factor/subscale score should be recorded as a missing value.
+
+    Factors use 1–76 and 91–92
+    Factors do not use item 77-90 and 93-100 
 '''
 
 def import_dog(base_dir):

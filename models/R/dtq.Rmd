@@ -33,7 +33,7 @@ Other potential variables for inclusion in the model:
 "Source" -> IGDB = 60, AADI =3, Cesecah = 1, GDBUK = 16, Private breeder = 8, PRV breeder = 1
 
 ```{r, echo = FALSE}
-dtq = read.csv('data//2022-06-27-DTQ_MCPQ-R.csv')
+dtq = read.csv('data//2022-06-27-DTQ_MCPQ-R.csv', stringsAsFactors=TRUE)
 colnames(dtq)
 # converting date types
 dtq$Timestamp = as.Date(dtq$Timestamp, format= "%Y-%m-%d")
@@ -76,8 +76,7 @@ Calculate and save the descritive statist of the features selected for hypothesi
 ```{r, echo = FALSE}
 # selecting predictive features
 data = dtq %>% select(contains(c("Extraversion", "Motivation", "Training",
- "Amicability", "Neuroticism", "Sex", "Breed","Outcome")))  %>% select(!contains("Comments"))
-
+ "Amicability", "Neuroticism", "Sex", "Breed", "Outcome")))  %>% select(!contains("Comments"))
 dim(data)
 str(data)
 # calculate descriptive statistics on the dataset
@@ -100,24 +99,27 @@ chi_results$significant_0.1 <- (chi_results$p_value < 0.1)
 chi_results$significant_0.2 <- (chi_results$p_value < 0.2)
 chi_results[order(chi_results$p_value),]
 print("Number of variables considering each level of significance using Chisq test")
-print(count(chi_results[,4:6]))
-feat_chi = rownames(chi_results[chi_results$p_value < 0.2,])
+print(colSums(chi_results[,4:6], na.rm = TRUE))
+print(chi_results[chi_results$significant_0.05 == TRUE, 'p_value', drop = FALSE])
 
+feat_chi = rownames(chi_results[chi_results$p_value < 0.2,])
 data_chisq <- data %>% select(all_of(feat_chi), Outcome)
 ```
 
 Using univariate Logistic Regression models where each feature is used individually to predict the outcome.
 ```{r, echo = FALSE}
 # univariate logistic regression using one predictor and outcome
-lr_models <- lapply(data[-length(data)], function(x) glm(formula = Outcome ~ x, data = data, family = binomial(link = logit), na.action = na.omit))
+lr_models <- lapply(data[-length(data)], function(x) glm(formula = Outcome ~ x, data = data, family = binomial(link = logit)))
+str(data[-length(data)])
 lr_results <- data.frame(do.call(rbind, lapply(lr_models, function(x) c(round(coef(summary(x))[2,4],4), x$deviance))))
 colnames(lr_results) <- c("p_value", "deviance")
 lr_results$significant_0.05 <- (lr_results$p_value < 0.05)
 lr_results$significant_0.1 <- (lr_results$p_value < 0.1)
 lr_results$significant_0.2 <- (lr_results$p_value < 0.2)
-lr_results[order(lr_results$p_value),]
+# lr_results[order(lr_results$p_value),]
 print("Number of variables considering each level of significance using Logistic test")
-print(count(lr_results[,3:5]))
+print(colSums(lr_results[,3:5], na.rm = TRUE))
+print(lr_results[lr_results$significant_0.05 == TRUE, 'p_value', drop = FALSE])
 
 feat_lr = rownames(lr_results[lr_results$p_value < 0.2,])
 data_lr <- data %>% select(all_of(feat_lr), Outcome)
@@ -143,6 +145,7 @@ print(VIF(model_chi))
 
 # including all features selected by lr test
 model_lr <- glm(Outcome ~ ., data=data_lr, family = binomial(link = logit)) 
+summary(model_lr)
 print(VIF(model_lr))
 ```
 

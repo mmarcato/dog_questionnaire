@@ -87,8 +87,53 @@ model_lr <- rfe_lr$fit
 summary(model_lr)
 ```
 
+## Chisq for the analysis
+
+Using Chisq test on contingency tables created with each feature and the outcome.
+
+```{r, echo = FALSE}
+# chisq test between predictors and outcome on contingency tables
+chi_test <- lapply(data[-length(data)], function(x) chisq.test(table(x, data$Outcome)))
+chi_results <- data.frame(do.call(rbind, lapply(chi_test, function(x) c( x$parameter, x$statistic, round(x$p.value,4)))))
+colnames(chi_results)[3] <- "p_value"
+chi_results$significant_0.05 <- (chi_results$p_value < 0.05)
+chi_results$significant_0.1 <- (chi_results$p_value < 0.1)
+chi_results$significant_0.2 <- (chi_results$p_value < 0.2)
+chi_results[order(chi_results$p_value),]
+print("Number of variables considering each level of significance using Chisq test")
+print(colSums(chi_results[,4:6], na.rm = TRUE))
+print(chi_results[chi_results$significant_0.05 == TRUE, 'p_value', drop = FALSE])
+
+feat_chi = rownames(chi_results[chi_results$p_value < 0.2,])
+data_chisq <- data %>% select(all_of(feat_chi), Outcome)
+```
 
 
+Checking the intersection and difference between chisq and logistic regression 
+```{r, echo = FALSE}
+cat("Chisq p_value < 0.2\n", feat_chi)
+cat("Logistic Regression p_value < 0.2\n", feat_lr)
+cat("intersection lr and chi:\n", intersect(feat_lr, feat_chi))
+cat("difference lr - chi:\n", setdiff(feat_lr, feat_chi))
+cat("difference chi - lr:\n", setdiff(feat_chi, feat_lr))
+```
+
+Considering features selected with univariate chisq test pvalue.
+```{r, echo = FALSE}
+# Recursive Feature Elimination with feat_chisq
+rfe_chi <- rfe(Outcome ~ . ,                 # predict Outcome using all other variables
+            data = data_chisq,              # selecting the features from chisq
+                   sizes = c(1:length(data_chisq)-1),
+                   rfeControl = ctrl,
+                   metric = "ROC")
+                
+warnings()   
+print(rfe_chi)
+ggplot(data = rfe_chi, metric = "ROC") + theme_bw()
+cat("Features in the model that delivered the best ROC", predictors(rfe_chi))
+
+model_chi <- rfe_chi$fit
+summary(model_chi)
 
 ### Principal Component Analysis (PCA)
 Principal component analysis was used to combine features that showed high multicollinearity.
@@ -156,10 +201,53 @@ impute_pca_rfe_lr <- function(df){
 
 impute_pca_rfe_lr(data_0.05_full)
 
+```
+Visualisation of PC1 and Outcome
+```{r, echo = FALSE}
+# Scatter plot of PC1 and Outcome
+ggplot(data_0.05_full_pca, aes(x = as.numeric(row.names(data_0.05_full_pca)), y = PC01, color = Outcome))+
+  geom_point()
+
 
 ```
 
+## Feature Importance
+### Full Feature Set
+The 5 highest values in PC1 are 
+"X26 Toward unfamiliar dogs visiting your home", 
+"X45 When approached directly by an unfamiliar dog of the same or larger size",
+"X29 When barked growled or lunged at by another unfamiliar dog", 
+"F_03 Dog directed aggression", 
+"F_04 Dog directed fear"
+which indicate that this principal component places most variation in these variables related to fearful and agressive behaviour.
 
+The 5 highest values in PC5 are
+"X75 Chases or would chase birds given the opportunity"
+"X77 Escapes or would escape from home or yard given the chance"
+"X99 Licks people or objects excessively"
+"X82 Begs persistently for food when people are eating"
+"F_09 Nonsocial fear"
+which indicate that this principal component places most variation in these variables. 
+(chasing, escaping, licking, food drive, nonsocial fear)
+
+```{r, echo = FALSE}
+# model prep is th receipe steps, for the pca, number = 3, because it's the 3rd step
+df_pca_full <- as.data.frame(tidy(data_0.05_full_prep, number = 3))
+# creating another dataframe with PC1 and PC5 values for the analysis
+df_pcs_full <- df_pca_full %>% filter(component == 'PC1' | component == 'PC5') %>% select(terms, value, component)
+
+# figuring out the righest loading items for the PC1 and PC5 
+print("PC1 and PC2 values")
+df_pcs_full %>% filter(component == 'PC1') %>% arrange(desc(abs(value))) %>% select(terms, value)
+df_pcs_full %>% filter(component == 'PC5') %>% arrange(desc(abs(value))) %>% select(terms, value)
+
+ggplot(df_pcs_full, aes(x=unlist(lapply(strsplit(terms,"[.]"), function(x) x[1])), y=value, fill=component)) +
+    geom_bar(stat='identity', position='dodge', width = 0.8) +
+    xlab("C-BARQ items or factors") +
+    ylab("Principal components") +
+    theme(axis.text.x = element_text(angle = 45), legend.position = "top")
+print(df_pcs_full$terms[1:29])
+```
 
 
 
@@ -177,7 +265,7 @@ dev_null_residual <- function(model){
     cat('\ndeviance difference: ', dev)
     cat('\ndf difference: ', df)
     cat('\nlevel of significance: ', pchisq(dev, df, lower.tail = FALSE))
-    cat('\nthe model is a good fit: ', pchisq(dev, df, lower.tail = FALSE) < 0.05)
+    cat('\nmodel is a good fit: ', pchisq(dev, df, lower.tail = FALSE) < 0.05)
 }
 ```
 

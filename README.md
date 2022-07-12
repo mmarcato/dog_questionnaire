@@ -32,15 +32,5 @@ prq = Puppy raiser questionnaire analysis (C-BARQ)
 dtq = Dog Trainer questionnaire analysis (MCPQ-R)
 
 2_outcomes considers (Fail, Success)
-3_outcomes considers (GD = Guide Dog, AD = Assistance Dog, W = Withdraw)
 
-## prediction folder
 
-### preliminary
-Contains modules and scripts to train different machine models to predict training outcome as a multi-class (GD, AD, W) and a regression (GD=2, AD=1, W=0) problem. In this preliminary prediction models, the former was proven to be very innefective, even though the latter delivered a higher performance, it was discarded due to the assumption of a linear relationship between the classes. 
-
-- modules.py constains the functions used to evaluate the model in a cross fold validation.
-
-## models folder
-
-## output folder

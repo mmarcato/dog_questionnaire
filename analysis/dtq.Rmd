@@ -10,6 +10,7 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_knit$set(root.dir = "C:/Users/marinara.marcato/Project/Scripts/dog_questionnaires")
 knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
 #install.packages("ggpubr")
 library(DescTools)
 library(ggplot2)
@@ -266,8 +267,8 @@ diagnostics <- function(model){
 diag_lr <- diagnostics(model_lr)
 diag_lr[order(diag_lr$rpear, decreasing = TRUE),]
 ```
-
-## Feature Importance
+<!-- 
+## Feature Importance -->
 ```{r, echo = FALSE}
 importance <- data.frame(feature = row.names(varImp(rfe_lr))[1:8],
                           importance = varImp(rfe_lr)[1:8, 1])

@@ -1,7 +1,10 @@
 ---
 title: "Puppy Raiser Questionnaire vs Outcome (Success, Fail)"
 author: "Marinara Marcato"
-output: html_document
+output: 
+  html_document:
+    toc: true
+    number_sections: true
 ---
 
 ```{r setup, include=FALSE}
@@ -41,7 +44,7 @@ prq$Timestamp = as.Date(prq$Timestamp, format= "%Y-%m-%d")
 prq$DOB = as.Date(prq$DOB, format= "%Y-%m-%d")
 prq$DOA = as.Date(prq$DOA, format= "%Y-%m-%d")
 prq$End.Date = as.Date(prq$End.Date, format= "%Y-%m-%d")
-dtq$Duration = as.numeric(gsub(" .*$", "", dtq$Duration))
+prq$Duration = as.numeric(gsub(" .*$", "", prq$Duration))
 ```
 
 ## Demographics
@@ -150,7 +153,7 @@ print(stats[order(stats$Missing, decreasing = TRUE)[1:15], 'Missing', drop = FAL
 # 12-10 NAs -> Because of no other dog  in household -> Items 33,34,32,35
 
 # save descriptive statistics of the dataset to csv
-write.csv(stats, "models/prq-stats.csv") 
+write.csv(stats, "analysis/prq-stats.csv") 
 ```
 
 ## Univariate Logistic Regression

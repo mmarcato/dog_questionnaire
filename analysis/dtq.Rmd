@@ -12,29 +12,33 @@ knitr::opts_knit$set(root.dir = "C:/Users/marinara.marcato/Project/Scripts/dog_q
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
 #install.packages("ggpubr")
+
+#install.packages("ggpubr")
 library(DescTools)
+# plot
 library(ggplot2)
-library(cowplot)
-library(plyr)
-library(dplyr)
-library(tidyverse)
-library(rstatix)
 library(ggpubr)
-library(car) # multicollinearity
-
-
-library(mlbench)
+library(cowplot)
+# datasets
+library(dplyr)
+library(plyr)
+library(tidyverse)
+library(reshape2) # remove?
+# machine learning/stats
+library(recipes)
 library(caret)
-library(reshape2)
+library(mlbench) # remove?
 
 ```
 
 # Introduction 
-This document tests the hypothesis that there is a difference in behaviours reported in the standardised questionnaire Monash Canine Personality Questionnaire - Revised considering dog's training outcome.
+In order to objectively evaluate trainee guide dogs personality, their dog trainers filled out the standardised questionnaire Monash Canine Personality Questionnaire - Revised (MCPQ-R) after 10 weeks of training. 
+This document shows the data analysis carried out to investigate the association between the ratings given by trainers and the dog’s training outcome. 
+Statistical methods will be used to test the hypothesis that there is a relationship between personality ratings and training outcome (Success, Fail).
 
 # Data Exploration
 
-Importing data and converting to adequate data types.
+Importing data and converting variables to adequate data types.
 ```{r, echo = FALSE}
 dtq = read.csv('data//2022-06-27-DTQ_MCPQ-R.csv', stringsAsFactors=TRUE)
 # colnames(dtq)
@@ -46,14 +50,14 @@ dtq$End.Date = as.Date(dtq$End.Date, format= "%Y-%m-%d")
 dtq$Duration = as.numeric(gsub(" .*$", "", dtq$Duration))
 ```
 ## Demographics
-The number of dogs in the Dog Trainer Questionnaire dataset.
+The number of dogs in the Dog Trainer Questionnaire dataset. Selection criteria: dogs who successed training (assistance and guide dogs) and dogs withdrawn for behavioural reasons.
 ```{r, echo = FALSE}
 cat('Number of dogs:', length(dtq$Code))
 cat('Training Outcome:')
 table(dtq$Outcome)
 ```
 
-Analysing categorical demographic data: Sex, Breed. There was only one German Shepherd and two Golden Doodle in the sample, their breeds were relabeled as "Other" for the data analysis.
+Analysing categorical demographic data: Sex, Breed. There was only one German Shepherd and two Golden Doodle dogs in the sample, their breeds were relabeled as "Other" for the data analysis.
 ```{r, echo = FALSE}
 print(table(dtq$Sex))
 print("Original classes")
@@ -65,16 +69,48 @@ print("Processed classes")
 table(dtq$Breed)
 ```
 
-Analysing age at assessment and duration of training until withdrawal:
+Analysing age at arrival to the training centre and age at assessment when the questionnaire was completed:
+
 ```{r, echo = FALSE}
+n <- dim(dtq)[1]
+
+dtq$Age.at.Arrival <- dtq$DOA - dtq$DOB
+mean <- mean(dtq$Age.at.Arrival)
+std <- sd(dtq$Age.at.Arrival)
+margin <- qt(0.975,df=n-1)*sd(std)/sqrt(n)
+
+cat('Age at Arrival: Mean', round(mean/30.417, 2), 
+            'Standard Deviation', round(std/30.417, 2))
+            # 'Confidence Interval', round((mean-margin)/30.417, 2), round((mean+margin)/30.417, 2)
+
+
 dtq$Age.at.Assessment <- dtq$Timestamp - dtq$DOB
 cat('Age at Assessment: Mean', round(mean(dtq$Age.at.Assessment)/30.417,2), 
             'Standard Deviation', round(sd(dtq$Age.at.Assessment)/30.417, 2))
 
+
+dtq$Duration.at.Assessment <- dtq$Timestamp - dtq$DOA
+cat('Duration at Assessment: Mean', round(mean(dtq$Duration.at.Assessment)/30.417,2), 
+            'Standard Deviation', round(sd(dtq$Duration.at.Assessment)/30.417, 2))
+summary(as.integer(dtq$Duration.at.Assessment)/7)
+hist(as.integer(dtq$Duration.at.Assessment)/7)
+```
+
+Calculate statistics of duration of training for the dogs that were withdrawn from training. 
+```{r, echo = FALSE}
 # Duration of training before withdrawal in weeks
-duration <- dtq %>% filter(Outcome == "Fail") %>% pull(Duration)/7
+# dtq %>% arrange(Duration) %>% select(Duration, Timestamp, DOA, Name)
+duration <- dtq %>% filter(Outcome == "Fail") %>% select(Duration)/7
+print('Duration of Training in weeks')
 summary(duration)
-hist(duration)
+
+h <- ggplot(duration, aes(x=Duration)) +
+ geom_histogram(binwidth = 1) +
+ xlab("Duration (Weeks)") +
+ ylab("Number of Dogs") + theme_bw()
+ 
+h
+suppressMessages(ggsave("analysis/dtq/duration-histogram.png",h))
 ```
 
 ## Descriptive Statistics
@@ -88,17 +124,18 @@ Other potential variables for inclusion in the model:
 "Source" -> IGDB = 60, AADI =3, Cesecah = 1, GDBUK = 16, Private breeder = 8, PRV breeder = 1 -->
 
 ```{r, echo = FALSE}
-# selecting predictive features
+# selecting features for modelling
 data = dtq %>% select(contains(c("Extraversion", "Motivation", "Training",
  "Amicability", "Neuroticism", "Sex", "Breed", "Outcome")))  %>% select(!contains("Comments"))
 data$Outcome <- relevel(data$Outcome, "Success")
 cat("Dimension of the dataset including the dependent variable: ", dim(data))
 # str(data)
-# calculate descriptive statistics on the dataset
-stats <- data.frame(do.call(rbind, lapply(data, summary)))
+# calculate descriptive statistics on for the numeric factors
+stats <- data.frame(do.call(rbind, lapply(data %>% select(where(is.numeric)), summary)))
 print(stats)
+# lapply(data %>% select(where(is.factor)), summary)
 # save descriptive statistics of the dataset to csv
-write.csv(stats, "analysis/dtq-stats.csv") 
+write.csv(stats, "analysis/dtq/descriptive-statistics.csv") 
 ```
 
 ## Univariate Logistic Regression
@@ -108,19 +145,36 @@ Features with a p_value < 0.2 were kept for the multicollinearity analysis and f
 
 ```{r, echo = FALSE}
 # univariate logistic regression using one predictor and outcome
-lr_models <- lapply(data[-length(data)], function(x) glm(formula = Outcome ~ x, data = data, family = binomial(link = logit)))
-str(data[-length(data)])
-lr_results <- data.frame(do.call(rbind, lapply(lr_models, function(x) c(round(coef(summary(x))[2,4],4), x$deviance))))
-colnames(lr_results) <- c("p_value", "deviance")
-lr_results$significant_0.05 <- (lr_results$p_value < 0.05)
-lr_results$significant_0.1 <- (lr_results$p_value < 0.1)
-lr_results$significant_0.2 <- (lr_results$p_value < 0.2)
-# lr_results[order(lr_results$p_value),]
-print("Number of variables considering each level of significance using Logistic test")
-print(colSums(lr_results[,3:5], na.rm = TRUE))
-print(lr_results[lr_results$significant_0.05 == TRUE, 'p_value', drop = FALSE])
+lr_models <- lapply(data %>% select(-Outcome), 
+        function(x) summary(glm(formula = Outcome ~ x, 
+        data = data, 
+        family = binomial(link = logit))))
+lr_result <- lapply(lr_models, function(x) round(c(coef(x), x$deviance),4))
 
-feat_lr = rownames(lr_results[lr_results$p_value < 0.2,])
+## univariate models with 3 dfs (Breed)
+print(lr_models[28])
+lr_breeds <- data.frame(transpose(lr_result[28]))
+colnames(lr_breeds) <- c("estimate_0", "estimate_1", "estimate_2", 
+                    "se_0", "se_1", "se_2", "z_value_0", "z_value_1", "z_value_2", 
+                    "p_value_0", "p_value_1", "p_value_2", "deviance")
+# print(unique(data$Breed))
+cat('Difference between Other and LR: \t', lr_breeds$p_value_1, '\t -> not significant')
+cat('Difference between Other and LRxGR: \t', lr_breeds$p_value_2, '\t -> not significant')
+
+## univariate models with up to 2 dfs
+lr_results <- data.frame(do.call(rbind,lr_result[1:27]))
+colnames(lr_results) <- c("estimate_0", "estimate_1", 
+                    "se_0", "se_1", "z_value_0", "z_value_1",
+                    "p_value_0", "p_value_1", "deviance")
+lr_results %>% filter(p_value_1 < 0.05) %>% select(estimate_1, p_value_1)
+
+# saving univariate logistic regression results to csv
+write.csv(lr_results, "analysis/dtq/univariate-logistic-regression.csv")
+```
+
+```{r, echo = FALSE}
+# select questionnaire items based on the p values
+feat_lr <- lr_results %>% filter(p_value_1 < 0.05) %>% rownames()
 data_lr <- data %>% select(all_of(feat_lr), Outcome)
 ```
 
@@ -136,140 +190,282 @@ summary(model_lr)
 print(VIF(model_lr))
 ```
 
-## Principal Component Analysis (PCA)
-Principal component analysis will be used to combine features that showed high multicollinearity.
-As no variables showed VIF > 5, no PCA was performed in this model.
-
 ## Visualization
 Plotting features selected considering univariate logistic regression pvalue results.
 
 ```{r, echo = FALSE}
-
-plotseries <- function(var){
-    plot1 <- ggplot(dtq, aes_string( x = var, fill = 'Outcome')) + 
+plot_items <- function(var){
+    
+    plot1 <- ggplot(data_lr, aes_string( x = var, fill = 'Outcome', width = 1)) + 
             geom_bar(position = "dodge") +
-            theme(legend.position = c(0.13,0.88)) +
-            scale_x_discrete("Rating", limits = c(1:6), breaks = c(1:6), labels = c(1:6)) +
-            expand_limits(x = c(1,6))
+            theme(legend.position = c(0.84,0.88)) 
+            # scale_x_discrete("Rating", limits = c(0:4), breaks = c(0:4), labels = c(0:4)) +
+            # expand_limits(x = c(0,4))
 
-    plot2 <- ggplot(dtq, aes_string( x = 'Outcome', y = var)) + 
-            geom_boxplot(position = "dodge", aes(colour = Outcome))  +
+    plot2 <- ggplot(data_lr, aes_string( x = 'Outcome', y = var)) + 
+            geom_violin(position = "dodge", width = 0.8, aes(color = Outcome, fill = Outcome), alpha = 0.2) +
+            geom_boxplot(position = "dodge", aes(colour = Outcome), fill = "white",  width = 0.3) +
             theme(legend.position = "none") +
-            scale_y_discrete("Rating", limits = c(1:6), breaks = c(1:6), labels = c(1:6)) +
-            expand_limits(y = c(1,6)) +
             ylab("Rating")
     plot3 <- plot_grid(plot1, plot2, rel_widths = c(2, 1), labels = "AUTO")
-    
 
     title <- ggdraw() + 
-      draw_label(gsub("[.]", " - ", var), fontface = 'bold')
+        draw_label(gsub("[.]", " ", var), fontface = 'bold')
     
     plot <- plot_grid(title, plot3, ncol = 1, rel_heights = c(0.1, 1))
 
-    suppressMessages(ggsave(paste("output//model-dtq//", gsub("[.]", "-", var), ".png", sep = "") 
-          , plot))
+    suppressMessages(ggsave(paste("analysis/dtq/", 
+                    gsub("[.]", "-", var), ".png", sep = ""), plot3))
     
     plot
 }
-lapply(feat_lr, plotseries)
+lapply(feat_lr, plot_items)
 
 ```
 
-# Recursive Feature Elimination (RFE) + Multivariate Logistic Regression (LR)
+# Multivariate Model
 
-Selecting only features that had a pvalue < 0.2 in univariate logistic regression analysis and no collinearity issues to estimate Outcome using Logistic Regression.
-The model also implements Backwards Feature Selection with Recursive Feature Elimination using Leave One Subject Out Cross Validation.
-[Caret RFE](https://search.r-project.org/CRAN/refmans/caret/html/rfe.html), 
-[RFE Control](https://search.r-project.org/CRAN/refmans/caret/html/rfeControl.html), 
+## Preprocessing: Normalization + PCA
+Only variables that had a pvalue < 0.05 in univariate logistic regression analysis. They were normalized and KNN imputation was used to replace missing values. 
+Principal Component Analysis (PCA) was used to combine the original questionnaire items to derive features that capture the variance dataset and are uncorrelated (orthogonal).
+The Principal Components that captured up to 95% of the variance of the original questionnaire data were used as predictors to estimate Outcome using Logistic Regression.
+
+## Recursive Feature Elimination (RFE) + Multivariate Logistic Regression (LR)
+Backwards Feature Selection is used to eliminate the least predictive Principal Components. 
+It estimates the importance of each principal component by evaluating the difference in performance caused by the removal of individual components. 
+Leave One Subject Out Cross Validation divides these datasets into train sets for modelling and test sets for estimating performance.
+The AUC-ROC results achieved on the test sets by each of the models trained are considered when choosing which features to keep and remove in order to derive an optimal model.
+This methodology was implemented in R using [rfe](https://search.r-project.org/CRAN/refmans/caret/html/rfe.html) (recursive feature elimination) function with ROC and [rfeControl](https://search.r-project.org/CRAN/refmans/caret/html/rfeControl.html) function with LOOCV in caret.
+
 [Example with RF](https://towardsdatascience.com/effective-feature-selection-recursive-feature-elimination-using-r-148ff998e4f7), [ROC as metric](https://stackoverflow.com/questions/18242692/r-package-caret-rfe-function-how-to-customize-metric-to-use-auc).
 
-```{r, echo = FALSE}
-# feature selection using recursive feature elimination (RFE)
+```{r definition, echo = FALSE}
+impute_pca <- function(df){
 
-# Setting ROC as the metric for the Logistic Regression function
-lrFuncs$summary <- twoClassSummary
+    print("Dimensions of original dataset:")
+    print(dim(df))
 
-ctrl <- rfeControl(functions = lrFuncs,     # logistic regression
-                    method = "LOOCV",       # Leave One Out Cross Validation
-                    verbose = FALSE)
+    model_pca <- recipe(formula =  ~ ., data = df) %>%
+                    step_normalize(all_numeric()) %>%
+                    # step_impute_knn(all_numeric(), neighbors = 3) %>%
+                    step_pca(all_numeric(), threshold = .95)
 
-# Recursive Feature Elimination with feat_lr
-rfe_lr <- rfe(Outcome ~ . ,                 # predict Outcome using all other variables
-            data = data_lr,                 # selecting the features from univariate lr
-                   sizes = c(1:length(data_lr)-1),
-                   rfeControl = ctrl,
-                   metric = "ROC")
+    model_prep <- prep(model_pca, training = df)
+    return(model_prep)
+}
 
-warnings()
-print(rfe_lr)
-ggplot(data = rfe_lr, metric = "ROC") + theme_bw()
-cat("Features in the model that delivered the best ROC", predictors(rfe_lr))
+rfe_lr <- function(df){
 
-model_lr <- rfe_lr$fit
-summary(model_lr)
+    # Setting ROC as the metric for the Logistic Regression function
+    lrFuncs$summary <- twoClassSummary
+    set.seed(77)    
+
+    ctrl <- rfeControl(functions = lrFuncs,     # logistic regression
+                        method = "LOOCV",       # Leave One Out Cross Validation
+                        verbose = FALSE)
+
+    # Recursive Feature Elimination with feat_lr
+    model <- rfe(Outcome ~ . ,                  # predict Outcome using all other variables
+                    data = df,                  # selecting the features from univariate lr
+                    sizes = c(1:length(df)),
+                    rfeControl = ctrl,
+                    metric = "ROC") 
+    
+    # Printing outputs
+    warnings()
+    print(model)
+    print(summary(model$fit))
+    
+    return(model)
+}
+
+
+dev_null_residual <- function(model){
+    dev = model$null.deviance - model$deviance
+    deg = model$df.null - model$df.residual
+    cat('\ndeviance difference: ', dev)
+    cat('\ndf difference: ', deg)
+    cat('\nlevel of significance: ', 1-pchisq(dev, deg, lower.tail = FALSE))
+    cat('\nthe model is a good fit: ', pchisq(dev, deg, lower.tail = FALSE) < 0.05)
+}
+
 ```
+
+```{r, echo = FALSE}
+data_prep <- impute_pca(data_lr)
+data_pca  <- bake(data_prep, data_lr)
+model_rfe <- rfe_lr(data_pca)
+dev_null_residual(summary(model_rfe$fit))
+
+# plot roc per rfe iteration
+plot <- ggplot(data = model_rfe, metric = "ROC") + theme_bw()
+suppressMessages(ggsave("analysis/dtq/rfe-roc.png", plot))
+plot
+```
+
+The best Logistic Regression model is used to investigate the effect of the principal components on the training outcome.
+The estimates were exponentiated to get the Odds Ratio (OR). The 95% Confident Interval (CI) of the ORs was also calculated. 
+RFE chose 2 principal components, PC01 and PC09. 
+The OR for PC01 is 2.54, this means that the probability of withdrawal increases by (2.54-1 = 1.54) 154% for every unit increase of PC1.
+We are 95% confident that a unit increase in PC01 results in a 69 to 340% (1.69-1 = 0.69, 4.40-1 = 3.40) more odds of being withdrawn from training.
+The OR for PC09 is 0.20, this means that the probability of withdrawal decreases by (0.20-1 = 0.80) 80% for every unit increase of PC9.
+We are 95% confident that a unit increase in PC09 results in a 23 to 95% (0.04-1 = 0.96, 0.77-1 = 0.23) less odds of being withdrawn from training.
+
+<!-- 
 RFE chose 6 variables when optimizing for AUC-ROC, namely:
 "Training.Trainable", "Amicability.Friendly", "Motivation.Persevering", "Training.Biddable", "Extraversion.Hyperactive", "Amicability.Easy.going".
 Analysing deviance of full model compared to the null model. 
-Reduction in deviance must be significant (chi-squared test) for the model to be considered a good fit.
-```{r, echo = FALSE}
-dev_null_residual <- function(model){
-    dev = model$null.deviance - model$deviance
-    df = model$df.null - model$df.residual
-    cat('\ndeviance difference: ', dev)
-    cat('\ndf difference: ', df)
-    cat('\nlevel of significance: ', 1 - pchisq(dev, df, lower.tail = FALSE))
-}
+Reduction in deviance must be significant (chi-squared test) for the model to be considered a good fit. -->
 
-dev_null_residual(model_lr)
-```
 
 ## Interpretation
 The best Logistic Regression model is used to investigate the effect of each variable on the training outcome.
 
+<!-- 
 Three variables showed some level of statistical significance, namely:
 - "Training.Trainable" (p<0.05), for each unit increase the OR was smaller by 0.228 (less likely to be withdrawn)
 - "Motivation.Persevering" (p<0.01), each unit increase the OR was smaller by 0.418 (less likely to be withdrawn)
-- "Amicability.Easy.going" (p<0.1), each unit increase the OR was smaller by 0.531 (less likely to be withdrawn)
+- "Amicability.Easy.going" (p<0.1), each unit increase the OR was smaller by 0.531 (less likely to be withdrawn) -->
 
 ```{r, echo = FALSE}
-# exponentiate the coefficentes to get the odd ratio and their confidence intervals
-## odds ratios and 95% CI using profiled log-likelihood
-df_model <- as.data.frame(coef(summary(model_lr)))
-df_model$OR <- exp(df_model$Estimate)
-df_model <- cbind(df_model, exp(confint(model_lr, level = 0.95)))
+results_rfe <- as.data.frame(coef(summary(model_rfe$fit)))
+results_rfe$OR <- exp(results_rfe$Estimate)
+results_rfe <- cbind(results_rfe, exp(confint(model_rfe$fit, level = 0.95)))
 print("Results from the model created")
-print(df_model)
-rownames(df_model)[2:7]
+print(results_rfe)
 ```
 
-
-
-## Diagnostics
-1. Index plot: residuals vs case number
-2. Leverage cases
-3. Influence cases
 
 ```{r, echo = FALSE}
-diagnostics <- function(model){
-    h <- lm.influence(model)$hat
-    rpear <- residuals(model, "pearson")/sqrt(1-h)
-    rdev <- residuals(model, "deviance")/sqrt(1-h)
-    phat <- model$fitted.values
-    D <- rpear*rpear*h/(2**(1-h))
-    diagnostic <- data.frame(data$Outcome, phat, h, rpear, rdev, D)
-    return(diagnostic)
+coef <- predictors(model_rfe)
 
-    plot(rpear, main="Index Plot of Pearson Residuals")
-    plot(model$linear.predictors, rpear, main = "Plot of Pearson Residuals vs Linear Predictor")
-}
+perf <- as.data.frame(data_pca %>% select(coef,Outcome))
+perf$Outcome <- relevel(perf$Outcome, "Fail")
+perf$Probability <- predict(model_rfe$fit,       # model
+                newdata = data_pca,        # dataframe, this will only select PC01
+                type  = "response")
+perf$Status <- dtq$Status
+perf <- perf %>% mutate(Status = Status %>% fct_relevel(c("W", "GD", "AD")))
+perf$Predicted <- ifelse(perf$Probability > 0.5, "Fail", "Success")
+perf$Estimate <- log( 1 / (1/perf$Probability - 1) )
 
-diag_lr <- diagnostics(model_lr)
-diag_lr[order(diag_lr$rpear, decreasing = TRUE),]
+# logit function, calculate y given the probability(x)
+y <- function(x){ return(log(1/( 1/x - 1))) }
+th_fail = 0.65
+th_success = 0.35
+
+print("Probability predicted by the LR using PRQ data vs true Outcome")
+plot <- ggplot(perf, aes(x = Estimate, y = Probability, color = Outcome )) +
+    # bottom - green
+    geom_rect(aes(xmin = -Inf, xmax = y(th_success), ymin = 0, ymax = th_success), 
+            fill = "#99ff99", alpha = 0.2, color = "white") + 
+    # top - orange
+    geom_rect(aes(xmin = y(th_fail), xmax = Inf, ymin = th_fail, ymax = 1), 
+            fill = "#ffff99", alpha = 0.2, color = "white") +  
+    geom_point() 
+plot
+
+suppressMessages(ggsave(paste("analysis/dtq/logit-outcome.png"), plot))
+
+
+print("Probability predicted by the LR using PRQ data vs true Status")
+# plot Logit vs Status
+plot <- ggplot(perf, aes(x = Estimate, y = Probability, color = Status )) +
+    # bottom - green
+    geom_rect(aes(xmin = -Inf, xmax = y(th_success), ymin = 0, ymax =  th_success), 
+            fill = "#99ff99", alpha = 0.2, color = "white") + 
+    # top - orange
+    geom_rect(aes(xmin = y(th_fail), xmax = Inf, ymin =  th_fail, ymax = 1), 
+            fill = "#ffff99", alpha = 0.2, color = "white") +  
+    geom_point()
+plot
+
+suppressMessages(ggsave(paste("analysis/dtq/logit-status.png"), plot))
+
+cat("Predicted probability <", th_success, " -> Green flag ")
+print("Dogs flagged green are likely to SUCCEED, true outcome count and status proportion:")
+table(perf %>% filter(Probability < th_success) %>% pull(Outcome))
+prop.table(table(perf %>% filter(Probability < th_success) %>% pull(Status)))
+cat("Predicted probability >", th_fail, "-> Yellow flag")
+print("Dogs flagged green are likely to FAIL, true outcome count and status proportion:")
+table(perf %>% filter(Probability > th_fail) %>% pull(Outcome))
+prop.table(table(perf %>% filter(Probability > th_fail) %>% pull(Status)))
+
 ```
-<!-- 
-## Feature Importance -->
+## Feature Importance
+
+### Explained Variance
+
 ```{r, echo = FALSE}
-importance <- data.frame(feature = row.names(varImp(rfe_lr))[1:8],
-                          importance = varImp(rfe_lr)[1:8, 1])
+# tidy(recipe steps, number = select pca step, type = coef or variance
+dc_pca_var <- as.data.frame(tidy(data_prep, number = 2, type = "variance"))
+dc_pca_var <- dc_pca_var %>% spread(key = "terms", value = value) %>% select(-c(id))
+dc_pca_var$component <- mapvalues(dc_pca_var$component, from = 1:13, 
+    to = c('PC01', 'PC02', 'PC03', 'PC04', 'PC05', 'PC06', 'PC07', 'PC08', 'PC09', 'PC10', 'PC11', 'PC12', 'PC13'))
+colnames(dc_pca_var) <- make.names(names(dc_pca_var)) # fixing column names with space
+
+cat("PCA features kept in the final model after RFE: ", coef)
+print("Explained Variance per Principal Component (Scree Plot)")
+dc_pca_var$Included = factor(c("Yes", "No", "No", "No", "No", "No", "No", "No", "Yes", "No", "No", "No", "No"))
+plot <- ggplot(dc_pca_var, aes(x = component, y = percent.variance, fill = Included)) +
+    geom_bar(stat='identity', position = 'dodge', width = 0.8)+
+    xlab("Principal components") +
+    ylab("Explained Variance (%)") 
+plot
+suppressMessages(ggsave(paste("analysis/dtq/pc-explained-variance.png"), plot))
+
+print("Cumulative Explained Variance per Principal Component")
+plot <- ggplot(dc_pca_var, aes(x = component, y = cumulative.percent.variance, fill = Included)) +
+    geom_bar(stat='identity', position = 'dodge', width = 0.8)+
+    xlab("Principal Components") +
+    ylab("Cumulative Variance (%)")
+plot
+suppressMessages(ggsave(paste("analysis/dtq/pc-cumulative-variance.png"), plot))
+
 ```
+
+### Coefficient Loadings
+PC01: an unit increase results in an INCREASE probability of withdrawal by 154% 
+- Training-Trainable -0.3483274
+- Training-Reliable -0.3388923
+- Neuroticism-Fearful  0.2990981
+- Amicability-Friendly -0.2980233
+- Amicability-Sociable -0.2947486
+
+PC09: an unit increase results in a DECREASED probability of withdrawal by 80%
+- Training.Obedient -0.54724378 (n)
+- Amicability.Easy.going  0.43676304 (n)
+- Training.Trainable  0.41639880 
+- Amicability.Relaxed -0.36376041  (n)
+- Amicability.Sociable -0.23742114
+
+```{r, echo = FALSE}
+# model prep is the recipe steps, select pca -> number = 2, because it's the 3rd step
+df_pca_coef <- as.data.frame(tidy(data_prep, number = 2, type = "coef"))
+df_pca_coef$component <- mapvalues(df_pca_coef$component, 
+    from = c('PC1', 'PC2', 'PC3', 'PC4', 'PC5', 'PC6', 'PC7', 'PC8', 'PC9', 'PC10', 'PC11', 'PC12', 'PC13'), 
+    to = c('PC01', 'PC02', 'PC03', 'PC04', 'PC05', 'PC06', 'PC07', 'PC08', 'PC09', 'PC10', 'PC11', 'PC12', 'PC13'))
+# creating another dataframe with PC1 values for the analysis
+df_pca_coef <- df_pca_coef  %>% filter(grepl(paste(coef, collapse = '|'), component)) %>% select(-id)
+
+# print the PCs values
+df_pca_coef %>% 
+    filter(grepl(paste(coef, collapse = '|'), component)) %>% 
+    pivot_wider(names_from = component, values_from = value)
+
+df_pca_coef %>% filter(component == 'PC01') %>% arrange(desc(abs(value))) %>% select(terms, value)
+df_pca_coef %>% filter(component == 'PC09') %>% arrange(desc(abs(value))) %>% select(terms, value)
+
+cat("Principal Component", coef," vs Original Variables")
+plot <- ggplot(df_pca_coef, aes(x=terms, y=value, fill = component)) +
+    geom_bar(stat="identity", position='dodge', width = 0.8) +
+    xlab("MCPQ-R items - Predictor Variables") +
+    ylab("Loadings") +
+    theme(axis.text.x = element_text(angle = 90), legend.position = "top")
+suppressMessages(ggsave(paste("analysis/dtq/pc-loadings.png"), plot))
+plot
+    
+```
+
+# Conclusion
+Completing this questionnaire during training (Week 10) would allow assistance dog training organisations to understand which dog are more suitable and allow them to make informed decisions when analysing which dogs to keep for training considering the results of this objective assessment. 

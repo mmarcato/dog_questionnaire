@@ -31,13 +31,14 @@ library(recipes)
 ```
 
 # Introduction 
-This document tests assess the association between behaviours reported in the standardised questionnaire Canine Behavioural Assessement & Research Questionnaire (C-BARQ) and the dog's training outcome.
-
+In order to objectively evaluate trainee guide dogs personality, their puppy raisers filled out the standardised questionnaire Canine Behavioural Assessement & Research Questionnaire (C-BARQ) around the time they were due to start formal training.
+This document shows the data analysis carried out to investigate the association between ratings given by the puppy raisers and the dog's training outcome.
+ Statistical methods will be used to test the hypothesis that there is a relationship between personality ratings and training outcome (Success, Fail).
 # Data Exploration
 
-Importing data and converting to adequate data types.
+Importing data and converting variables to adequate data types.
 ```{r, echo = FALSE}
-prq = read.csv('data//2022-05-10-PRQ_C-BARQ.csv', stringsAsFactors=TRUE)
+prq = read.csv('data/2022-05-10-PRQ_C-BARQ.csv', stringsAsFactors=TRUE)
 # colnames(prq)
 # converting date types
 prq$Timestamp = as.Date(prq$Timestamp, format= "%Y-%m-%d")
@@ -56,7 +57,7 @@ cat('Training Outcome:')
 table(prq$Outcome)
 ```
 
-Analysing categorical demographic data: Sex, Breed. There was only one German Shepherd and Golden Doodle in the sample, their breeds were relabeled as "Other" for the data analysis.
+Analysing categorical demographic data: Sex, Breed. There was only one German Shepherd and Golden Doodle dogs in the sample, their breeds were relabeled as "Other" for the data analysis.
 ```{r, echo = FALSE}
 print(table(prq$Sex))
 print("Original classes")
@@ -68,7 +69,8 @@ print("Processed classes")
 table(prq$Breed)
 ```
 
-Calculate descriptive statistics for age at assessment:
+Analysing age at arrival to the training centre and age at assessment when the questionnaire was completed:
+
 ```{r, echo = FALSE}
 n <- dim(prq)[1]
 
@@ -90,12 +92,24 @@ margin <- qt(0.975,df=n-1)*sd(std)/sqrt(n)
 cat('Age at Assessment: Mean', round(mean/30.417, 2), 
             'Standard Deviation', round(std/30.417, 2))
             # 'Confidence Interval', round((mean-margin)/30.417, 2), round((mean+margin)/30.417, 2)
+```
+
+Calculate statistics of duration of training for the dogs that were withdrawn from training. 
+```{r, echo = FALSE}
 
 # Duration of training before withdrawal in weeks
-duration <- prq %>% filter(Outcome == "Fail") %>% pull(Duration)/7
+duration <- prq %>% filter(Outcome == "Fail") %>% select(Duration)/7
+print('Duration of Training in weeks')
 summary(duration)
-hist(duration)
 
+
+h <- ggplot(duration, aes(x=Duration)) +
+ geom_histogram(binwidth = 1) +
+ xlab("Duration (Weeks)") +
+ ylab("Number of Dogs") + theme_bw()
+ 
+h
+suppressMessages(ggsave("analysis/prq/duration-histogram.png",h))
 ```
 
 ## Descriptive Statistics
@@ -145,7 +159,13 @@ stats <- data.frame(do.call(rbind, lapply(data[1:114], summary)))
 # missing values, there is something weird about the NAs calculations using summary
 stats <- cbind(stats, colSums(is.na(data[1:114])))
 colnames(stats)[8] <- "Missing"
-hist(stats$Missing, breaks = 20)
+
+# histogram of missing values in original dataset
+h <- ggplot(stats, aes(x=Missing)) +
+ geom_histogram(binwidth = 1) +
+ xlab("Number of Missing values ") +
+ ylab("Number of Variables") + theme_bw()
+
 print('Features sorted by number of missing rows')
 print(stats[order(stats$Missing, decreasing = TRUE)[1:15], 'Missing', drop = FALSE])
 
@@ -153,7 +173,7 @@ print(stats[order(stats$Missing, decreasing = TRUE)[1:15], 'Missing', drop = FAL
 # 12-10 NAs -> Because of no other dog  in household -> Items 33,34,32,35
 
 # save descriptive statistics of the dataset to csv
-write.csv(stats, "analysis/prq-stats.csv") 
+write.csv(stats, "analysis/prq/descriptive-statistics.csv") 
 ```
 
 ## Univariate Logistic Regression
@@ -166,20 +186,20 @@ Breeds (p = 0.44 and p = 0.16) and Sex (p = 0.61) were not significantly associa
 lr_models <- lapply(data[-length(data)], function(x) summary(glm(formula = Outcome ~ x, 
                             data = data, family = binomial(link = logit), na.action = na.exclude)))
 lr_result <- lapply(lr_models, function(x) c(coef(x), x$deviance))
-lr_models[115]
+
 ## univariate models with 3 dfs (Breed)
 lr_breeds <- data.frame(transpose(lr_result[116]))
 colnames(lr_breeds) <- c("estimate_0", "estimate_1", "estimate_2", 
-                    "se_0", "se_1", "se_2", 
-                    "z_value_0", "z_value_1", "z_value_2", 
+                    "se_0", "se_1", "se_2", "z_value_0", "z_value_1", "z_value_2", 
                     "p_value_0", "p_value_1", "p_value_2", "deviance")
-print(unique(data$Breed))
+print(lr_models[116])
 cat('Difference between Other and LR: \t', lr_breeds$p_value_1, '\t -> not significant')
 cat('Difference between Other and LRxGR: \t', lr_breeds$p_value_2, '\t -> not significant')
 
 ## univariate models with up to 2 dfs (items are ints)
 lr_results <- data.frame(do.call(rbind,lr_result[1:115]))
-colnames(lr_results) <- c("estimate_0", "estimate_1", "se_0", "se_1", "z_value_0", "z_value_1",
+colnames(lr_results) <- c("estimate_0", "estimate_1", 
+                    "se_0", "se_1", "z_value_0", "z_value_1",
                     "p_value_0", "p_value_1", "deviance")
 
 # check if the columns were named appropriately 
@@ -189,12 +209,15 @@ colnames(lr_results) <- c("estimate_0", "estimate_1", "se_0", "se_1", "z_value_0
 ## univariate models with 1 df (because the predictor variable is constant)
 print("Columns 9,10,13,17,30,37 are CONSTANT, that's why they p_values don't make sense")
 lr_results[c(9,10,13,17,30,37),'p_value_1']
+
+# saving univariate logistic regression results to csv
+write.csv(lr_results, "analysis/prq/univariate-logistic-regression.csv")
 ```
 
 Analysing p-values.
 ```{r, echo = FALSE}
 # print variables sorted by pvalue
-lr_results[order(lr_results$p_value_1, decreasing = FALSE), 'p_value_1' , drop = FALSE]
+# lr_results[order(lr_results$p_value_1, decreasing = FALSE), 'p_value_1' , drop = FALSE]
 # pvalue analysis
 lr_results$significant_0.05 <- (lr_results$p_value_1 > 0) & (lr_results$p_value_1 < 0.05)
 lr_results$significant_0.1 <- (lr_results$p_value_1 > 0) & (lr_results$p_value_1 < 0.1)
@@ -202,6 +225,7 @@ lr_results$significant_0.2 <- (lr_results$p_value_1 > 0) & (lr_results$p_value_1
 #  lr_results[order(lr_results$p_value_1),]
 print("Number of features considering each level of significance using Logistic Regression p-value test")
 print(colSums(lr_results[,10:12], na.rm = TRUE))
+# inclusion of X96,98 and F3,6 in feature set p<0.2 compared to with p<0.05 
 ```
 
 Analysing deviance of full model compared to the null model. 
@@ -215,31 +239,117 @@ cat('Number of features whose univariate models resulted in a significant differ
 ```
 
 Data selection based on the univariate logistic regression p-value and deviance analysis. 
-Full feature set constains all factors and all items significant p < 0.05.
-Reduced feature set contains all factors and items NOT included in the calculation of ANY factor with p<0.05 (i.e. Items 77-90, 93-100).
+This reduced feature set contains all factors and only items that were NOT included in the calculation of ANY factor with p<0.05 (i.e. Items 1,27 an 75 and some myscellaneous items 77-90, 93-100).
 
 ```{r, echo = FALSE}
-# all of the features with p < 0.2 had significant reduction in deviance too, the filtering by two conditions is NOT necessary in that case
-# lr_results %>% filter(p_value_1 <0.2 & significant_dev == TRUE) %>%  select(p_value_1, significant_dev)
-# selecting features with p < 0.2
-data_0.2_full <- data %>% select(all_of(rownames(lr_results[lr_results$p_value_1 < 0.2, ])), Outcome)
-data_0.2_reduced <- data_0.2_full %>% select(contains(c(as.character(c(77:90, 93:100)), 'Sex', 'Breed', 'F_')), Outcome)
-# inclusion of X96,98 and F3,6 compared to feature set with 0.05 
-# colnames(data_0.2_reduced)
-# dim(data_0.2_reduced)
-
-# print("All features with level of significance < 0.05 using Univariate Logistic Regression p-value test")
+# selecting features for modelling
+print("All features with level of significance < 0.05 using Univariate Logistic Regression p-value test")
 # print(lr_results[lr_results$significant_0.05 == TRUE, 'p_value_1', drop = FALSE])
 
 # selecting features with p < 0.05 
-data_0.05_full <- data %>% select(all_of(rownames(lr_results[lr_results$significant_0.05 ,])), Outcome)
-cat("Full Feature Set with p<0.05\t", dim(data_0.05_full))
-colnames(data_0.05_full)
-# Significant Factors and Items 77-90 and 93-100
-data_0.05_reduced <- data_0.05_full  %>% select(contains(c(as.character(c(77:90, 93:100)), 'Sex', 'Breed', 'F_')), Outcome)
-cat("Reduced Feature Set with p<0.05\t", dim(data_0.05_reduced))
-colnames(data_0.05_reduced)
+data_full <- data %>% 
+            select(all_of(lr_results %>% filter(significant_0.05 ==TRUE) %>% rownames()), Outcome)
+cat("Full Feature Set with p<0.05\t", dim(data_full))
+colnames(data_full)
 
+# items that were significant but not used to calculate factors 1, 27, 75 -> "X1", 27, 75,
+# items not used to calculate factors 77-90 and 93-100
+data_reduced <- data_full  %>% select(contains(c(as.character(c("X1", 27, 75, 77:90, 93:100)), 'Sex', 'Breed', 'F_')), Outcome)
+cat("Reduced Feature Set with p<0.05\t", dim(data_reduced))
+colnames(data_reduced)
+
+```
+
+## Missing Data
+
+PRQ, missing values per column and per row. Very few data are missing considering the original items selected.
+```{r, echo = FALSE}
+# original dataset
+# dc_col_nas <- unlist(lapply(dc, function (x) sum(is.na(x))))
+# table(dc_col_nas)
+# dc_row_nas <- apply(dc, 1, function (x) sum(is.na(x)) ) 
+# table(dc_row_nas)
+# reduced dataset
+col_nas <- unlist(lapply(data_reduced, function (x) sum(is.na(x))))
+print(col_nas)
+row_nas <- apply(data_reduced, 1, function (x) sum(is.na(x)) ) 
+table(row_nas)
+```
+
+
+## Visualization
+Plotting the items and factors that will be used for modelling.
+```{r, echo = FALSE}
+
+plot_discrete <- function(var){
+    
+    plot1 <- ggplot(data_reduced, aes_string( x = var, fill = 'Outcome', width = 1)) + 
+            geom_bar(position = "dodge") +
+            theme(legend.position = c(0.84,0.88)) 
+            # scale_x_discrete("Rating", limits = c(0:4), breaks = c(0:4), labels = c(0:4)) +
+            # expand_limits(x = c(0,4))
+
+    plot2 <- ggplot(data_reduced, aes_string( x = 'Outcome', y = var)) + 
+            geom_violin(position = "dodge", width = 0.8, aes(color = Outcome, fill = Outcome), alpha = 0.2) +
+            theme(legend.position = "none") +
+            geom_boxplot(position = "dodge", aes(colour = Outcome), fill = "white",  width = 0.3) +
+            ylab("Rating")
+    plot3 <- plot_grid(plot1, plot2, rel_widths = c(2, 1), labels = "AUTO")
+
+    title <- ggdraw() + 
+            draw_label(gsub("[.]", " ", var), fontface = 'bold')
+    
+    plot <- plot_grid(title, plot3, ncol = 1, rel_heights = c(0.1, 1))
+
+    suppressMessages(ggsave(paste("analysis/prq/", 
+                    gsub("[.]", "-", var), ".png", sep = ""), plot3))
+    
+    plot
+}
+
+feat_items <- data_reduced %>% select(-Outcome, -contains('F_')) %>% colnames
+lapply(feat_items, plot_discrete)
+
+plot_continuous <- function(var){
+
+    # bin = (max(data_reduced[var], na.rm = TRUE) - min(data_reduced[var], na.rm = TRUE)) / 5
+    max_x <- max(data_reduced[var], na.rm = TRUE)
+    min_x <- min(data_reduced[var], na.rm = TRUE)
+    bin <- seq(min_x, max_x, (max_x - min_x)/3)
+    cat(min_x, max_x, bin)
+    
+    plot1 <- ggplot(data_reduced, aes_string(x = var, color = 'Outcome')) + 
+            geom_histogram(position = "dodge") +
+            theme(legend.position = c(0.84,0.88))
+
+    plot2 <- ggplot(data_reduced, aes_string( x = 'Outcome', y = var)) + 
+            geom_violin(position = "dodge", width = 0.8, aes(color = Outcome, fill = Outcome), alpha = 0.2) +
+            geom_boxplot(position = "dodge", aes(colour = Outcome), fill = "white",  width = 0.3) +
+            theme(legend.position = "none") +
+            ylab("Rating")
+    plot3 <- plot_grid(plot1, plot2, rel_widths = c(2, 1), labels = "AUTO")
+
+    title <- ggdraw() + 
+            draw_label(gsub("S[.]|[.]", " ", var), fontface = 'bold')
+    
+    plot <- plot_grid(title, plot3, ncol = 1, rel_heights = c(0.1, 1))
+
+    suppressMessages(ggsave(paste("analysis/prq/", 
+                    gsub("[.]", "-", var), ".png", sep = ""), plot3))
+    
+    plot
+}   
+
+feat_factors <- data_reduced %>% select(contains('F_')) %>% colnames
+lapply(feat_factors, plot_discrete)
+
+lapply(feat_factors, function (var) {
+    print(var)
+    max_x <- max(data_reduced[var], na.rm = TRUE)
+    min_x <- min(data_reduced[var], na.rm = TRUE)
+    cat(min_x, max_x)
+    print(seq(min_x, max_x, (max_x - min_x)/5))
+})
 ```
 
 ## Multicollinearity 
@@ -254,17 +364,17 @@ VIF values indicate a high degree of multicollinearity.
 They were much larger for the full model compared to the reduced model.
 
 ```{r, echo = FALSE}
-print("VIF full")
-model_lr_full <- glm(Outcome ~ ., data=data_0.05_full, family = binomial(link = logit), na.action = na.exclude)
-summary(model_lr_full)
-# N = 41 samples do NOT contain NAs in the 0.05 FULL dataset, M = 29 features
-vif_full <- VIF(model_lr_full)
-feat_full_mc <- names(vif_full[vif_full > 5])
-feat_full_id <- names(vif_full[vif_full < 5])
-print(vif_full)
+# print("VIF full")
+# model_lr_full <- glm(Outcome ~ ., data=data_full, family = binomial(link = logit), na.action = na.exclude)
+# summary(model_lr_full)
+# # N = 41 samples do NOT contain NAs in the 0.05 FULL dataset, M = 29 features
+# vif_full <- VIF(model_lr_full)
+# feat_full_mc <- names(vif_full[vif_full > 5])
+# feat_full_id <- names(vif_full[vif_full < 5])
+# print(vif_full)
 
 cat("VIF reduced")
-model_lr_reduced <- glm(Outcome ~ ., data=data_0.05_reduced, family = binomial(link = logit), na.action = na.exclude)
+model_lr_reduced <- glm(Outcome ~ ., data=data_reduced, family = binomial(link = logit), na.action = na.exclude)
 summary(model_lr_reduced)
 # N = 47 samples do NOT contain NAs in 0.05 REDUCED dataset, M = 12 features
 vif_reduced <- VIF(model_lr_reduced)
@@ -273,52 +383,16 @@ feat_redu_id <- names(vif_reduced[vif_reduced < 5])
 print(vif_reduced)
 ```
 
-## Visualization
-I think for the factors, because they are continuous variables (average of discrete variables), it is better to only have the boxplot.
-```{r, echo = FALSE}
-
-plotseries <- function(var){
-    plot1 <- ggplot(prq, aes_string( x = var, fill = 'Outcome')) + 
-            geom_bar(position = "dodge") +
-            theme(legend.position = c(0.13,0.88)) +
-            scale_x_discrete("Rating", limits = c(0:4), breaks = c(0:4), labels = c(0:4)) +
-            expand_limits(x = c(0,4))
-
-    plot2 <- ggplot(prq, aes_string( x = 'Outcome', y = var)) + 
-            geom_boxplot(position = "dodge", aes(colour = Outcome))  +
-            theme(legend.position = "none") +
-            scale_y_discrete("Rating", limits = c(0:4), breaks = c(0:4), labels = c(0:4)) +
-            expand_limits(y = c(0,4)) +
-            ylab("Rating")
-    plot3 <- plot_grid(plot1, plot2, rel_widths = c(2, 1), labels = "AUTO")
-    
-
-    title <- ggdraw() + 
-      draw_label(gsub("[.]", " ", var), fontface = 'bold')
-    
-    plot <- plot_grid(title, plot3, ncol = 1, rel_heights = c(0.1, 1))
-
-    suppressMessages(ggsave(paste("output//model-prq//", gsub("[.]", "-", var), ".png", sep = "") 
-          , plot))
-    
-    plot
-}
-
-feat_reduced <- colnames(data_0.05_reduced)[1:length(data_0.05_reduced)-1]
-lapply(feat_reduced, plotseries)
-
-```
-
-# Multivariate Logistic Regression Model
-## Preprocessing (Normalization + KNN Imputation + PCA) and Feature Selection (RFE)
-It only uses features selected considering the previous univariate logistic regression pvalue and deviance analysis.
+# Multivariate Model
+## Preprocessing: Normalization + Imputation + PCA
+Only variables that had a p < 0.05 in univariate logistic regression analysis were used as predictors to estimate Outcome using Logistic Regression.
 All variables from both the full and reduced features sets had VIF > 5, therefore PCA was performed using the entire feature sets. 
 The "recipes" package was used to perform preprocessing (missing value imputation + normalization + PCA) 
-[link](https://recipes.tidymodels.org/reference/step_pca.html) 
-[Recipes documentation](https://cran.r-project.org/web/packages/recipes/recipes.pdf)
+[link](https://recipes.tidymodels.org/reference/step_pca.html),
+[Recipes documentation](https://cran.r-project.org/web/packages/recipes/recipes.pdf),
 [Example Recipes](https://www.rebeccabarter.com/blog/2019-06-06_pre_processing/)
 
-
+## Recursive Feature Elimination (RFE) + Multivariate Logistic Regression (LR)
 Features selection was performed using the Caret package Recursive Feature Elimination rfe function.
 Logistic Regression was used to model the dataset and Leave One Subject Out Cross Validation was employed to validate the results.
 [Caret RFE](https://search.r-project.org/CRAN/refmans/caret/html/rfe.html), 
@@ -326,12 +400,12 @@ Logistic Regression was used to model the dataset and Leave One Subject Out Cros
 [Examples using RFE with Recipes](http://topepo.github.io/caret/recursive-feature-elimination.html#rferecipes)
 [Example RFE + RF as predictor](https://towardsdatascience.com/effective-feature-selection-recursive-feature-elimination-using-r-148ff998e4f7), 
 [RFE + ROC as metric](https://stackoverflow.com/questions/18242692/r-package-caret-rfe-function-how-to-customize-metric-to-use-auc).
-
+<!-- 
 I did not manage to make the preprocessing work within rfe using LOOCV, it only works with repeatedCV.
 Therefore, I had to implement the preprocessing steps (normalization, imputation and pca) using recipes steps and then 
 use that transformed dataframe to learn using RFE + LR.
-<!-- This results in dataleakage in the ROC estimations using LOOCV.  -->
-The resulting models using LOOCV and repeatedCV had PC01 and sometimes PC05 and ROC varying between 0.80 and 0.87, depending on the number of repeats. 
+This results in dataleakage in the ROC estimations using LOOCV.
+The resulting models using LOOCV and repeatedCV had PC01 and sometimes PC05 and ROC varying between 0.80 and 0.87, depending on the number of repeats.  -->
 
 ```{r definition, echo = FALSE}
 
@@ -385,11 +459,11 @@ dev_null_residual <- function(model){
 }
 
 ```
-## Comparing models
+<!-- ## Comparing models
 Both Full and Reduced feature sets were used for this analysis. The results obtained were:
 
 - Full -> ROC: 0.81, TPR: 0.92, TNR: 0.36, AIC: 45.038
-- Reduced -> ROC: 0.75, TPR: 0.98, TNR: 0.36, AIC: 44.661
+- Reduced -> ROC: 0.75, TPR: 0.98, TNR: 0.36, AIC: 44.661 -->
 
 Interpreting performance metrics:
 
@@ -398,79 +472,136 @@ Interpreting performance metrics:
 
 - Specificity (TNR) = negative result for success dogs. How many graduate dogs were flaged as success?
 - Type 2 error = false negative error: 1-TNR = 64% of the dogs flagged as success would fail.
-
-The results reveals that the model learnt on the full dataset delivers a better AUC-ROC 0.81 compared to 0.75.
+<!-- 
+The results reveal that the model learnt on the reduced dataset delivers a better AUC-ROC 0.81 compared to 0.75.
 On the other hand, the TPR or Sensitivity is 98% for the Reduced model and 92% for the Full model. 
 Therefore, the Reduced model is a better fit for the data. 
 The sample size is rather small, therefore that such differences performance may be caused for just a few dogs being correctly classified.
 Regardless, a simpler model is always a better choice if the differences in performance are not significant.
 Another metric that can be used to compare model is AIC (Akaike Information Criterion), an optimal model minimizes AIC.
 
-Conclusively, the AIC indicates that the Reduced model is a better fit.
+Conclusively, the AIC indicates that the Reduced model is a better fit. -->
 
 ```{r, echo = FALSE}
-print("p<0.05 + full")
-data_0.05_full_prep <- impute_pca(data_0.05_full)
-data_0.05_full_pca <- bake(data_0.05_full_prep, data_0.05_full)
-rfe_0.05_full <- rfe_lr(data_0.05_full_pca)
-dev_null_residual(summary(rfe_0.05_full$fit))
-ggplot(data = rfe_0.05_full, metric = "ROC") + theme_bw()
-
 print("p<0.05 + reduced")
-data_0.05_reduced_prep <- impute_pca(data_0.05_reduced)
-data_0.05_reduced_pca  <- bake(data_0.05_reduced_prep, data_0.05_reduced)
-rfe_0.05_reduced <- rfe_lr(data_0.05_reduced_pca)
-dev_null_residual(summary(rfe_0.05_reduced$fit))
-ggplot(data = rfe_0.05_reduced, metric = "ROC") + theme_bw()
+data_prep <- impute_pca(data_reduced)
+data_pca  <- bake(data_prep, data_reduced)
+rfe_reduced <- rfe_lr(data_pca)
+dev_null_residual(summary(rfe_reduced$fit))
+
+# plot roc per rfe iteration
+plot <- ggplot(data = rfe_reduced, metric = "ROC") + theme_bw()
+suppressMessages(ggsave(paste("analysis/prq/rfe-roc.png"), plot))
+plot
 
 ```
 
-## Interpretation: Reduced Feature Set Model
+## Interpretation
 
-The best Logistic Regression model (Reduced feature set model) is used to investigate the effect of the predictors on the training outcome.
-The estimates were exponentiated to get the Odds Ratio (OR). The 95% Confident Intervals (CI) of the estimates were also calculated. 
-The OR for PC01 is 1.985, this means that the probability of withdrawal increased by 98.5% for every unit increase of PC1.
+The best Logistic Regression model is used to investigate the effect of the principal components on the training outcome.
+The estimates were exponentiated to get the Odds Ratio (OR). The 95% Confident Interval (CI) of the ORs was also calculated. 
+The OR for PC01 is 0.4994, this means that the probability of withdrawal decreases by (0.50-1) 50% for every unit increase of PC1.
+We are 95% confident that a unit increase in PC01 results in a 29 to 71% (0.29-1 = 0.71, 0.71-1 = 0.29) less odds of being withdrawn from training.
 <!-- Use Wald test to test the significance of the slope  -->
 
 ```{r, echo = FALSE}
-# exponentiate the coefficentes to get the odd ratio and their confidence intervals
-## odds ratios and 95% CI using profiled log-likelihood
-# results_0.05_full <- as.data.frame(coef(summary(rfe_0.05_full$fit)))
-# results_0.05_full$OR <- exp(results_0.05_full$Estimate)
-# results_0.05_full <- cbind(results_0.05_full, confint(rfe_0.05_full$fit, level = 0.95))
-# print("Results from the model create with the full feature set")
-# print(results_0.05_full)
-```
-
-```{r, echo = FALSE}
-results_0.05_reduced <- as.data.frame(coef(summary(rfe_0.05_reduced$fit)))
-results_0.05_reduced$OR <- exp(results_0.05_reduced$Estimate)
-results_0.05_reduced <- cbind(results_0.05_reduced, exp(confint(rfe_0.05_reduced$fit, level = 0.95)))
+results_reduced <- as.data.frame(coef(summary(rfe_reduced$fit)))
+results_reduced$OR <- exp(results_reduced$Estimate)
+results_reduced <- cbind(results_reduced, exp(confint(rfe_reduced$fit, level = 0.95)))
 print("Results from the model created with the reduced feature set")
-print(results_0.05_reduced)
+print(results_reduced)
 ```
 
 ```{r, echo = FALSE}
-perf <- as.data.frame(data_0.05_reduced_pca %>% select(PC01,Outcome))
-perf$Probability <- predict(rfe_0.05_reduced$fit,            # model
-                newdata = data_0.05_reduced_pca,        # dataframe, this will only select PC01
+coef <- predictors(rfe_reduced)
+
+perf <- as.data.frame(data_pca %>% select(coef,Outcome))
+perf$Outcome <- relevel(perf$Outcome, "Fail")
+perf$Probability <- predict(rfe_reduced$fit,       # model
+                newdata = data_pca,        # dataframe, this will only select PC01
                 type  = "response")
+perf$Status <- prq$Status
+perf <- perf %>% mutate(Status = Status %>% fct_relevel(c("W", "GD", "AD")))
 perf$Predicted <- ifelse(perf$Probability > 0.5, "Fail", "Success")
+perf$Estimate <- log( 1 / (1/perf$Probability - 1) )
 
+# logit function, calculate y given the probability(x)
+y <- function(x){ return(log(1/( 1/x - 1))) }
+th_fail = 0.65
+th_success = 0.35
 
-ggplot(perf, aes(x = PC01, y = Probability, color = Outcome )) +
+print("Probability predicted by the LR using PRQ data vs true Outcome")
+plot <- ggplot(perf, aes(x = Estimate, y = Probability, color = Outcome )) +
     # bottom - green
-    geom_rect(aes(xmin = -2.5, xmax = 0, ymin = 0, ymax = 0.375), 
+    geom_rect(aes(xmin = -Inf, xmax = y(th_success), ymin = 0, ymax = th_success), 
             fill = "#99ff99", alpha = 0.2, color = "white") + 
     # top - orange
-    geom_rect(aes(xmin = 5, xmax = 7.5, ymin = 0.625, ymax = 1), 
+    geom_rect(aes(xmin = y(th_fail), xmax = Inf, ymin = th_fail, ymax = 1), 
             fill = "#ffff99", alpha = 0.2, color = "white") +  
-    geom_point() +
-    scale_color_brewer(palette = "Set2")
-perf
+    geom_point() 
+plot
+
+suppressMessages(ggsave(paste("analysis/prq/logit-outcome.png"), plot))
+
+
+print("Probability predicted by the LR using PRQ data vs true Status")
+# plot Logit vs Status
+plot <- ggplot(perf, aes(x = Estimate, y = Probability, color = Status )) +
+    # bottom - green
+    geom_rect(aes(xmin = -Inf, xmax = y(th_success), ymin = 0, ymax =  th_success), 
+            fill = "#99ff99", alpha = 0.2, color = "white") + 
+    # top - orange
+    geom_rect(aes(xmin = y(th_fail), xmax = Inf, ymin =  th_fail, ymax = 1), 
+            fill = "#ffff99", alpha = 0.2, color = "white") +  
+    geom_point()
+plot
+
+suppressMessages(ggsave(paste("analysis/prq/logit-status.png"), plot))
+
+cat("Predicted probability <", th_success, " -> Green flag ")
+print("Dogs flagged green are likely to SUCCEED, true outcome count and status proportion:")
+table(perf %>% filter(Probability < th_success) %>% pull(Outcome))
+prop.table(table(perf %>% filter(Probability < th_success) %>% pull(Status)))
+cat("Predicted probability >", th_fail, "-> Yellow flag")
+print("Dogs flagged green are likely to FAIL, true outcome count and status proportion:")
+table(perf %>% filter(Probability > th_fail) %>% pull(Outcome))
+prop.table(table(perf %>% filter(Probability > th_fail) %>% pull(Status)))
+
 ```
 
-## Feature Importance: Reduced Feature Set Model
+## Feature Importance
+
+### Explained Variance
+```{r, echo = FALSE}
+# tidy(recipe steps, number = select pca step, type = coef or variance
+dc_pca_var <- as.data.frame(tidy(data_prep, number = 3, type = "variance"))
+dc_pca_var <- dc_pca_var %>% spread(key = "terms", value = value) %>% select(-c(id))
+dc_pca_var$component <- mapvalues(dc_pca_var$component, from = 1:15, 
+    to = c('PC01', 'PC02', 'PC03', 'PC04', 'PC05', 'PC06', 'PC07', 'PC08', 'PC09', 'PC10', 'PC11', 'PC12', 'PC13', 'PC14', 'PC15'))
+colnames(dc_pca_var) <- make.names(names(dc_pca_var)) # fixing column names with space
+
+cat("PCA features kept in the final model after RFE: ", coef)
+print("Explained Variance per Principal Component (Scree Plot)")
+dc_pca_var$Included = factor(c("Yes", "No", "No", "No", "No", "No", "No", "No", "No", "No", "No", "No", "No", "No", "No"))
+plot <- ggplot(dc_pca_var, aes(x = component, y = percent.variance, fill = Included)) +
+    geom_bar(stat='identity', position = 'dodge', width = 0.8)+
+    xlab("Principal components") +
+    ylab("Explained Variance (%)") 
+plot
+suppressMessages(ggsave(paste("analysis/prq/pc-explained-variance.png"), plot))
+
+print("Cumulative Explained Variance per Principal Component")
+plot <- ggplot(dc_pca_var, aes(x = component, y = cumulative.percent.variance, fill = Included)) +
+    geom_bar(stat='identity', position = 'dodge', width = 0.8)+
+    xlab("Principal Components") +
+    ylab("Cumulative Variance (%)")
+plot
+suppressMessages(ggsave(paste("analysis/prq/pc-cumulative-variance.png"), plot))
+
+```
+
+### Coefficient Loadings
+
 Analysis of the principal component loadings that were used in the best Multivariate Logistic Regression Model.
 
 The 5 highest loading values in PC1 come from the variables 
@@ -484,34 +615,29 @@ This indicates that this principal component places most variation in these vari
 
 ```{r, echo = FALSE}
 # model prep is the recipe steps, select pca -> number = 3, because it's the 3rd step
-df_pca_reduced <- as.data.frame(tidy(data_0.05_reduced_prep, number = 3, type = "coef"))
+df_pca_reduced <- as.data.frame(tidy(data_prep, number = 3, type = "coef"))
 # creating another dataframe with PC1 values for the analysis
 df_pcs_reduced <- df_pca_reduced  %>% filter(component == 'PC1') %>% select(terms, value, component)
 
-# figuring out the righest loading items for the PC1 and PC5 
+# figuring out the righest loading items for the PC1
 df_pcs_reduced %>% filter(component == 'PC1') %>% arrange(desc(abs(value))) %>% select(terms, value)
 
 ggplot(df_pcs_reduced, aes(x=unlist(lapply(strsplit(terms,"[.]"), function(x) x[1])), y=value)) +
     geom_bar(stat='identity', position='dodge', width = 0.8) +
-    xlab("C-BARQ items or factors") +
+    xlab("C-BARQ items and factors - Predictor Variables") +
     ylab("Principal components") +
-    theme(axis.text.x = element_text(angle = 45), legend.position = "top")
-print(df_pcs_reduced$terms[1:12])
+    theme(axis.text.x = element_text(angle = 45))
+    
 ```
 
-```{r, echo = FALSE}
-l <- unlist(data_0.05_reduced[1,1:12]) * df_pcs_reduced$value
-sum(l)
-data_0.05_reduced_pca 
-```
+# Conclusion
 
-
-## Conclusion
-
-This model could be used to flag dogs likely to be withdrawn from training for behavioural reasons. 
+Completing this questionnaire before training (Week 0) would allow assistance dog training organisations to understand which dog are more suitable and allow them to make informed decisions when analysing which dogs to keep for training considering the results of this objective assessment. 
+The model could be used to flag dogs likely to be withdrawn from training for behavioural reasons. 
 Dog trainers could consider the output to re-assess and adjust the training programme for flagged dogs in order to address behavioural issues.
 Considering the higher TPR achieved by the Reduced model, that might be a better choice when employing this system to correcly identify unsuitable dogs for the training programme.
 
 Duration of dog correctly classified as Fail and went on to Fail in days (Dog 16 = 100, Dog42 = 55, Dog51 = 113, Dog51 = 90), 30, 43, 20 days of training saved! 
 70 days for this assessment it could be done earlier too. 
 Ideally assign a dog to a dog trainer from start to Week 3. They are them responsible for filling out the questionnaire.
+

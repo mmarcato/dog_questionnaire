@@ -39,8 +39,8 @@ def import_dog(base_dir):
             usecols = ['Code', 'Name', 'DOB',  'Sex', 'Breed', 'Source', 
                     'DOA','PR Sup', 'Coat Colour',  'Status', 'End Date'])
 
-    print('Columns in Demographics dataframe: \n', df.columns.tolist())
-    print('\nShape of Demographics dataframe: \n', df.shape)
+    print('Columns in Dog dataframe: \n', df.columns.tolist())
+    print('\nShape of Dog dataframe: \n', df.shape)
     # calculating duration of training
     df['Duration'] = df['End Date'] - df['DOA']
     # defining training outcome

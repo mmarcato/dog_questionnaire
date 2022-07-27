@@ -144,14 +144,48 @@ Therefore PCA will be implemented in the RFE cross validation loop as a preproce
 
 ## Recursive Feature Elimination (RFE) + Multivariate Logistic Regression (LR)
 
+```{r, echo = FALSE}
+# simple model used for dtq without performing PCA 
+feat_lr = lr_results %>% filter(significant_0.05 == TRUE) %>% rownames()
+data_lr <- data %>% select(all_of(feat_lr), Outcome)
+
+# Setting ROC as the metric for the Logistic Regression function
+lrFuncs$summary <- twoClassSummary
+
+ctrl <- rfeControl(functions = lrFuncs,     # logistic regression
+                    method = "LOOCV",       # Leave One Out Cross Validation
+                    verbose = FALSE)
+
+# Recursive Feature Elimination with feat_lr
+rfe_lr <- rfe(Outcome ~ .,      # predict Outcome using all other variables
+            data = data_lr,     # selecting the features from univariate lr
+                   sizes = c(1:length(data_lr)-1),
+                   rfeControl = ctrl,
+                   metric = "ROC")
+
+warnings()
+print(rfe_lr)
+ggplot(data = rfe_lr, metric = "ROC") + theme_bw()
+cat("Features in the model that delivered the best ROC", predictors(rfe_lr))
+
+model_lr <- rfe_lr$fit
+summary(model_lr)
+```
+
 
 I tried giving the recipe for preprocessing to the rfe function, but it did not work for some reason!
-LOOCV did not work, I did some research (keywords: Caret rfeControl with loocv Num_Resamples) but there isn't much out there.
+LOOCV did not work, I did some research (keywords: Caret rfeControl with loocv Num_Resamples) but there is not much out there.
 I managed to make it run, but I needed to change the method to be repeatedCV 
-I ran the models with df = data_0.05_full only because it gave the best 
+PRQ
+I ran the models with df = data_0.05_full only because it gave the best results
 Best model PC01            ROC = 0.8712 (with repeats = 2, size = 1:3)
 Best model PC01, PC05       ROC = 0.8394 (with repeats = 5, size = 1:3)
 Best model PC01, PC05       ROC = 0.8394 (with repeats = 5, size = 1:10)
+
+DTQ
+dataset method          ROC     Sens    Spec    ROCSD   SensSD  SpecSD  Num_Resamples Selected
+p<0.05        repeatedCV      0.8843  0.9667  0.4167  0.2450  0.1214  0.5000            50        *
+
 
 Conclusion
 changing size variable, i.e. adding more features to the RFE does not yield a better model, as it will choose a small set
@@ -169,25 +203,29 @@ impute_pca_rfe_lr <- function(df){
                     step_impute_knn(all_numeric(), neighbors = 3) %>%
                     step_pca(all_numeric(), threshold = .95)
 
-    prep(model_pca, training = df, retrain = TRUE) %>% 
-    juice(all_predictors()) %>% 
-    ncol()
+    # prep(model_pca, training = df, retrain = TRUE) %>% 
+    # juice(all_predictors()) %>% 
+    # ncol()
 
     # Setting ROC as the metric for the Logistic Regression function
     lrFuncs$summary <- twoClassSummary
     set.seed(36)    
 
     ctrl <- rfeControl(functions = lrFuncs,     # logistic regression
-                        # method = "LOOCV",       # Leave One Out Cross Validation
-                        method = "repeatedCV",       # Leave One Out Cross Validation
-                        repeats = 2,
+                        method = "LOOCV",       # Leave One Out Cross Validation
+                        # number = 1, 
+                        # method = "repeatedcv",  # Repeated Cross Validation
+                        # number = 3,             # Number of folds 
+                        repeats = 10,           # Number of iterations/repetition
                         verbose = FALSE,
-                        returnResamp = "final")
+                        returnResamp = "all")
 
     # Recursive Feature Elimination with feat_lr
     model <- rfe(model_pca,                     # predict Outcome using all other variables
                     data = df,                  # selecting the features from univariate lr
-                    sizes = 1:10,
+                    sizes = 1:10, 
+                    # number = 1,                
+                    # Num_Resamples = 2,
                     rfeControl = ctrl,
                     metric = "ROC") 
     
@@ -199,7 +237,7 @@ impute_pca_rfe_lr <- function(df){
     return(model)
 }
 
-impute_pca_rfe_lr(data_0.05_full)
+# impute_pca_rfe_lr(data_0.05_full)
 
 ```
 Visualisation of PC1 and Outcome
@@ -316,6 +354,30 @@ ggplot(df_pcs, aes(x=unlist(lapply(strsplit(terms,"[.]"), function(x) x[1])), y=
     ylab("Principal components") +
     theme(axis.text.x = element_text(angle = 45), legend.position = "top")
 ```
+
+## Diagnostics
+1. Index plot: residuals vs case number
+2. Leverage cases
+3. Influence cases
+
+```{r, echo = FALSE}
+diagnostics <- function(model){
+    h <- lm.influence(model)$hat
+    rpear <- residuals(model, "pearson")/sqrt(1-h)
+    rdev <- residuals(model, "deviance")/sqrt(1-h)
+    phat <- model$fitted.values
+    D <- rpear*rpear*h/(2**(1-h))
+    diagnostic <- data.frame(data$Outcome, phat, h, rpear, rdev, D)
+    return(diagnostic)
+
+    plot(rpear, main="Index Plot of Pearson Residuals")
+    plot(model$linear.predictors, rpear, main = "Plot of Pearson Residuals vs Linear Predictor")
+}
+
+diag_lr <- diagnostics(model_lr)
+diag_lr[order(diag_lr$rpear, decreasing = TRUE),]
+```
+
 
 ## Conclusion
 Results with the original dataset.

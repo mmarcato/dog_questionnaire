@@ -1,0 +1,142 @@
+Item,&,Min.,&,X1st.Qu.,&,Median,&,Mean,&,X3rd.Qu.,&,Max.,&,Missing,\\\hline
+1 When off the leash returns immediately when called,&,1,&,3,&,3,&,3.11,&,4,&,4,&,0,\\\hline
+2 Obeys the sit command immediately,&,2,&,3,&,4,&,3.49,&,4,&,4,&,0,\\\hline
+3 Obeys the stay command immediately,&,1,&,3,&,3,&,3.15,&,4,&,4,&,2,\\\hline
+4 Seems to attend/listen closely to everything you say or do,&,2,&,3,&,3,&,3.40,&,4,&,4,&,0,\\\hline
+5 Slow to respond to correction or punishment thick-skinned,&,0,&,3,&,3,&,2.96,&,4,&,4,&,6,\\\hline
+6 Slow to learn new tricks or tasks,&,0,&,3,&,3,&,3.16,&,4,&,4,&,0,\\\hline
+7 Easily distracted by interesting sights sounds or smells,&,0,&,2,&,2,&,2.16,&,3,&,4,&,0,\\\hline
+8 Will fetch or attempt to fetch sticks balls or objects,&,1,&,1.75,&,2,&,2.57,&,4,&,4,&,3,\\\hline
+9 When verbally corrected or punished scolded shouted at etc by you or a household member,&,0,&,0,&,0,&,0.00,&,0,&,0,&,6,\\\hline
+10 When approached directly by an unfamiliar adult while being walked/exercised on a leash,&,0,&,0,&,0,&,0.00,&,0,&,0,&,0,\\\hline
+11 When approached directly by an unfamiliar child while being walked/exercised on a leash,&,0,&,0,&,0,&,0.02,&,0,&,1,&,0,\\\hline
+12 Toward unfamiliar persons approaching the dog while she is in your car at the gas station for example,&,0,&,0,&,0,&,0.06,&,0,&,2,&,1,\\\hline
+13 When toys bones or other objects are taken away by a household member,&,0,&,0,&,0,&,0.00,&,0,&,0,&,0,\\\hline
+14 When bathed or groomed by a household member,&,0,&,0,&,0,&,0.02,&,0,&,1,&,0,\\\hline
+15 When an unfamiliar person approaches you or another member of your family at home,&,0,&,0,&,0,&,0.03,&,0,&,2,&,0,\\\hline
+16 When unfamiliar persons approach you or another member of your family away from your home,&,0,&,0,&,0,&,0.02,&,0,&,1,&,0,\\\hline
+17 When approached directly by a household member while she the dog is eating,&,0,&,0,&,0,&,0.00,&,0,&,0,&,0,\\\hline
+18 When mailmen or other delivery workers approach your home,&,0,&,0,&,0,&,0.19,&,0,&,2,&,1,\\\hline
+19 When his/her food is taken away by a household member,&,0,&,0,&,0,&,0.02,&,0,&,1,&,3,\\\hline
+20 When strangers walk past your home while your dog is outside or in the yard,&,0,&,0,&,0,&,0.18,&,0,&,2,&,1,\\\hline
+21 When an unfamiliar person tries to touch or pet the dog,&,0,&,0,&,0,&,0.02,&,0,&,1,&,0,\\\hline
+22 When joggers cyclists roller bladers or skate boarders pass your home,&,0,&,0,&,0,&,0.08,&,0,&,2,&,1,\\\hline
+23 When approached directly by an unfamiliar male dog while being walked/exercised on a leash,&,0,&,0,&,0,&,0.13,&,0,&,3,&,0,\\\hline
+24 When approached directly by an unfamiliar female dog while being walked/exercised on a leash,&,0,&,0,&,0,&,0.10,&,0,&,3,&,0,\\\hline
+25 When stared at directly by a member of the household,&,0,&,0,&,0,&,0.05,&,0,&,3,&,0,\\\hline
+26 Toward unfamiliar dogs visiting your home,&,0,&,0,&,0,&,0.21,&,0,&,3,&,2,\\\hline
+27 Toward cats squirrels or other small animals entering your yard,&,0,&,0,&,0,&,0.38,&,1,&,4,&,2,\\\hline
+28 Toward unfamiliar persons visiting your home,&,0,&,0,&,0,&,0.03,&,0,&,1,&,0,\\\hline
+29 When barked growled or lunged at by another unfamiliar dog,&,0,&,0,&,0,&,0.36,&,0,&,4,&,2,\\\hline
+30 When stepped over by a member of the household,&,0,&,0,&,0,&,0.00,&,0,&,0,&,0,\\\hline
+31 When you or a household member retrieves food or objects stolen by the dog,&,0,&,0,&,0,&,0.03,&,0,&,1,&,2,\\\hline
+32 Towards another familiar dog in your household NA if no other dogs,&,0,&,0,&,0,&,0.09,&,0,&,3,&,10,\\\hline
+33 When approached at a favorite resting/sleeping place by another familiar household dog NA if no other dogs,&,0,&,0,&,0,&,0.04,&,0,&,1,&,11,\\\hline
+34 When approached while eating by another familiar household dog NA if no other dogs,&,0,&,0,&,0,&,0.10,&,0,&,2,&,12,\\\hline
+35 When approached while playing with/chewing a favorite toy bone object etc by another familiar household dog NA if no other dogs,&,0,&,0,&,0,&,0.09,&,0,&,3,&,10,\\\hline
+36 When approached directly by an unfamiliar adult while away from your home,&,0,&,0,&,0,&,0.08,&,0,&,1,&,0,\\\hline
+37 When approached directly by an unfamiliar child while away from your home,&,0,&,0,&,0,&,0.00,&,0,&,0,&,1,\\\hline
+38 In response to sudden or loud noises eg vacuum cleaner car backfire road drills objects being dropped etc,&,0,&,0,&,0,&,0.52,&,1,&,4,&,0,\\\hline
+39 When unfamiliar persons visit your home,&,0,&,0,&,0,&,0.03,&,0,&,1,&,1,\\\hline
+40 When an unfamiliar person tries to touch or pet the dog,&,0,&,0,&,0,&,0.03,&,0,&,1,&,0,\\\hline
+41 In heavy traffic,&,0,&,0,&,0,&,0.19,&,0,&,2,&,0,\\\hline
+42 In response to strange or unfamiliar objects on or near the sidewalk eg plastic trash bags leaves litter flags flapping etc,&,0,&,0,&,0,&,0.18,&,0,&,2,&,1,\\\hline
+43 When examined/treated by a veterinarian,&,0,&,0,&,0,&,0.29,&,0,&,4,&,0,\\\hline
+44 During thunderstorms firework displays or similar events,&,0,&,0,&,0,&,0.22,&,0,&,2,&,3,\\\hline
+45 When approached directly by an unfamiliar dog of the same or larger size,&,0,&,0,&,0,&,0.30,&,0,&,4,&,0,\\\hline
+46 When approached directly by an unfamiliar dog of a smaller size,&,0,&,0,&,0,&,0.24,&,0,&,4,&,0,\\\hline
+47 When first exposed to unfamiliar situations eg first car trip first time in elevator first visit to veterinarian etc,&,0,&,0,&,0,&,0.35,&,1,&,2,&,0,\\\hline
+48 In response to wind or windblown objects,&,0,&,0,&,0,&,0.24,&,0,&,4,&,0,\\\hline
+49 When having nails clipped by a household member,&,0,&,0,&,0,&,0.14,&,0,&,2,&,28,\\\hline
+50 When groomed or bathed by a household member,&,0,&,0,&,0,&,0.29,&,0,&,4,&,0,\\\hline
+51 When having his/her feet towed by a member of the household,&,0,&,0,&,0,&,0.03,&,0,&,1,&,1,\\\hline
+52 When unfamiliar dogs visit your home,&,0,&,0,&,0,&,0.17,&,0,&,4,&,4,\\\hline
+53 When barked growled or lunged at by an unfamiliar dog,&,0,&,0,&,0,&,0.67,&,1,&,4,&,3,\\\hline
+54 Shaking shivering or trembling,&,0,&,0,&,0,&,0.10,&,0,&,2,&,1,\\\hline
+55 Excessive salivation,&,0,&,0,&,0,&,0.13,&,0,&,2,&,3,\\\hline
+56 Restlessness/agitation/pacing,&,0,&,0,&,0,&,0.35,&,0,&,3,&,1,\\\hline
+57 Whining,&,0,&,0,&,0,&,0.58,&,1,&,3,&,1,\\\hline
+58 Howling,&,0,&,0,&,0,&,0.19,&,0,&,2,&,1,\\\hline
+59 Chewing/scratching at doors floor windows curtains etc,&,0,&,0,&,0,&,0.56,&,1,&,3,&,1,\\\hline
+60 Loss of appetite,&,0,&,0,&,0,&,0.07,&,0,&,2,&,2,\\\hline
+61 Barking,&,0,&,0,&,0,&,0.73,&,1,&,3,&,0,\\\hline
+62 When you or other members of the household come home after a brief absence,&,0,&,1,&,2,&,1.83,&,3,&,4,&,0,\\\hline
+63 When playing with you or other members of your household,&,0,&,1,&,2,&,1.63,&,2,&,4,&,0,\\\hline
+64 When doorbell rings,&,0,&,0,&,1,&,1.30,&,2,&,4,&,3,\\\hline
+65 Just before being taken for a walk,&,0,&,0,&,1,&,0.92,&,1,&,4,&,0,\\\hline
+66 Just before being taken on a car trip,&,0,&,0,&,0,&,0.65,&,1,&,4,&,0,\\\hline
+67 When visitors arrive at your home,&,0,&,1,&,1,&,1.54,&,2,&,4,&,0,\\\hline
+68 Displays a strong attachment for one particular member of the household,&,0,&,1,&,2,&,2.05,&,3,&,4,&,1,\\\hline
+69 Tends to follow you or other members of household about the house from room to room,&,0,&,2,&,3,&,2.52,&,3,&,4,&,0,\\\hline
+70 Tends to sit close to or in contact with you or others when you are sitting down,&,1,&,2,&,3,&,2.66,&,3,&,4,&,1,\\\hline
+71 Tends to nudge nuzzle or paw you or others for attention when you are sitting down,&,0,&,1,&,2,&,1.84,&,2,&,4,&,1,\\\hline
+72 Becomes agitated whines jumps up tries to intervene when you or others show affection for another person,&,0,&,0,&,0,&,0.68,&,1,&,3,&,1,\\\hline
+73 Becomes agitated whines jumps up tries to intervene when you show affection for another dog or animal,&,0,&,0,&,0,&,0.79,&,1,&,4,&,2,\\\hline
+74 Chases or would chase cats given the opportunity,&,0,&,0,&,1,&,1.48,&,2,&,4,&,7,\\\hline
+75 Chases or would chase birds given the opportunity,&,0,&,0,&,1,&,1.31,&,2,&,4,&,1,\\\hline
+76 Chases or would chase squirrels rabbits and other small animals given the opportunity,&,0,&,0,&,2,&,1.49,&,2,&,4,&,18,\\\hline
+77 Escapes or would escape from home or yard given the chance,&,0,&,0,&,0,&,0.65,&,1,&,4,&,6,\\\hline
+78 Rolls in animal droppings or other smelly substances,&,0,&,0,&,1,&,1.13,&,2,&,4,&,2,\\\hline
+79 Eats own or other animals droppings or faeces,&,0,&,0,&,0,&,0.87,&,2,&,4,&,0,\\\hline
+80 Chews inappropriate objects,&,0,&,0,&,1,&,1.11,&,2,&,4,&,2,\\\hline
+81 Mounts objects furniture or people,&,0,&,0,&,0,&,0.27,&,0,&,2,&,1,\\\hline
+82 Begs persistently for food when people are eating,&,0,&,0,&,0,&,0.61,&,1,&,4,&,1,\\\hline
+83 Steals food,&,0,&,0,&,0,&,0.77,&,1,&,4,&,1,\\\hline
+84 Nervous or frightened on stairs,&,0,&,0,&,0,&,0.16,&,0,&,4,&,1,\\\hline
+85 Pulls excessively hard when on the leash,&,0,&,0,&,1,&,0.94,&,2,&,3,&,1,\\\hline
+86 Urinates against objects furnishings in your home,&,0,&,0,&,0,&,0.06,&,0,&,4,&,1,\\\hline
+87 Urinates when approached petted handled or picked up,&,0,&,0,&,0,&,0.06,&,0,&,4,&,1,\\\hline
+88 Urinates when left alone at night or during the daytime,&,0,&,0,&,0,&,0.08,&,0,&,4,&,1,\\\hline
+89 Defecates when left alone at night or during the daytime,&,0,&,0,&,0,&,0.08,&,0,&,4,&,1,\\\hline
+90 Hyperactive restless has trouble settling down,&,0,&,0,&,0,&,0.32,&,0,&,3,&,1,\\\hline
+91 Playful puppyish boisterous,&,0,&,1,&,2,&,1.68,&,2,&,4,&,0,\\\hline
+92 Active energetic always on the go,&,0,&,1,&,2,&,1.75,&,3,&,4,&,0,\\\hline
+93 Stares intently at nothing visible,&,0,&,0,&,0,&,0.23,&,0,&,4,&,7,\\\hline
+94 Snaps at invisible flies,&,0,&,0,&,0,&,0.19,&,0,&,4,&,4,\\\hline
+95 Chases own tailwind end,&,0,&,0,&,1,&,0.92,&,2,&,3,&,2,\\\hline
+96 Chases/follows shadows light spots etc,&,0,&,0,&,0,&,0.45,&,0,&,4,&,5,\\\hline
+97 Barks persistently when alarmed or excited,&,0,&,0,&,0,&,0.49,&,1,&,4,&,0,\\\hline
+98 Licks him/herself excessively,&,0,&,0,&,0,&,0.34,&,1,&,2,&,2,\\\hline
+99 Licks people or objects excessively,&,0,&,0,&,0,&,0.47,&,1,&,3,&,3,\\\hline
+100 Displays other bizarre strange or repetitive behaviors,&,0,&,0,&,0,&,0.18,&,0,&,4,&,7,\\\hline
+F_01 Stranger directed aggression,&,0.00,&,0.00,&,0.00,&,0.06,&,0.10,&,0.50,&,0,\\\hline
+F_02 Owner directed aggression,&,0.00,&,0.00,&,0.00,&,0.02,&,0.00,&,0.43,&,0,\\\hline
+F_03 Dog directed aggression,&,0.00,&,0.00,&,0.00,&,0.20,&,0.00,&,3.25,&,0,\\\hline
+F_04 Dog directed fear,&,0.00,&,0.00,&,0.00,&,0.34,&,0.29,&,3.75,&,0,\\\hline
+F_05 Dog rivalry,&,0.00,&,0.00,&,0.00,&,0.08,&,0.00,&,1.50,&,11,\\\hline
+F_06 Trainability,&,2.13,&,2.75,&,3.00,&,3.00,&,3.25,&,3.88,&,0,\\\hline
+F_07 Chasing,&,0.00,&,0.29,&,1.00,&,1.13,&,1.50,&,4.00,&,4,\\\hline
+F_08 Stranger directed fear,&,0.00,&,0.00,&,0.00,&,0.04,&,0.00,&,0.75,&,0,\\\hline
+F_09 Nonsocial fear,&,0.00,&,0.00,&,0.17,&,0.29,&,0.50,&,1.60,&,0,\\\hline
+F_10 Separation related problems,&,0.00,&,0.00,&,0.19,&,0.34,&,0.63,&,1.50,&,1,\\\hline
+F_11 Touch sensitivity,&,0.00,&,0.00,&,0.00,&,0.16,&,0.25,&,1.25,&,1,\\\hline
+F_12 Excitability,&,0.00,&,0.67,&,1.00,&,1.31,&,1.92,&,3.83,&,0,\\\hline
+F_13 Attachment attention seeking,&,0.33,&,1.33,&,1.83,&,1.76,&,2.17,&,3.50,&,2,\\\hline
+F_14 Energy,&,0.00,&,1.00,&,1.50,&,1.71,&,2.25,&,4.00,&,0,\\\hline
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,

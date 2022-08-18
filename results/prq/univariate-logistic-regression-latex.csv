@@ -1,0 +1,116 @@
+Item,&,estimate_0,&,estimate_1,&,se_0,&,se_1,&,z_value_0,&,z_value_1,&,p_value_0,&,p_value_1,&,deviance,\\\hline
+1 When off the leash returns immediately when called,&,1.69,&,-1.12,&,1.30,&,0.46,&,1.30,&,-2.44,&,1.94E-01,&,1.47E-02,&,5.16E+01,\\\hline
+2 Obeys the sit command immediately,&,-0.20,&,-0.39,&,1.79,&,0.52,&,-0.11,&,-0.76,&,9.10E-01,&,4.48E-01,&,5.78E+01,\\\hline
+3 Obeys the stay command immediately,&,-1.97,&,0.11,&,1.50,&,0.46,&,-1.31,&,0.24,&,1.90E-01,&,8.13E-01,&,5.44E+01,\\\hline
+4 Seems to attend/listen closely to everything you say or do,&,-1.15,&,-0.12,&,1.95,&,0.57,&,-0.59,&,-0.21,&,5.56E-01,&,8.34E-01,&,5.83E+01,\\\hline
+5 Slow to respond to correction or punishment thick-skinned,&,-1.21,&,-0.08,&,1.07,&,0.35,&,-1.13,&,-0.22,&,2.61E-01,&,8.26E-01,&,5.59E+01,\\\hline
+6 Slow to learn new tricks or tasks,&,-2.09,&,0.17,&,1.28,&,0.38,&,-1.63,&,0.44,&,1.03E-01,&,6.61E-01,&,5.81E+01,\\\hline
+7 Easily distracted by interesting sights sounds or smells,&,0.01,&,-0.78,&,0.85,&,0.42,&,0.01,&,-1.85,&,9.95E-01,&,6.44E-02,&,5.47E+01,\\\hline
+8 Will fetch or attempt to fetch sticks balls or objects,&,-1.47,&,-0.06,&,0.81,&,0.29,&,-1.81,&,-0.19,&,7.08E-02,&,8.46E-01,&,5.40E+01,\\\hline
+9 When verbally corrected or punished scolded shouted at etc by you or a household member,&,-1.55,&,0.35,&,-4.44,&,0.00,&,52.94,&,-1.55,&,3.48E-01,&,-4.44E+00,&,8.84E-06,\\\hline
+10 When approached directly by an unfamiliar adult while being walked/exercised on a leash,&,-1.55,&,0.33,&,-4.68,&,0.00,&,58.35,&,-1.55,&,3.32E-01,&,-4.68E+00,&,2.86E-06,\\\hline
+11 When approached directly by an unfamiliar child while being walked/exercised on a leash,&,-1.65,&,18.21,&,0.35,&,2399.54,&,-4.77,&,0.01,&,1.80E-06,&,9.94E-01,&,5.48E+01,\\\hline
+12 Toward unfamiliar persons approaching the dog while she is in your car at the gas station for example,&,-1.63,&,1.09,&,0.35,&,0.88,&,-4.66,&,1.24,&,3.14E-06,&,2.15E-01,&,5.65E+01,\\\hline
+13 When toys bones or other objects are taken away by a household member,&,-1.55,&,0.33,&,-4.68,&,0.00,&,58.35,&,-1.55,&,3.32E-01,&,-4.68E+00,&,2.86E-06,\\\hline
+14 When bathed or groomed by a household member,&,-1.53,&,-15.03,&,0.33,&,2399.54,&,-4.61,&,-0.01,&,3.95E-06,&,9.95E-01,&,5.80E+01,\\\hline
+15 When an unfamiliar person approaches you or another member of your family at home,&,-1.65,&,9.11,&,0.35,&,1199.77,&,-4.77,&,0.01,&,1.80E-06,&,9.94E-01,&,5.48E+01,\\\hline
+16 When unfamiliar persons approach you or another member of your family away from your home,&,-1.65,&,18.21,&,0.35,&,2399.54,&,-4.77,&,0.01,&,1.80E-06,&,9.94E-01,&,5.48E+01,\\\hline
+17 When approached directly by a household member while she the dog is eating,&,-1.55,&,0.33,&,-4.68,&,0.00,&,58.35,&,-1.55,&,3.32E-01,&,-4.68E+00,&,2.86E-06,\\\hline
+18 When mailmen or other delivery workers approach your home,&,-1.62,&,0.38,&,0.37,&,0.63,&,-4.39,&,0.61,&,1.11E-05,&,5.42E-01,&,5.76E+01,\\\hline
+19 When his/her food is taken away by a household member,&,-1.59,&,-14.98,&,0.35,&,2399.54,&,-4.58,&,-0.01,&,4.65E-06,&,9.95E-01,&,5.37E+01,\\\hline
+20 When strangers walk past your home while your dog is outside or in the yard,&,-1.54,&,0.03,&,0.36,&,0.78,&,-4.26,&,0.04,&,2.03E-05,&,9.70E-01,&,5.80E+01,\\\hline
+21 When an unfamiliar person tries to touch or pet the dog,&,-1.65,&,18.21,&,0.35,&,2399.54,&,-4.77,&,0.01,&,1.80E-06,&,9.94E-01,&,5.48E+01,\\\hline
+22 When joggers cyclists roller bladers or skate boarders pass your home,&,-1.63,&,0.86,&,0.35,&,0.82,&,-4.62,&,1.05,&,3.85E-06,&,2.92E-01,&,5.69E+01,\\\hline
+23 When approached directly by an unfamiliar male dog while being walked/exercised on a leash,&,-1.73,&,1.01,&,0.36,&,0.66,&,-4.76,&,1.54,&,1.91E-06,&,1.24E-01,&,5.56E+01,\\\hline
+24 When approached directly by an unfamiliar female dog while being walked/exercised on a leash,&,-1.66,&,0.83,&,0.35,&,0.65,&,-4.74,&,1.28,&,2.15E-06,&,2.02E-01,&,5.66E+01,\\\hline
+25 When stared at directly by a member of the household,&,-1.65,&,6.07,&,0.35,&,799.85,&,-4.77,&,0.01,&,1.80E-06,&,9.94E-01,&,5.48E+01,\\\hline
+26 Toward unfamiliar dogs visiting your home,&,-1.93,&,1.31,&,0.40,&,0.52,&,-4.80,&,2.52,&,1.55E-06,&,1.19E-02,&,4.90E+01,\\\hline
+27 Toward cats squirrels or other small animals entering your yard,&,-2.14,&,1.00,&,0.46,&,0.49,&,-4.65,&,2.06,&,3.31E-06,&,3.95E-02,&,4.92E+01,\\\hline
+28 Toward unfamiliar persons visiting your home,&,-1.63,&,1.63,&,0.35,&,1.46,&,-4.71,&,1.12,&,2.47E-06,&,2.63E-01,&,5.72E+01,\\\hline
+29 When barked growled or lunged at by another unfamiliar dog,&,-2.05,&,1.07,&,0.43,&,0.43,&,-4.82,&,2.51,&,1.46E-06,&,1.20E-02,&,4.83E+01,\\\hline
+30 When stepped over by a member of the household,&,-1.55,&,0.33,&,-4.68,&,0.00,&,58.35,&,-1.55,&,3.32E-01,&,-4.68E+00,&,2.86E-06,\\\hline
+31 When you or a household member retrieves food or objects stolen by the dog,&,-1.59,&,-14.98,&,0.35,&,1696.73,&,-4.58,&,-0.01,&,4.65E-06,&,9.93E-01,&,5.37E+01,\\\hline
+32 Towards another familiar dog in your household NA if no other dogs,&,-1.82,&,1.93,&,0.41,&,1.28,&,-4.48,&,1.51,&,7.49E-06,&,1.30E-01,&,4.33E+01,\\\hline
+33 When approached at a favorite resting/sleeping place by another familiar household dog NA if no other dogs,&,-1.52,&,-15.05,&,0.37,&,1696.73,&,-4.12,&,-0.01,&,3.80E-05,&,9.93E-01,&,4.71E+01,\\\hline
+34 When approached while eating by another familiar household dog NA if no other dogs,&,-1.58,&,-16.30,&,0.39,&,2684.31,&,-4.08,&,-0.01,&,4.48E-05,&,9.95E-01,&,4.29E+01,\\\hline
+35 When approached while playing with/chewing a favorite toy bone object etc by another familiar household dog NA if no other dogs,&,-1.58,&,0.93,&,0.37,&,0.72,&,-4.25,&,1.29,&,2.13E-05,&,1.97E-01,&,4.94E+01,\\\hline
+36 When approached directly by an unfamiliar adult while away from your home,&,-1.57,&,0.18,&,0.35,&,1.17,&,-4.51,&,0.16,&,6.40E-06,&,8.76E-01,&,5.83E+01,\\\hline
+37 When approached directly by an unfamiliar child while away from your home,&,-1.53,&,0.33,&,-4.61,&,0.00,&,57.96,&,-1.53,&,3.32E-01,&,-4.61E+00,&,3.95E-06,\\\hline
+38 In response to sudden or loud noises eg vacuum cleaner car backfire road drills objects being dropped etc,&,-2.24,&,1.03,&,0.49,&,0.46,&,-4.57,&,2.23,&,4.95E-06,&,2.57E-02,&,5.20E+01,\\\hline
+39 When unfamiliar persons visit your home,&,-1.61,&,1.61,&,0.35,&,1.46,&,-4.65,&,1.11,&,3.38E-06,&,2.69E-01,&,5.68E+01,\\\hline
+40 When an unfamiliar person tries to touch or pet the dog,&,-1.75,&,18.32,&,0.36,&,1696.73,&,-4.86,&,0.01,&,1.18E-06,&,9.91E-01,&,5.10E+01,\\\hline
+41 In heavy traffic,&,-1.85,&,1.12,&,0.39,&,0.60,&,-4.70,&,1.88,&,2.60E-06,&,5.97E-02,&,5.49E+01,\\\hline
+42 In response to strange or unfamiliar objects on or near the sidewalk eg plastic trash bags leaves litter flags flapping etc,&,-1.80,&,0.68,&,0.39,&,0.70,&,-4.58,&,0.98,&,4.64E-06,&,3.29E-01,&,5.39E+01,\\\hline
+43 When examined/treated by a veterinarian,&,-1.90,&,0.91,&,0.40,&,0.47,&,-4.75,&,1.93,&,2.05E-06,&,5.33E-02,&,5.39E+01,\\\hline
+44 During thunderstorms firework displays or similar events,&,-1.55,&,0.23,&,0.37,&,0.59,&,-4.22,&,0.39,&,2.45E-05,&,6.93E-01,&,5.70E+01,\\\hline
+45 When approached directly by an unfamiliar dog of the same or larger size,&,-1.91,&,0.83,&,0.39,&,0.39,&,-4.85,&,2.16,&,1.26E-06,&,3.08E-02,&,5.27E+01,\\\hline
+46 When approached directly by an unfamiliar dog of a smaller size,&,-1.78,&,0.70,&,0.37,&,0.40,&,-4.77,&,1.75,&,1.86E-06,&,7.98E-02,&,5.51E+01,\\\hline
+47 When first exposed to unfamiliar situations eg first car trip first time in elevator first visit to veterinarian etc,&,-1.96,&,0.92,&,0.44,&,0.52,&,-4.45,&,1.76,&,8.69E-06,&,7.85E-02,&,5.53E+01,\\\hline
+48 In response to wind or windblown objects,&,-1.88,&,1.06,&,0.40,&,0.60,&,-4.73,&,1.75,&,2.25E-06,&,7.93E-02,&,5.39E+01,\\\hline
+49 When having nails clipped by a household member,&,-2.76,&,1.29,&,0.74,&,0.79,&,-3.73,&,1.63,&,1.91E-04,&,1.04E-01,&,1.82E+01,\\\hline
+50 When groomed or bathed by a household member,&,-1.72,&,0.47,&,0.37,&,0.38,&,-4.61,&,1.23,&,3.97E-06,&,2.18E-01,&,5.69E+01,\\\hline
+51 When having his/her feet towed by a member of the household,&,-1.61,&,-14.96,&,0.35,&,1696.73,&,-4.65,&,-0.01,&,3.38E-06,&,9.93E-01,&,5.41E+01,\\\hline
+52 When unfamiliar dogs visit your home,&,-1.78,&,1.39,&,0.39,&,0.74,&,-4.62,&,1.88,&,3.92E-06,&,6.00E-02,&,5.06E+01,\\\hline
+53 When barked growled or lunged at by an unfamiliar dog,&,-2.10,&,0.70,&,0.47,&,0.31,&,-4.50,&,2.27,&,6.78E-06,&,2.34E-02,&,5.16E+01,\\\hline
+54 Shaking shivering or trembling,&,-1.75,&,1.51,&,0.37,&,0.77,&,-4.77,&,1.97,&,1.88E-06,&,4.94E-02,&,5.34E+01,\\\hline
+55 Excessive salivation,&,-1.95,&,1.14,&,0.41,&,0.74,&,-4.75,&,1.54,&,2.07E-06,&,1.24E-01,&,4.85E+01,\\\hline
+56 Restlessness/agitation/pacing,&,-1.93,&,0.81,&,0.42,&,0.38,&,-4.61,&,2.11,&,3.93E-06,&,3.49E-02,&,5.36E+01,\\\hline
+57 Whining,&,-2.13,&,0.79,&,0.49,&,0.37,&,-4.36,&,2.12,&,1.28E-05,&,3.43E-02,&,5.34E+01,\\\hline
+58 Howling,&,-1.76,&,0.84,&,0.38,&,0.51,&,-4.63,&,1.66,&,3.59E-06,&,9.60E-02,&,5.54E+01,\\\hline
+59 Chewing/scratching at doors floor windows curtains etc,&,-1.74,&,0.32,&,0.41,&,0.32,&,-4.22,&,0.99,&,2.42E-05,&,3.24E-01,&,5.70E+01,\\\hline
+60 Loss of appetite,&,-1.74,&,1.16,&,0.37,&,0.89,&,-4.75,&,1.31,&,2.03E-06,&,1.90E-01,&,5.27E+01,\\\hline
+61 Barking,&,-2.18,&,0.66,&,0.49,&,0.30,&,-4.42,&,2.16,&,1.01E-05,&,3.06E-02,&,5.37E+01,\\\hline
+62 When you or other members of the household come home after a brief absence,&,-3.86,&,1.04,&,0.98,&,0.36,&,-3.96,&,2.92,&,7.64E-05,&,3.52E-03,&,4.77E+01,\\\hline
+63 When playing with you or other members of your household,&,-3.27,&,0.88,&,0.86,&,0.35,&,-3.82,&,2.52,&,1.34E-04,&,1.19E-02,&,5.08E+01,\\\hline
+64 When doorbell rings,&,-2.68,&,0.75,&,0.67,&,0.31,&,-4.02,&,2.42,&,5.80E-05,&,1.56E-02,&,5.07E+01,\\\hline
+65 Just before being taken for a walk,&,-2.42,&,0.73,&,0.55,&,0.29,&,-4.43,&,2.48,&,9.34E-06,&,1.31E-02,&,5.18E+01,\\\hline
+66 Just before being taken on a car trip,&,-2.09,&,0.64,&,0.46,&,0.30,&,-4.56,&,2.15,&,5.04E-06,&,3.19E-02,&,5.38E+01,\\\hline
+67 When visitors arrive at your home,&,-2.35,&,0.46,&,0.63,&,0.27,&,-3.74,&,1.68,&,1.87E-04,&,9.38E-02,&,5.55E+01,\\\hline
+68 Displays a strong attachment for one particular member of the household,&,-2.57,&,0.40,&,0.80,&,0.29,&,-3.20,&,1.40,&,1.36E-03,&,1.61E-01,&,5.26E+01,\\\hline
+69 Tends to follow you or other members of household about the house from room to room,&,-3.01,&,0.54,&,1.13,&,0.38,&,-2.65,&,1.42,&,7.94E-03,&,1.55E-01,&,5.61E+01,\\\hline
+70 Tends to sit close to or in contact with you or others when you are sitting down,&,-2.19,&,0.24,&,1.11,&,0.38,&,-1.97,&,0.64,&,4.83E-02,&,5.24E-01,&,5.75E+01,\\\hline
+71 Tends to nudge nuzzle or paw you or others for attention when you are sitting down,&,-2.36,&,0.41,&,0.74,&,0.30,&,-3.21,&,1.37,&,1.34E-03,&,1.71E-01,&,5.60E+01,\\\hline
+72 Becomes agitated whines jumps up tries to intervene when you or others show affection for another person,&,-2.03,&,0.46,&,0.47,&,0.32,&,-4.32,&,1.45,&,1.57E-05,&,1.48E-01,&,5.28E+01,\\\hline
+73 Becomes agitated whines jumps up tries to intervene when you show affection for another dog or animal,&,-1.82,&,0.34,&,0.46,&,0.31,&,-3.98,&,1.10,&,7.00E-05,&,2.71E-01,&,5.64E+01,\\\hline
+74 Chases or would chase cats given the opportunity,&,-1.75,&,0.15,&,0.55,&,0.26,&,-3.20,&,0.57,&,1.40E-03,&,5.71E-01,&,5.22E+01,\\\hline
+75 Chases or would chase birds given the opportunity,&,-2.50,&,0.61,&,0.61,&,0.27,&,-4.10,&,2.23,&,4.21E-05,&,2.56E-02,&,5.27E+01,\\\hline
+76 Chases or would chase squirrels rabbits and other small animals given the opportunity,&,-1.92,&,0.32,&,0.63,&,0.27,&,-3.07,&,1.20,&,2.11E-03,&,2.32E-01,&,4.36E+01,\\\hline
+77 Escapes or would escape from home or yard given the chance,&,-2.84,&,1.05,&,0.63,&,0.38,&,-4.53,&,2.74,&,5.93E-06,&,6.14E-03,&,3.70E+01,\\\hline
+78 Rolls in animal droppings or other smelly substances,&,-1.47,&,-0.04,&,0.47,&,0.30,&,-3.16,&,-0.13,&,1.56E-03,&,8.97E-01,&,5.76E+01,\\\hline
+79 Eats own or other animals droppings or faeces,&,-1.29,&,-0.36,&,0.40,&,0.36,&,-3.26,&,-1.02,&,1.12E-03,&,3.07E-01,&,5.71E+01,\\\hline
+80 Chews inappropriate objects,&,-1.97,&,0.37,&,0.54,&,0.31,&,-3.63,&,1.18,&,2.89E-04,&,2.39E-01,&,5.62E+01,\\\hline
+81 Mounts objects furniture or people,&,-1.63,&,0.30,&,0.38,&,0.53,&,-4.30,&,0.57,&,1.74E-05,&,5.71E-01,&,5.77E+01,\\\hline
+82 Begs persistently for food when people are eating,&,-2.08,&,0.68,&,0.45,&,0.31,&,-4.59,&,2.23,&,4.42E-06,&,2.59E-02,&,5.28E+01,\\\hline
+83 Steals food,&,-1.57,&,0.04,&,0.41,&,0.29,&,-3.84,&,0.14,&,1.21E-04,&,8.85E-01,&,5.79E+01,\\\hline
+84 Nervous or frightened on stairs,&,-1.54,&,0.07,&,0.35,&,0.52,&,-4.48,&,0.12,&,7.55E-06,&,9.01E-01,&,5.79E+01,\\\hline
+85 Pulls excessively hard when on the leash,&,-2.47,&,0.82,&,0.63,&,0.40,&,-3.91,&,2.06,&,9.13E-05,&,3.97E-02,&,5.34E+01,\\\hline
+86 Urinates against objects furnishings in your home,&,-1.51,&,-3.76,&,0.33,&,599.89,&,-4.55,&,-0.01,&,5.45E-06,&,9.95E-01,&,5.76E+01,\\\hline
+87 Urinates when approached petted handled or picked up,&,-1.51,&,-3.76,&,0.33,&,599.89,&,-4.55,&,-0.01,&,5.45E-06,&,9.95E-01,&,5.76E+01,\\\hline
+88 Urinates when left alone at night or during the daytime,&,-1.49,&,-14.88,&,0.33,&,2177.75,&,-4.48,&,-0.01,&,7.55E-06,&,9.95E-01,&,5.72E+01,\\\hline
+89 Defecates when left alone at night or during the daytime,&,-1.49,&,-14.88,&,0.33,&,2177.75,&,-4.48,&,-0.01,&,7.55E-06,&,9.95E-01,&,5.72E+01,\\\hline
+90 Hyperactive restless has trouble settling down,&,-1.92,&,0.87,&,0.41,&,0.43,&,-4.62,&,2.02,&,3.80E-06,&,4.32E-02,&,5.39E+01,\\\hline
+91 Playful puppyish boisterous,&,-2.79,&,0.66,&,0.81,&,0.36,&,-3.44,&,1.84,&,5.80E-04,&,6.58E-02,&,5.48E+01,\\\hline
+92 Active energetic always on the go,&,-2.67,&,0.57,&,0.78,&,0.33,&,-3.42,&,1.75,&,6.30E-04,&,8.10E-02,&,5.51E+01,\\\hline
+93 Stares intently at nothing visible,&,-2.00,&,1.03,&,0.43,&,0.52,&,-4.64,&,1.97,&,3.46E-06,&,4.83E-02,&,4.43E+01,\\\hline
+94 Snaps at invisible flies,&,-1.69,&,0.41,&,0.37,&,0.40,&,-4.57,&,1.02,&,4.95E-06,&,3.07E-01,&,5.27E+01,\\\hline
+95 Chases own tailwind end,&,-1.90,&,0.38,&,0.53,&,0.36,&,-3.62,&,1.05,&,2.98E-04,&,2.94E-01,&,5.65E+01,\\\hline
+96 Chases/follows shadows light spots etc,&,-1.70,&,0.43,&,0.39,&,0.28,&,-4.35,&,1.56,&,1.37E-05,&,1.19E-01,&,5.40E+01,\\\hline
+97 Barks persistently when alarmed or excited,&,-1.69,&,0.26,&,0.40,&,0.39,&,-4.19,&,0.67,&,2.80E-05,&,5.01E-01,&,5.79E+01,\\\hline
+98 Licks him/herself excessively,&,-1.98,&,0.80,&,0.45,&,0.54,&,-4.40,&,1.50,&,1.10E-05,&,1.35E-01,&,5.23E+01,\\\hline
+99 Licks people or objects excessively,&,-2.14,&,0.84,&,0.47,&,0.39,&,-4.53,&,2.16,&,5.89E-06,&,3.10E-02,&,4.94E+01,\\\hline
+100 Displays other bizarre strange or repetitive behaviors,&,-1.67,&,0.08,&,0.38,&,0.44,&,-4.44,&,0.19,&,8.85E-06,&,8.51E-01,&,4.93E+01,\\\hline
+F_01 Stranger directed aggression,&,-2.03,&,5.74,&,0.44,&,2.63,&,-4.65,&,2.18,&,3.27E-06,&,2.90E-02,&,5.35E+01,\\\hline
+F_02 Owner directed aggression,&,-1.65,&,4.85,&,0.35,&,4.06,&,-4.71,&,1.19,&,2.42E-06,&,2.33E-01,&,5.70E+01,\\\hline
+F_03 Dog directed aggression,&,-1.99,&,1.58,&,0.41,&,0.68,&,-4.86,&,2.31,&,1.17E-06,&,2.07E-02,&,5.09E+01,\\\hline
+F_04 Dog directed fear,&,-1.99,&,0.96,&,0.41,&,0.44,&,-4.84,&,2.16,&,1.28E-06,&,3.11E-02,&,5.26E+01,\\\hline
+F_05 Dog rivalry,&,-1.70,&,1.25,&,0.40,&,1.03,&,-4.29,&,1.21,&,1.81E-05,&,2.26E-01,&,4.65E+01,\\\hline
+F_06 Trainability,&,1.48,&,-1.03,&,2.42,&,0.83,&,0.61,&,-1.24,&,5.41E-01,&,2.13E-01,&,5.68E+01,\\\hline
+F_07 Chasing,&,-2.28,&,0.62,&,0.60,&,0.34,&,-3.78,&,1.82,&,1.54E-04,&,6.91E-02,&,5.34E+01,\\\hline
+F_08 Stranger directed fear,&,-1.72,&,3.35,&,0.36,&,2.34,&,-4.72,&,1.43,&,2.36E-06,&,1.52E-01,&,5.63E+01,\\\hline
+F_09 Nonsocial fear,&,-2.49,&,2.51,&,0.54,&,0.94,&,-4.58,&,2.67,&,4.74E-06,&,7.65E-03,&,5.01E+01,\\\hline
+F_10 Separation related problems,&,-2.86,&,2.85,&,0.65,&,0.94,&,-4.37,&,3.01,&,1.25E-05,&,2.57E-03,&,4.70E+01,\\\hline
+F_11 Touch sensitivity,&,-1.80,&,0.85,&,0.41,&,1.08,&,-4.38,&,0.79,&,1.21E-05,&,4.30E-01,&,5.42E+01,\\\hline
+F_12 Excitability,&,-3.52,&,1.25,&,0.84,&,0.43,&,-4.17,&,2.91,&,3.03E-05,&,3.60E-03,&,4.81E+01,\\\hline
+F_13 Attachment attention seeking,&,-3.55,&,1.00,&,1.21,&,0.57,&,-2.92,&,1.77,&,3.48E-03,&,7.66E-02,&,5.09E+01,\\\hline
+F_14 Energy,&,-2.98,&,0.75,&,0.87,&,0.38,&,-3.42,&,1.95,&,6.33E-04,&,5.12E-02,&,5.42E+01,\\\hline
+Sex,&,-1.39,&,-0.34,&,0.46,&,0.67,&,-3.04,&,-0.50,&,2.39E-03,&,6.14E-01,&,5.81E+01,\\\hline

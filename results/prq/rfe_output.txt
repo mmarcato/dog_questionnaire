@@ -1,0 +1,22 @@
+
+Recursive feature selection
+
+Outer resampling method: Leave-One-Out Cross-Validation 
+
+Resampling performance over subset size:
+
+ Variables    ROC   Sens   Spec Selected
+         1 0.8409 0.9423 0.3636        *
+         2 0.7552 0.9231 0.2727         
+         3 0.6591 0.8846 0.2727         
+         4 0.6066 0.8846 0.2727         
+         5 0.5787 0.8846 0.2727         
+         6 0.6084 0.9038 0.2727         
+         7 0.6224 0.9038 0.2727         
+         8 0.6346 0.9038 0.3636         
+         9 0.6294 0.8846 0.2727         
+        10 0.6294 0.8846 0.2727         
+
+The top 1 variables (out of 1):
+   PC01
+

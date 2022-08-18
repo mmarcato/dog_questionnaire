@@ -1,0 +1,446 @@
+# Correlation
+Correlation matrix and heatmap for all the variables in the Dog Trainer Questionnaire. 
+Items within the same canine personality subscale typically have a higher correlation.
+
+```{r, echo = FALSE}
+# OPTION 1
+# calculate correlation matrix
+correlationMatrix <- round(cor(data[,1:26]),2)
+# summarize the correlation matrix
+print(correlationMatrix)
+# find attributes that are highly corrected (ideally >0.75)
+highlyCorrelated <- findCorrelation(correlationMatrix, cutoff=0.6, names = TRUE, exact = TRUE)
+# print indexes of highly correlated attributes
+print(highlyCorrelated)
+ggplot(data = melt(correlationMatrix), aes(x=Var1, y=Var2,
+                                   fill=value)) + geom_tile()
+write.table(correlationMatrix, file = "models/R/dtq-correlation.csv")
+```
+```{r, echo = FALSE}
+# OPTION 2
+M<-abs(cor(training[,-58]))#left 58 column on the training dataset because that is going to be the output variable. We are checking correlation among all other variables in the training dataset, and we are taking the absolute value.
+diag(M)<-0 #setting the correlation of a variable to itself to be a zero. Because we know that every variable has a correlation of 1 with itself
+which(M>0.8, arr.ind=T)#Checking which of the variables have higher correlation than 0.8. 
+```
+
+# Model
+```{r, echo = FALSE}
+# I think this is not valid because for binary data, only the difference in deviance follows a chisq distribution
+dev_critical <- function(model){
+    critical = qchisq(0.95, model$df.residual, lower.tail = TRUE)
+    residual = model$deviance
+    cat('critical deviance: ', critical, '\nresidual deviance: ', residual)
+    cat('\nmodel is a good fit: ', residual < critical)
+}
+# dev_critical(model)
+```
+
+# Univariate Logistic Regression
+```{r, echo = FALSE}
+# option 2 for univariate logistic regression using one predictor and outcome
+# I didn't use this as I preferred using a two step approach so I could have
+# 1 variable = list of model results output for each feature
+# 1 variable = dataframe with the model results pulled (p_value and deviance)
+lr_test <- lapply(data[-length(data)], function(x){
+    model <- summary(glm(formula = Outcome ~ x, data = data, family = binomial(link = logit), na.action = na.exclude))
+    c(coef(model)), model$deviance) })
+lr_test
+```
+
+
+# Caret RFE + preprocessing
+RFE model in R. Apparently RFE allows you to specify pre-processing (link)[https://stackoverflow.com/questions/44776763/recursive-feature-elimination-with-caret-metric-roc-is-not-created-by-the-sum]. 
+I could use the trControl = (trainControl)[https://www.rdocumentation.org/packages/caret/versions/6.0-92/topics/trainControl] and specify preProcOptions (link)[https://www.rdocumentation.org/packages/caret/versions/6.0-92/topics/preProcess]
+Using (trainControl)[https://stackoverflow.com/questions/24612824/r-caret-package-error-if-i-specified-index-for-both-rfe-control-and-train-contr]
+Ignoreing (trainControl)[https://stackoverflow.com/questions/54088406/r-caret-combine-rfe-and-train]
+```{r, echo = FALSE}
+# df = data_lr
+# Setting ROC as the metric for the Logistic Regression function
+lrFuncs$summary <- twoClassSummary
+
+# I saw somewhere that I should try using seeds, but I think this does not apply for LOOCV
+set.seed(36)
+set.seed(123)
+seeds <- vector(mode = "list", length = 51)
+for(i in 1:50) seeds[[i]] <- sample.int(1000, length(subsetSizes) + 1)
+seeds[[51]] <- sample.int(1000, 1)
+
+set.seed(1)
+
+MyRFEcontrol <- rfeControl(functions = lrFuncs,     # logistic regression
+                    method = "LOOCV",       # Leave One Out Cross Validation
+                    # number = 1, 
+                #     method = "repeatedcv",  # Repeated Cross Validation
+                #     number = 4,             # Number of folds 
+                #     repeats = 10,           # Number of iterations/repetition
+                    verbose = FALSE,
+                    seeds = 
+                    returnResamp = "all")
+
+# train control for preprocessing dataset
+MyTrainControl <- trainControl(
+                method = "LOOCV", 
+                classProbs = TRUE, # compute the class probability (true enables ROC)
+		        # preProcOptions = list(method = c('center', 'scale', 'knnImpute', 'pca'), k = 3, thresh = 0.95),
+		        # preProcOptions = list('center', 'scale', 'knnImpute', 'pca', k = 3, 'thresh' = 0.95),
+                PCAthresh =0.95, k = 3,
+			    summaryFunction = twoClassSummary # calculate ROC metric
+)
+
+# Recursive Feature Elimination with feat_lr
+model <- rfe(Outcome ~ . ,                     # predict Outcome using all other variables
+                data = df,                  # selecting the features from univariate lr
+                sizes = 1:12, 
+                number = 63,                
+                # Num_Resamples = 2,
+                rfeControl = MyRFEcontrol,
+                metric = "ROC",
+                maximize = TRUE,
+                trControl = MyTrainControl) 
+
+warnings()
+print(model)
+print(summary(model$fit))
+predictors(model)
+
+```
+
+# Recipes + Caret RFE
+recipes + caret rfe  -> I do NOT understand why this is not working, 
+WTF this does not work! 
+```{r, echo = FALSE}
+df = data_reduced
+str(df)
+# loading example datasest from caret
+df <- twoClassSim(100)
+
+model_recipe <- recipe(Class ~ ., data = df )  %>%
+        step_impute_mean(all_numeric()) %>%
+        step_normalize(all_numeric()) %>%
+        step_pca(all_predictors(), threshold = .95)
+
+# this allows us to see how many features the pca transformed dataset has
+# prep(model_recipe, training = df, retain = TRUE) %>% 
+#   juice(all_predictors()) %>% 
+#   ncol()
+
+# Setting ROC as the metric for the Logistic Regression function
+lrFuncs$summary <- twoClassSummary
+set.seed(42)
+
+ctrl <- rfeControl(functions = lrFuncs,     # Logistic Regression
+                    method = "LOOCV",       # Leave One Out Cross Validation
+                    # number = 63,            # Num_Resamples
+                    verbose = FALSE)
+                    
+# Recursive Feature Elimination with feat_lr
+rfe_lr <- rfe(model_recipe ,                 # predict Outcome using all other variables
+                data = df,                 # selecting the features from univariate lr
+                sizes = c(2:5),
+                rfeControl = ctrl,
+                metric = "ROC",
+                maximize = TRUE)
+
+warnings()
+print(rfe_lr)
+ggplot(data = rfe_lr, metric = "ROC") + theme_bw()
+print("Features in the model that delivered the best ROC")
+print(predictors(rfe_lr))
+
+model_lr <- rfe_lr$fit
+summary(model_lr)
+```
+
+## Chisq for the univariate analysis
+
+Using Chisq test on contingency tables created with each feature and the outcome.
+
+```{r, echo = FALSE}
+# chisq test between predictors and outcome on contingency tables
+chi_test <- lapply(data[-length(data)], function(x) chisq.test(table(x, data$Outcome)))
+chi_results <- data.frame(do.call(rbind, lapply(chi_test, function(x) c( x$parameter, x$statistic, round(x$p.value,4)))))
+colnames(chi_results)[3] <- "p_value"
+chi_results$significant_0.05 <- (chi_results$p_value < 0.05)
+chi_results$significant_0.1 <- (chi_results$p_value < 0.1)
+chi_results$significant_0.2 <- (chi_results$p_value < 0.2)
+chi_results[order(chi_results$p_value),]
+print("Number of variables considering each level of significance using Chisq test")
+print(colSums(chi_results[,4:6], na.rm = TRUE))
+print(chi_results[chi_results$significant_0.05 == TRUE, 'p_value', drop = FALSE])
+
+feat_chi = rownames(chi_results[chi_results$p_value < 0.2,])
+data_chisq <- data %>% select(all_of(feat_chi), Outcome)
+```
+
+Checking the intersection and difference between chisq and logistic regression 
+```{r, echo = FALSE}
+cat("Chisq p_value < 0.2\n", feat_chi)
+cat("Logistic Regression p_value < 0.2\n", feat_lr)
+cat("intersection lr and chi:\n", intersect(feat_lr, feat_chi))
+cat("difference lr - chi:\n", setdiff(feat_lr, feat_chi))
+cat("difference chi - lr:\n", setdiff(feat_chi, feat_lr))
+```
+
+Considering features selected with univariate chisq test pvalue.
+```{r, echo = FALSE}
+# Recursive Feature Elimination with feat_chisq
+rfe_chi <- rfe(Outcome ~ . ,                 # predict Outcome using all other variables
+            data = data_chisq,              # selecting the features from chisq
+                   sizes = c(1:length(data_chisq)-1),
+                   rfeControl = ctrl,
+                   metric = "ROC")
+                
+warnings()   
+print(rfe_chi)
+ggplot(data = rfe_chi, metric = "ROC") + theme_bw()
+cat("Features in the model that delivered the best ROC", predictors(rfe_chi))
+
+model_chi <- rfe_chi$fit
+summary(model_chi)
+
+### Principal Component Analysis (PCA)
+Principal component analysis was used to combine features that showed high multicollinearity.
+VIF = 1 no correlation, 5 < VIF < 10 moderate correlation, VIF >10 high multicollinearity. 
+All variables from both the full and reduced features sets had VIF > 5, therefore PCA was performed.
+PCA can be implemented using prcomp function, however, it deletes all the row with NAs.
+Therefore PCA will be implemented in the RFE cross validation loop as a preprocessing method after missing value imputation.
+
+## Recursive Feature Elimination (RFE) + Multivariate Logistic Regression (LR)
+
+```{r, echo = FALSE}
+# simple model used for dtq without performing PCA 
+feat_lr = lr_results %>% filter(significant_0.05 == TRUE) %>% rownames()
+data_lr <- data %>% select(all_of(feat_lr), Outcome)
+
+# Setting ROC as the metric for the Logistic Regression function
+lrFuncs$summary <- twoClassSummary
+
+ctrl <- rfeControl(functions = lrFuncs,     # logistic regression
+                    method = "LOOCV",       # Leave One Out Cross Validation
+                    verbose = FALSE)
+
+# Recursive Feature Elimination with feat_lr
+rfe_lr <- rfe(Outcome ~ .,      # predict Outcome using all other variables
+            data = data_lr,     # selecting the features from univariate lr
+                   sizes = c(1:length(data_lr)-1),
+                   rfeControl = ctrl,
+                   metric = "ROC")
+
+warnings()
+print(rfe_lr)
+ggplot(data = rfe_lr, metric = "ROC") + theme_bw()
+cat("Features in the model that delivered the best ROC", predictors(rfe_lr))
+
+model_lr <- rfe_lr$fit
+summary(model_lr)
+```
+
+
+I tried giving the recipe for preprocessing to the rfe function, but it did not work for some reason!
+LOOCV did not work, I did some research (keywords: Caret rfeControl with loocv Num_Resamples) but there is not much out there.
+I managed to make it run, but I needed to change the method to be repeatedCV 
+PRQ
+I ran the models with df = data_0.05_full only because it gave the best results
+Best model PC01            ROC = 0.8712 (with repeats = 2, size = 1:3)
+Best model PC01, PC05       ROC = 0.8394 (with repeats = 5, size = 1:3)
+Best model PC01, PC05       ROC = 0.8394 (with repeats = 5, size = 1:10)
+
+DTQ
+dataset method          ROC     Sens    Spec    ROCSD   SensSD  SpecSD  Num_Resamples Selected
+p<0.05        repeatedCV      0.8843  0.9667  0.4167  0.2450  0.1214  0.5000            50        *
+
+
+Conclusion
+changing size variable, i.e. adding more features to the RFE does not yield a better model, as it will choose a small set
+
+```{r, echo = FALSE}
+
+impute_pca_rfe_lr <- function(df){
+
+    print("Dimensions of original dataset:")
+    print(dim(df))
+
+    model_pca <- recipe(formula =  Outcome ~ ., data = df) %>%
+                    step_normalize(all_numeric()) %>%
+                    # step_impute_mean(all_numeric()) %>%
+                    step_impute_knn(all_numeric(), neighbors = 3) %>%
+                    step_pca(all_numeric(), threshold = .95)
+
+    # prep(model_pca, training = df, retrain = TRUE) %>% 
+    # juice(all_predictors()) %>% 
+    # ncol()
+
+    # Setting ROC as the metric for the Logistic Regression function
+    lrFuncs$summary <- twoClassSummary
+    set.seed(36)    
+
+    ctrl <- rfeControl(functions = lrFuncs,     # logistic regression
+                        method = "LOOCV",       # Leave One Out Cross Validation
+                        # number = 1, 
+                        # method = "repeatedcv",  # Repeated Cross Validation
+                        # number = 3,             # Number of folds 
+                        repeats = 10,           # Number of iterations/repetition
+                        verbose = FALSE,
+                        returnResamp = "all")
+
+    # Recursive Feature Elimination with feat_lr
+    model <- rfe(model_pca,                     # predict Outcome using all other variables
+                    data = df,                  # selecting the features from univariate lr
+                    sizes = 1:10, 
+                    # number = 1,                
+                    # Num_Resamples = 2,
+                    rfeControl = ctrl,
+                    metric = "ROC") 
+    
+    # Printing outputs
+    warnings()
+    print(model)
+    print(summary(model$fit))
+    
+    return(model)
+}
+
+# impute_pca_rfe_lr(data_0.05_full)
+
+```
+Visualisation of PC1 and Outcome
+```{r, echo = FALSE}
+# Scatter plot of PC1 and Outcome
+ggplot(data_0.05_full_pca, aes(x = as.numeric(row.names(data_0.05_full_pca)), y = PC01, color = Outcome))+
+  geom_point()
+
+
+```
+
+## Feature Importance
+### Full Feature Set
+The 5 highest values in PC1 are 
+"X26 Toward unfamiliar dogs visiting your home", 
+"X45 When approached directly by an unfamiliar dog of the same or larger size",
+"X29 When barked growled or lunged at by another unfamiliar dog", 
+"F_03 Dog directed aggression", 
+"F_04 Dog directed fear"
+which indicate that this principal component places most variation in these variables related to fearful and agressive behaviour.
+
+The 5 highest values in PC5 are
+"X75 Chases or would chase birds given the opportunity"
+"X77 Escapes or would escape from home or yard given the chance"
+"X99 Licks people or objects excessively"
+"X82 Begs persistently for food when people are eating"
+"F_09 Nonsocial fear"
+which indicate that this principal component places most variation in these variables. 
+(chasing, escaping, licking, food drive, nonsocial fear)
+
+```{r, echo = FALSE}
+# model prep is th receipe steps, for the pca, number = 3, because it's the 3rd step
+df_pca_full <- as.data.frame(tidy(data_0.05_full_prep, number = 3))
+# creating another dataframe with PC1 and PC5 values for the analysis
+df_pcs_full <- df_pca_full %>% filter(component == 'PC1' | component == 'PC5') %>% select(terms, value, component)
+
+# figuring out the righest loading items for the PC1 and PC5 
+print("PC1 and PC2 values")
+df_pcs_full %>% filter(component == 'PC1') %>% arrange(desc(abs(value))) %>% select(terms, value)
+df_pcs_full %>% filter(component == 'PC5') %>% arrange(desc(abs(value))) %>% select(terms, value)
+
+ggplot(df_pcs_full, aes(x=unlist(lapply(strsplit(terms,"[.]"), function(x) x[1])), y=value, fill=component)) +
+    geom_bar(stat='identity', position='dodge', width = 0.8) +
+    xlab("C-BARQ items or factors") +
+    ylab("Principal components") +
+    theme(axis.text.x = element_text(angle = 45), legend.position = "top")
+print(df_pcs_full$terms[1:29])
+```
+
+
+
+
+
+### Model Analysis
+
+The best Logistic Regression model is used to investigate the effect of each variable on the training outcome.
+Odds ratio calculation, consider using Bon Ferroni correction
+
+```{r definition, echo = FALSE}
+dev_null_residual <- function(model){
+    dev = model$null.deviance - model$deviance
+    df = model$df.null - model$df.residual
+    cat('\ndeviance difference: ', dev)
+    cat('\ndf difference: ', df)
+    cat('\nlevel of significance: ', pchisq(dev, df, lower.tail = FALSE))
+    cat('\nmodel is a good fit: ', pchisq(dev, df, lower.tail = FALSE) < 0.05)
+}
+```
+
+```{r, echo = FALSE}
+print('Best model summary')
+print(summary(model$fit))
+
+print('Best model fit analysis (difference in deviance considering the degrees of freedom')
+dev_null_residual(summary(model$fit))
+
+# exponentiate the coefficentes to get the odd ratio and their confidence intervals
+## odds ratios and 95% CI using profiled log-likelihood
+round(exp(cbind(OR = coef(model$fit), confint(model$fit, level = 0.95))),4)
+```
+After exponentiating the Odds Ratio and 95% CI 
+            OR      2.5%    97.5%
+(Intercept) 0.1327 0.0458 0.2988
+PC01        0.6167 0.4223 0.7976
+PC05        0.6057 0.3100 1.1220
+
+
+## Feature Importance
+Principal Component Analysis output. Considering that the best model chose 
+
+```{r, echo = FALSE}
+model_pca <- recipe(formula =  ~ ., data = data_0.05_full) %>%
+                step_normalize(all_numeric()) %>%
+                # step_impute_mean(all_numeric()) %>%
+                step_impute_knn(all_numeric(), neighbors = 3) %>%
+                step_pca(all_numeric(), threshold = .95)
+
+model_prep <- prep(model_pca, training = data_0.05_full)
+
+# model prep is th receipe steps, for the pca, number = 3, because it's the 3rd step
+df_pca <- as.data.frame(tidy(model_prep, number = 3))
+df_pc1 <- df_pca %>% filter(component == 'PC1') %>% select(terms,value)
+df_pc5 <- df_pca %>% filter(component == 'PC5') %>% select(value)
+df_pcs <- cbind(df_pc1, df_pc5)
+colnames(df_pcs)[2:3] <- c('PC1', 'PC5')
+colnames(df_pca)
+ggplot(aes(x = )) + geom_col
+
+df_pcs <- df_pca %>% filter(component == 'PC1' | component == 'PC5') %>% select(terms, value, component)
+
+ggplot(df_pcs, aes(x=unlist(lapply(strsplit(terms,"[.]"), function(x) x[1])), y=value, fill=component)) +
+    geom_bar(stat='identity', position='dodge', width = 0.8) +
+    xlab("C-BARQ items or factors") +
+    ylab("Principal components") +
+    theme(axis.text.x = element_text(angle = 45), legend.position = "top")
+```
+
+## Diagnostics
+1. Index plot: residuals vs case number
+2. Leverage cases
+3. Influence cases
+
+```{r, echo = FALSE}
+diagnostics <- function(model){
+    h <- lm.influence(model)$hat
+    rpear <- residuals(model, "pearson")/sqrt(1-h)
+    rdev <- residuals(model, "deviance")/sqrt(1-h)
+    phat <- model$fitted.values
+    D <- rpear*rpear*h/(2**(1-h))
+    diagnostic <- data.frame(data$Outcome, phat, h, rpear, rdev, D)
+    return(diagnostic)
+
+    plot(rpear, main="Index Plot of Pearson Residuals")
+    plot(model$linear.predictors, rpear, main = "Plot of Pearson Residuals vs Linear Predictor")
+}
+
+diag_lr <- diagnostics(model_lr)
+diag_lr[order(diag_lr$rpear, decreasing = TRUE),]
+```
+
+
+## Conclusion
+Results with the original dataset.

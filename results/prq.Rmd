@@ -13,21 +13,24 @@ knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 
 # install.packages("broom")
 library(DescTools)
+# plot
 library(ggplot2)
+library(ggpubr)
 library(cowplot)
+
+# datasets
 library(plyr)
 library(dplyr)
 library(tidyverse)
-library(rstatix)
-library(ggpubr)
+library(reshape2)
+
 library(ggsci)  # colors for the graphs - npg for nature
 library(broom)  # convert r output into tibbles
 library(xtable) # latex table output
 
-# feature selection using recursive feature elimination (RFE)
+# machine learning/stats
 library(mlbench)
 library(caret)
-library(reshape2)
 library(recipes)
 ```
 
@@ -63,7 +66,7 @@ fig_results <- function(plot, name, caption = NULL, label = NULL){
     # save png
     suppressMessages(ggsave(filename = path, 
                 plot = plot + theme(text = element_text(size = 20)),
-                width = 8, height = 8))
+                width = 12, height = 8))
     cat("Image saved at", path)
 
     # latex code for image
@@ -139,7 +142,6 @@ cat('Age at Assessment: Mean', round(mean/30.417, 2),
 
 Calculate statistics of duration of training for the dogs that were withdrawn from training. 
 ```{r, echo = FALSE}
-
 # Duration of training before withdrawal in weeks
 duration <- prq %>% filter(Outcome == "Fail") %>% select(Duration)/7
 print('Duration of Training in weeks')
@@ -220,8 +222,10 @@ C-BARQ Correlation with Training Outcome.
 Breeds (p = 0.44 and p = 0.16) and Sex (p = 0.61) were not significantly associated with training outcome.
 ```{r, echo = FALSE}
 # univariate logistic regression using one predictor and outcome
-lr_models <- lapply(data[-length(data)], function(x) glm(formula = Outcome ~ x, 
-                            data = data, family = binomial(link = logit), na.action = na.exclude))
+lr_models <- lapply(data[-length(data)], 
+                        function(x) glm(formula = Outcome ~ x, 
+                        data = data, 
+                        family = binomial(link = logit), na.action = na.exclude))
 lr_result <- lapply(lr_models, function(x) c(coef(summary(x)), summary(x)$deviance))
 
 ## univariate models with 3 dfs (Breed)
@@ -247,32 +251,10 @@ lr_results[c(9,10,13,17,30,37),'p_value_1']
 tab_results(lr_results, name = "univariate-logistic-regression")
 ``` 
 
-Analysing deviance of full model compared to the null model. 
-Reduction in deviance must be significant (chi-squared test) for the model to be considered a good fit.
-```{r, echo = FALSE}
-# deviance analysis (Null deviance: 58.352  on 62  degrees of freedom = N-1)
-lr_results$deviance_diff <- pchisq((58.352 - lr_results$deviance), 1, lower.tail = FALSE)
-lr_results$deviance_sign <- (lr_results$deviance_diff < 0.05)
-# significant differences in deviances
-cat('Number of features whose univariate models resulted in a significant difference in deviance: ', sum(lr_results$deviance_sign))
-```
-
-Analysing p-values and deviance.
-```{r, echo = FALSE}
-# print variables sorted by pvalue
-# lr_results[order(lr_results$p_value_1, decreasing = FALSE), 'p_value_1' , drop = FALSE]
-
-print("Number of features considering each level of significance using Logistic Regression p-value & difference in deviance test")
-lr_results$significant_0.05 <- (lr_results$p_value_1 > 0) & (lr_results$p_value_1 < 0.05) & (lr_results$deviance_sign = TRUE)
-lr_results$significant_0.1 <- (lr_results$p_value_1 > 0) & (lr_results$p_value_1 < 0.1) & (lr_results$deviance_sign = TRUE)
-lr_results$significant_0.2 <- (lr_results$p_value_1 > 0) & (lr_results$p_value_1 < 0.2) & (lr_results$deviance_sign = TRUE)
-print(colSums(lr_results[,12:14], na.rm = TRUE))
-# inclusion of X96,98 and F3,6 in feature set p<0.2 compared to with p<0.05 
-```
-
+Converting logistic regression result to odds ration and confidence interavals. 
 ```{r, echo = FALSE}
 lr <- lr_results %>% select(estimate_1, p_value_1) # se_1, z_value_1,
-colnames(lr) <- c("Estimate", "Pr(>|z|)")
+colnames(lr) <- c("Estimate", "p-value")
 lr$OR <- exp(lr$Estimate)
 # list of dataframes of CI for each of the models on the list
 lr_cis <- lapply(lr_models[-length(lr_models)], function(x) as.data.frame(exp(confint(x, level = 0.95))))
@@ -292,16 +274,36 @@ tab_results(lr,
     name = "lr-or-ci")
 ```
 
+Analysing p-values and deviance.
+Analysing deviance of full model compared to the null model. 
+Reduction in deviance must be significant (chi-squared test) for the model to be considered a good fit.
+```{r, echo = FALSE}
+# CRITERION 1: pvalue analysis
+print("Number of features considering each level of significance using Logistic Regression p-value & difference in deviance test")
+lr_results$significant_0.05 <- (lr_results$p_value_1 > 0) & (lr_results$p_value_1 < 0.05) 
+lr_results$significant_0.1 <- (lr_results$p_value_1 > 0) & (lr_results$p_value_1 < 0.1) 
+lr_results$significant_0.2 <- (lr_results$p_value_1 > 0) & (lr_results$p_value_1 < 0.2) 
+print(colSums(lr_results[,10:12], na.rm = TRUE))
+# inclusion of X96,98 and F3,6 in feature set p<0.2 compared to with p<0.05 
+
+# CRITERION 2: deviance analysis (Null deviance: 58.352  on 62  degrees of freedom = N-1)
+lr_results$deviance_diff <- pchisq((58.352 - lr_results$deviance), 1, lower.tail = FALSE)
+lr_results$deviance_sign <- (lr_results$deviance_diff < 0.05)
+# significant differences in deviances
+cat('Number of features whose univariate models resulted in a significant difference in deviance: ', sum(lr_results$deviance_sign))
+
+```
+
 Feature selection based on the univariate logistic regression p-value and deviance analysis. 
 This reduced feature set contains all factors and only items that were NOT included in the calculation of statistically significant factor with p<0.05 (i.e. Items 1,27 an 75 and some myscellaneous items 77-90, 93-100).
 ```{r, echo = FALSE}
-# Criterion 1 and 2
+# CRITERIA 1 and 2
 print("All features with level of significance < 0.05 using Univariate Logistic Regression p-value test")
 data_2 <- data %>% 
     select(all_of(lr_results %>% filter(significant_0.05 ==TRUE & deviance_sign == TRUE) %>% rownames()), Outcome)
 cat("Full Feature Set with p<0.05 and reduction in deviance\t", dim(data_2))
 
-# Criterion 3
+# CRITERION 3
 # items that were significant but not used to calculate significant factors 1, 27, 75 -> "I_01", 27, 75,
 # items not used to calculate any factors 77-90 and 93-100
 print("Keeping items 1, 27, 75 and anything between 77-90 and 93-100")
@@ -327,7 +329,7 @@ cat("Reduced Feature Set with p<0.05 and < 5% missing data\t", dim(data_4))
 ```
 
 ### Criterion 5: Correlation
-Removing features with more than 0.6 correlation (i.e. F_03)
+Removing features with more than 0.75 correlation (i.e. F_03)
 ```{r, echo = FALSE}
 # change col names for the plot
 colnames(data_4) <- unlist(lapply(strsplit(colnames(data_4),"[.]"), function(x) x[1]))
@@ -343,13 +345,13 @@ plot
 fig_results(plot = plot, name = "correlation",
             caption = "Correlation Matrix for variables considered for the reduced feature set")
 
-# find attributes that are highly corrected (ideally >0.75)
-highlyCorrelated <- findCorrelation(correlationMatrix, cutoff=0.60, names = TRUE, exact = TRUE)
+# find attributes that are highly corrected (ideally > 0.75)
+highlyCorrelated <- findCorrelation(correlationMatrix, cutoff=0.75, names = TRUE, exact = TRUE)
 # print indexes of highly correlated attributes
 cat("Highly correlated variable to be removed", highlyCorrelated)
 
 data_reduced <- data_3  %>% select(-contains(as.character(c(77, 93, highlyCorrelated))))
-cat("Reduced Feature Set with p<0.05 and < 5% missing data and <70% correlated\t", dim(data_reduced))
+cat("Reduced Feature Set with p<0.05 and < 5% missing data and <75% correlated\t", dim(data_reduced))
 ```
 
 
@@ -359,16 +361,17 @@ Plotting the items and factors that will be used for modelling.
 plot_discrete <- function(var){
     
     plot1 <- ggplot(data_reduced, aes_string( x = var, fill = 'Outcome', width = 1)) + 
-            geom_bar(position = "dodge") + xlab("Score") + 
+            geom_bar(position = "dodge") + 
             theme(legend.position = c(0.84,0.88), text = element_text(size = 20)) +
-            scale_x_discrete("Rating", limits = c(0:4), breaks = c(0:4), labels = c(0:4)) +
+            # scale_x_discrete("Rating", limits = c(0:4), breaks = c(0:4), labels = c(0:4)) +
             expand_limits(x = c(0,4))
 
     plot2 <- ggplot(data_reduced, aes_string( x = 'Outcome', y = var)) + 
             geom_violin(position = "dodge", width = 0.8, aes(color = Outcome, fill = Outcome), alpha = 0.2) +
-            theme(legend.position = "none", text = element_text(size = 20)) +
             geom_boxplot(position = "dodge", aes(colour = Outcome), fill = "white",  width = 0.3) +
-            ylab("Score")
+            theme(legend.position = "none", text = element_text(size = 20)) +
+            expand_limits(y = c(0,4)) +
+            ylab("Rating")
 
     plot3 <- plot_grid(plot1, plot2, rel_widths = c(2, 1), labels = "AUTO") 
     title <- ggdraw() + 

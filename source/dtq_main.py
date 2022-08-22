@@ -9,8 +9,10 @@ df_dir = os.path.join(my_dir, "data")
 #------------------------------------------------------------------------------------#
 
 def import_dt(base_dir):
+    
     # new column names as the original were quite long
-    cols = ['Timestamp', 'Code', 'Consent', 'Extraversion-Active', 'Extraversion-Energetic', 'Extraversion-Excitable', 
+    cols = ['Timestamp', 'Code', 'Consent', 
+    'Extraversion-Active', 'Extraversion-Energetic', 'Extraversion-Excitable', 
     'Extraversion-Hyperactive', 'Extraversion-Lively', 'Extraversion-Restless', 
     'Extraversion-Comments',
     'Motivation-Assertive', 'Motivation-Determined', 'Motivation-Independent', 
@@ -29,6 +31,26 @@ def import_dt(base_dir):
 
     # droping the timestamp and consent columns 
     df.drop(['Consent'], axis = 1, inplace = True)
+    # @Ley2009"This was done by summing the raw scores for each word on each subscale and then dividing this number 
+    # by the maximum score possible for that subscale. " -> This is the exact same as calculating the mean?!
+    # The result was then converted to a percentage, creating a subscale score for each personality dimension for
+    # each dog that can be easily compared with other administrations of the revised MCPQ questionnaire
+
+    # df['Extraversion'] = df[['Extraversion-Active', 'Extraversion-Energetic', 'Extraversion-Excitable',
+    # 'Extraversion-Hyperactive', 'Extraversion-Lively', 'Extraversion-Restless']].mean(axis = 1)#sum(axis = 1).div(36)
+    # df['Motivation']  =  df[['Motivation-Assertive', 'Motivation-Determined', 'Motivation-Independent', 
+    # 'Motivation-Persevering', 'Motivation-Tenacious']].mean(axis = 1)#sum(axis = 1).div(30)
+    # df['Training'] = df[['Training-Attentive', 'Training-Biddable', 'Training-Intelligent', 
+    # 'Training-Obedient', 'Training-Reliable', 'Training-Trainable']].mean(axis = 1)#sum(axis = 1).div(36)
+    # df['Amicability'] = df[['Amicability-Friendly', 'Amicability-Non-aggressive', 'Amicability-Relaxed', 
+    # 'Amicability-Sociable']].mean(axis = 1)#sum(axis = 1).div(24)
+    # df['Neuroticism'] = df[['Neuroticism-Fearful', 'Neuroticism-Nervous', 'Neuroticism-Submissive', 
+    # 'Neuroticism-Timid']].mean(axis = 1)#sum(axis = 1).div(24)
+
+    # # calculate percentage
+    # sum = df[['Extraversion', 'Motivation', 'Training', 'Amicability', 'Neuroticism']].sum(axis = 1)
+    # for col in ['Extraversion', 'Motivation', 'Training', 'Amicability', 'Neuroticism']:
+    #     df[col] = df[col] / sum
     
     return df
 
@@ -93,7 +115,7 @@ print('The last instance of a duplicate was KEPT')
 # dataset and training outcome statistics 
 print('\n\nDataset size: ', df.shape)
 print('Status: \n{}'.format(df.Status.value_counts()))
-
+df.columns
 # save the dataframe
 df.to_csv('%s\\2022-06-27-DTQ_MCPQ-R.csv' % df_dir)
 print('New DTQ_MCPQ-R Dataset available at: ', df_dir)

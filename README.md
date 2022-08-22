@@ -12,7 +12,7 @@ The following datasets as stored in Googlesheets:
 
 - Data Collection - Training tab: Googlesheet  containing data about the dog's training journey.
 
-## src folder
+## source folder
 - combination.py: combines PRQ and DTQ considering Inner join and Outer join.
 
 - dt_main.py & pr_main.py
@@ -26,10 +26,10 @@ Imports the Questionnaires raw data and "Data Collection - Dogs.csv" tab, the ma
 Saves as 'Date-DTQ_MCPQ-R.csv' and 'Date-PRQ_C-BARQ.csv' files.
 
 
-## analysis folder
+## results folder
 
-prq = Puppy raiser questionnaire analysis (C-BARQ)
-dtq = Dog Trainer questionnaire analysis (MCPQ-R)
+prq = Puppy raiser questionnaire analysis results (C-BARQ)
+dtq = Dog Trainer questionnaire analysis results (MCPQ-R)
 
 2_outcomes considers (Fail, Success)
 

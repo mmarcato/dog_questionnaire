@@ -8,10 +8,10 @@
 "I_90 Hyperactive restless has trouble settling down",1
 "I_93 Stares intently at nothing visible",7
 "I_99 Licks people or objects excessively",3
-"F_01 Stranger directed aggression",0
-"F_03 Dog directed aggression",0
-"F_04 Dog directed fear",0
-"F_09 Nonsocial fear",0
-"F_10 Separation related problems",1
-"F_12 Excitability",0
+"F_02 Stranger directed aggression",0
+"F_06 Nonsocial fear",0
+"F_07 Dog directed aggression",0
+"F_08 Dog directed fear",0
+"F_10 Separation related behaviour",1
+"F_11 Excitability",0
 "Outcome",0

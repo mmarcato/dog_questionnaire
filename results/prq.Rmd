@@ -11,7 +11,7 @@ output:
 knitr::opts_knit$set(root.dir = "C:/Users/marinara.marcato/Project/Scripts/dog_questionnaires")
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE) 
 
-# install.packages("broom")
+# install.packages("PRROC")
 library(DescTools)
 # plot
 library(ggplot2)
@@ -32,6 +32,9 @@ library(xtable) # latex table output
 library(mlbench)
 library(caret)
 library(recipes)
+library(pROC)   # calculates the roc
+library(PRROC)  # calculates precision recall curve
+
 ```
 
 ```{r output, include = FALSE, results = "hide", message = FALSE}
@@ -70,9 +73,9 @@ fig_results <- function(plot, name, caption = NULL, label = NULL){
     cat("Image saved at", path)
 
     # latex code for image
-    # cat("\n\nStart LaTeX code\n\n",
-    #         paste("\\begin{figure}[!h]\n\\centering\n\\caption{", paste(caption, ".", sep = ""),"}","\n\\label{F-prq-", label, "}\n\\includegraphics[width = 11cm]{",path,"}\n\\end{figure}", sep = ""), 
-    #         "\n\nEnd LaTeX Code\n\n")
+#     cat("\n\nStart LaTeX code\n\n",
+#             paste("\\begin{figure}[!h]\n\\centering\n\\caption{", paste(caption, ".", sep = ""),"}","\n\\label{F-prq-", label, "}\n\\includegraphics[width = 11cm]{",path,"}\n\\end{figure}", sep = ""), 
+#             "\n\nEnd LaTeX Code\n\n")
 }
 ```
 
@@ -167,29 +170,11 @@ Missing data is also analysed.
 
 ```{r, echo = FALSE}
 data = prq %>% select(starts_with(c('I_', 'F_')), Sex, Breed, Outcome)
-# LR will predict the probability of the LAST class 
-# R defaults to alphabetical order, therefore, between [Fail Success], it will predict Success.
-# releveling the independent variable so we will predict Fail instead of Success
-data$Outcome <- relevel(data$Outcome, "Success")
 print("Items")
 colnames(data[1:100])
 print("Factors, Demographic and Outcome")
 str(data[101:117])
 # FACTOR CALCULATIONS  - Items used 1–76 and 91–92; Items NOT used 77-90 and 93-100 
-    # 1.'Stranger-directed aggression' score = (questionnaire items 10 + 11 + 12 + 15 + 16 + 18 + 20 + 21 + 22 + 28)/10.
-    # 2.'Owner-directed aggression' score = (items 9 + 13 + 14 + 17 + 19 + 25 + 30 + 31)/8.
-    # 3.'Dog-directed aggression' = (items 23 + 24 + 26 + 29)/4
-    # 4.'Dog-directed fear' = (items 45 + 46 + 52 + 53)/4
-    # 5.'Dog rivalry'(familiar dog aggression) score = (items 32 + 33 + 34 + 35)/4
-    # 6.'Trainability' score = (items 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8)/8—remember to reverse scoring order for items 5, 6 & 7 (see above).   
-    # 7.'Chasing' score = (items 27 + 74 + 75 + 76)/4
-    # 8.'Stranger-directed fear' score = (items 36 + 37 + 39 + 40)/4
-    # 9.'Nonsocial fear' score = (items 38 + 41 + 42 + 44 + 47 + 48)/6
-    # 10.'Separation-related problems' score = (items 54 + 55 + 56 + 57 + 58 + 59 + 60 + 61)/8
-    # 11.'Touch sensitivity' score = (items 43 + 49 + 50 + 51)/4
-    # 12.'Excitability' score = (items 62 + 63 + 64 + 65 + 66 + 67)/6
-    # 13.'Attachment/attention-seeking' score = (items  68 + 69 + 70 + 71 + 72 + 73)/6
-    # 14.'Energy' score = (items 91 + 92)/2
 ```
 
 ```{r, echo = FALSE}
@@ -216,11 +201,17 @@ tab_results(stats, name = "descriptive-statistics")
 
 ## Feature Selection
 ### Criteria 1, 2 and 3: Univariate Logistic Regression
+
 Logistic regression was used to investigate whether there was a statistically significant difference between the behaviours reported by Puppy Raisers and the Training Outcome of the dogs.
 C-BARQ Correlation with Training Outcome. 
 
 Breeds (p = 0.44 and p = 0.16) and Sex (p = 0.61) were not significantly associated with training outcome.
 ```{r, echo = FALSE}
+# GLM function in R will predict the probability of the LAST class 
+# R defaults to alphabetical order, therefore, between [Fail Success], it will predict Success
+# releveling to have Success as FIRST class so Fail is the last class which will be predicted
+data$Outcome <- relevel(data$Outcome, "Success")
+
 # univariate logistic regression using one predictor and outcome
 lr_models <- lapply(data[-length(data)], 
                         function(x) glm(formula = Outcome ~ x, 
@@ -228,6 +219,8 @@ lr_models <- lapply(data[-length(data)],
                         family = binomial(link = logit), na.action = na.exclude))
 lr_result <- lapply(lr_models, function(x) c(coef(summary(x)), summary(x)$deviance))
 
+
+summary(lr_models[1])
 ## univariate models with 3 dfs (Breed)
 lr_breeds <- data.frame(transpose(lr_result[116]))
 colnames(lr_breeds) <- c("estimate_0", "estimate_1", "estimate_2", 
@@ -251,7 +244,7 @@ lr_results[c(9,10,13,17,30,37),'p_value_1']
 tab_results(lr_results, name = "univariate-logistic-regression")
 ``` 
 
-Converting logistic regression result to odds ration and confidence interavals. 
+Converting logistic regression result to odds ratio and confidence intervals. 
 ```{r, echo = FALSE}
 lr <- lr_results %>% select(estimate_1, p_value_1) # se_1, z_value_1,
 colnames(lr) <- c("Estimate", "p-value")
@@ -297,6 +290,7 @@ cat('Number of features whose univariate models resulted in a significant differ
 Feature selection based on the univariate logistic regression p-value and deviance analysis. 
 This reduced feature set contains all factors and only items that were NOT included in the calculation of statistically significant factor with p<0.05 (i.e. Items 1,27 an 75 and some myscellaneous items 77-90, 93-100).
 ```{r, echo = FALSE}
+lr_results %>% filter(significant_0.05 ==TRUE & deviance_sign == TRUE) %>% select(estimate_1, p_value_1)
 # CRITERIA 1 and 2
 print("All features with level of significance < 0.05 using Univariate Logistic Regression p-value test")
 data_2 <- data %>% 
@@ -304,7 +298,7 @@ data_2 <- data %>%
 cat("Full Feature Set with p<0.05 and reduction in deviance\t", dim(data_2))
 
 # CRITERION 3
-# items that were significant but not used to calculate significant factors 1, 27, 75 -> "I_01", 27, 75,
+# items that were significant but not used to calculate significant factors 1, 27, 75
 # items not used to calculate any factors 77-90 and 93-100
 print("Keeping items 1, 27, 75 and anything between 77-90 and 93-100")
 data_3 <- data_2  %>% 
@@ -314,6 +308,7 @@ colnames(data_2)
 ```
 
 ### Criterion 4: Missing Data
+
 PRQ, missing values per column and per row. Removing features with more than 5% missing data (i.e. I_77, I_93).
 ```{r, echo = FALSE}
 # reduced dataset
@@ -329,7 +324,8 @@ cat("Reduced Feature Set with p<0.05 and < 5% missing data\t", dim(data_4))
 ```
 
 ### Criterion 5: Correlation
-Removing features with more than 0.75 correlation (i.e. F_03)
+
+Removing features with more than 0.75 correlation (i.e. F_07)
 ```{r, echo = FALSE}
 # change col names for the plot
 colnames(data_4) <- unlist(lapply(strsplit(colnames(data_4),"[.]"), function(x) x[1]))
@@ -337,7 +333,7 @@ colnames(data_4) <- unlist(lapply(strsplit(colnames(data_4),"[.]"), function(x) 
 # calculate correlation matrix
 correlationMatrix <- round(abs(cor(data_4 %>% select(-c("Outcome")), use = "pairwise.complete.obs")),2)
 plot <- ggplot(data = melt(correlationMatrix), aes(x=Var1, y=Var2, fill=value)) + 
-        geom_tile() + theme(axis.text.x = element_text(angle = 45)) +
+        geom_tile() + theme(axis.text.x = element_text(angle = 45, vjust = 0.1)) +
         xlab("Variables") + ylab(NULL)
 plot
 
@@ -465,161 +461,109 @@ The "recipes" package was used to perform preprocessing (missing value imputatio
 [Example Recipes](https://www.rebeccabarter.com/blog/2019-06-06_pre_processing/)
 
 ## Recursive Feature Elimination (RFE) + Multivariate Logistic Regression (LR)
-Feature selection was performed using the caret package's rfe function.
+Feature selection was performed using the caret packages rfe function.
 Logistic Regression was used to model the dataset and Leave One Subject Out Cross Validation was employed to validate the results.
 [Caret RFE](https://search.r-project.org/CRAN/refmans/caret/html/rfe.html), 
 [Caret RFE Control](https://search.r-project.org/CRAN/refmans/caret/html/rfeControl.html), 
 [Examples using RFE with Recipes](http://topepo.github.io/caret/recursive-feature-elimination.html#rferecipes)
 [Example RFE + RF as predictor](https://towardsdatascience.com/effective-feature-selection-recursive-feature-elimination-using-r-148ff998e4f7), 
 [RFE + ROC as metric](https://stackoverflow.com/questions/18242692/r-package-caret-rfe-function-how-to-customize-metric-to-use-auc).
-<!-- 
-I did not manage to make the preprocessing work within rfe using LOOCV, it only works with repeatedCV.
-Therefore, I had to implement the preprocessing steps (normalization, imputation and pca) using recipes steps and then 
-use that transformed dataframe to learn using RFE + LR.
-This results in dataleakage in the ROC estimations using LOOCV.
-The resulting models using LOOCV and repeatedCV had PC01 and sometimes PC05 and ROC varying between 0.80 and 0.87, depending on the number of repeats.  -->
 
-```{r definition, echo = FALSE}
-impute_pca <- function(df){
 
-    print("Dimensions of original dataset:")
-    print(dim(df))
+```{r, echo = FALSE}
+# GLM predicts the SECOND class -> make sure Fail is second class
+data_reduced$Outcome <- relevel(data_reduced$Outcome, ref = "Success")
+cat('predicting second class:', levels(data_reduced$Outcome))
 
-    model_pca <- recipe(formula =  ~ ., data = df) %>%
-                    step_normalize(all_numeric()) %>%
-                    step_impute_knn(all_numeric(), neighbors = 3) %>%
-                    step_pca(all_numeric(), threshold = .95)
+model_recipe <- recipe(Outcome ~ ., data = data_reduced )  %>%
+        step_impute_mean(all_numeric()) %>%
+        step_normalize(all_numeric()) %>%
+        step_pca(all_predictors(), threshold = 0.95)
 
-    model_prep <- prep(model_pca, training = df)
-    return(model_prep)
-}
+# Setting ROC as the metric for the Logistic Regression function
+lrFuncs$summary <- twoClassSummary # prSummary # 
+set.seed(42)
 
-rfe_lr <- function(df){
+ctrl <- rfeControl(functions = lrFuncs,         # Logistic Regression
+                method = "cv",                  # Cross Validation
+                number = 63,                    # Number of folds
+                saveDetails = TRUE,
+                returnResamp = "all",
+                allowParallel = FALSE,
+                rerank = TRUE,
+                verbose = FALSE)
 
-    # Setting ROC as the metric for the Logistic Regression function
-    lrFuncs$summary <- twoClassSummary
-    set.seed(77)
+# Recursive Feature Elimination with feat_lr
+model_rfe <- rfe(model_recipe,                 # predict Outcome using all other variables
+                data = data_reduced,           # selecting the features from univariate lr
+                sizes = 1:10,                  # from 1 to 10 variables
+                rfeControl = ctrl,
+                metric = "Sens",               # optimising Specificity to avoid False Failures -> sens/spec are swapped in RFE
+                maximize = TRUE)
 
-    ctrl <- rfeControl(functions = lrFuncs,     # logistic regression
-                        rerank = TRUE,
-                        method = "LOOCV",       # Leave One Out Cross Validation
-                        verbose = FALSE)
-
-    # Recursive Feature Elimination with feat_lr
-    model <- rfe(Outcome ~ . ,                  # predict Outcome using all other variables
-                    data = df,                  # selecting the features from univariate lr
-                    sizes = c(1:length(df)),
-                    rfeControl = ctrl,
-                    metric = "ROC") 
-    
-    # Printing outputs
-    warnings()
-    
-    sink(file = "results/prq/rfe_output.txt")
-    print(model)
-    sink(file = NULL)
-
-    print(summary(model$fit))
-    
-    return(model)
-}
-
-dev_null_residual <- function(model){
-    dev = model$null.deviance - model$deviance
-    deg = model$df.null - model$df.residual
-    cat('\ndeviance difference: ', dev)
-    cat('\ndf difference: ', deg)
-    cat('\nlevel of significance: ', pchisq(dev, deg, lower.tail = FALSE))
-    cat('\nthe model is a good fit: ', pchisq(dev, deg, lower.tail = FALSE) < 0.05)
-}
+warnings()
+# print(model_rfe)
+model <- summary(model_rfe$fit)
+print(model)
 
 ```
 
-<!-- ## Comparing models
-Both Full and Reduced feature sets were used for this analysis. The results obtained were:
-
-- Full -> ROC: 0.81, TPR: 0.92, TNR: 0.36, AIC: 45.038
-- Reduced -> ROC: 0.75, TPR: 0.98, TNR: 0.36, AIC: 44.661 -->
-
-Interpreting performance metrics:
-
-- Sensitivity (TPR) = positive results for fail dogs. How many withdrawn dogs were flaged as fail?
-- Type 1 error = false positive rate: 1-TPR = 8% of the dogs flagged as fail would successed.
-
-- Specificity (TNR) = negative result for success dogs. How many graduate dogs were flaged as success?
-- Type 2 error = false negative error: 1-TNR = 64% of the dogs flagged as success would fail.
-<!-- 
-The results reveal that the model learnt on the reduced dataset delivers a better AUC-ROC 0.81 compared to 0.75.
-On the other hand, the TPR or Sensitivity is 98% for the Reduced model and 92% for the Full model. 
-Therefore, the Reduced model is a better fit for the data. 
-The sample size is rather small, therefore that such differences performance may be caused for just a few dogs being correctly classified.
-Regardless, a simpler model is always a better choice if the differences in performance are not significant.
-Another metric that can be used to compare model is AIC (Akaike Information Criterion), an optimal model minimizes AIC.
-
-Conclusively, the AIC indicates that the Reduced model is a better fit. -->
-
+Model fitness with deviance analysis. Performance metrics ROC and PR curves. 
 ```{r, echo = FALSE}
-print("p<0.05 + reduced")
-data_prep <- impute_pca(data_reduced)
-data_pca  <- bake(data_prep, data_reduced)
-rfe_reduced <- rfe_lr(data_pca)
-rfe_reduced
-dev_null_residual(summary(rfe_reduced$fit))
+# model fitness
+dev = model$null.deviance - model$deviance
+deg = model$df.null - model$df.residual
+cat('\ndeviance difference: ', dev)
+cat('\ndf difference: ', deg)
+cat('\nlevel of significance: ', pchisq(dev, deg, lower.tail = FALSE))
+cat('\nthe model is a good fit: ', pchisq(dev, deg, lower.tail = FALSE) < 0.05)
 
-# save csv and print latex code
-tab_results(as.data.frame(rfe_reduced$results), name = "rfe-results",
-    caption = "Recursive Feature Selection with Leave-One-Out Cross Validation"  )
-
-# plot roc per rfe iteration
-plot <- ggplot(data = rfe_reduced, metric = "ROC") + theme_bw() +
-            expand_limits(y = c(0,1))
-plot
-
-fig_results(plot = plot, name = "rfe-roc",
-            caption = "Recursive Feature Elimination ROC achieved considering Leave-One-Out Cross-Validation for each model versus the number of variables included in each model")
-            
-```
-
-## Interpretation
-
-The best Logistic Regression model is used to investigate the effect of the principal components on the training outcome.
-The estimates were exponentiated to get the Odds Ratio (OR). The 95% Confident Interval (CI) of the ORs was also calculated. 
-The OR for PC01 is 0.44, this means that the probability of withdrawal decreases by (0.44-1) 66% for every unit increase of PC1.
-We are 95% confident that a unit increase in PC01 results in a 33 to 75% (0.25-1 = 0.75, 0.67-1 = 0.33) less odds of being withdrawn from training.
-
-```{r, echo = FALSE}
-results_reduced <- as.data.frame(coef(summary(rfe_reduced$fit)))
-results_reduced$OR <- exp(results_reduced$Estimate)
-results_reduced <- cbind(results_reduced, exp(confint(rfe_reduced$fit, level = 0.95)))
-print("Results from the model created with the reduced feature set")
-print(results_reduced)
-
-# save csv and print latex code
-tab_results(results_reduced,
-    caption = "Best logistic regression model using selected by RFE",
-    name = "rfe-lr")
-```
-
-```{r, echo = FALSE}
-coef <- predictors(rfe_reduced)
-
-perf <- as.data.frame(data_pca %>% select(all_of(coef),Outcome))
-perf$Outcome <- relevel(perf$Outcome, "Fail")
-perf$Probability <- predict(rfe_reduced$fit,       # model
-                newdata = data_pca,        # dataframe, this will only select PC01
-                type  = "response")
-perf$Status <- prq$Status
-perf <- perf %>% mutate(Status = Status %>% fct_relevel(c("W", "GD", "AD")))
-perf$Predicted <- ifelse(perf$Probability > 0.5, "Fail", "Success")
-perf$Estimate <- log( 1 / (1/perf$Probability - 1) )
+# cross validated predictions for perfromance analysis
+df_perf <- model_rfe$pred %>% 
+            filter(Variables == 1) %>% 
+            select(rowIndex, Fail, pred, obs) %>% 
+            rename("Probability" = "Fail", "Predicted" = "pred", "Outcome" = "obs")
+df_perf$Status <- prq$Status
 
 # logit function, calculate y given the probability(x)
 y <- function(x){ return(log(1/( 1/x - 1))) }
-th_fail = 0.65
-th_success = 0.35
+df_perf$Estimate <- y(df_perf$Probability)
+
+# calculate performance metrics ROC
+confusionMatrix(data = df_perf$Predicted, reference = df_perf$Outcome, positive = "Fail")
+
+roc_curve <- roc.curve(scores.class0 = df_perf$Probability,
+             weights.class0 = abs(as.numeric(df_perf$Outcome)-1),
+             curve=TRUE)
+roc_curve
+png('results/prq/roc-curve.png')
+plot(roc_curve, xlab = "Specificity")
+dev.off()
+
+# calculate performance metrics PR
+confusionMatrix(data = df_perf$Predicted, reference = df_perf$Outcome, positive = "Fail", mode = "prec_recall")
+
+pr_curve <- pr.curve(scores.class0 = df_perf$Probability,
+             weights.class0 = abs(as.numeric(df_perf$Outcome)-1),
+             curve=TRUE)
+pr_curve
+
+png('results/prq/pr-curve.png')
+plot(pr_curve)
+dev.off()
+
+```
+
+```{r, echo = FALSE}
+th_fail = 0.7
+th_success = 0.3
+
+# releveling for the colours in the plot
+df_perf$Outcome <- relevel(df_perf$Outcome, "Fail")
+df_perf$Status <- relevel(df_perf$Status, "W")
 
 print("Probability predicted by the LR using PRQ data vs true Outcome")
-plot <- ggplot(perf, aes(x = Estimate, y = Probability, group = Outcome ))  +
+plot <- ggplot(df_perf, aes(x = Estimate, y = Probability, group = Outcome ))  +
     # bottom - green
     geom_rect(aes(xmin = -Inf, xmax = y(th_success), ymin = 0, ymax = th_success), 
             fill = "#99ff99", alpha = 0.2, color = "white") + 
@@ -631,12 +575,12 @@ plot <- ggplot(perf, aes(x = Estimate, y = Probability, group = Outcome ))  +
 plot
 
 fig_results(plot = plot, name = 'logit-outcome', 
-            caption = "Probability predicted by the LR using PRQ data vs true Outcome")
+            caption = "Probability predicted by the best logistic regression model using \acrshort{cbarq} data vs true Outcome")
 
 
 print("Probability predicted by the LR using PRQ data vs true Status")
 # plot Logit vs Status
-plot <- ggplot(perf, aes(x = Estimate, y = Probability, color = Status )) +
+plot <- ggplot(df_perf, aes(x = Estimate, y = Probability, color = Status )) +
     # bottom - green
     geom_rect(aes(xmin = -Inf, xmax = y(th_success), ymin = 0, ymax =  th_success), 
             fill = "#99ff99", alpha = 0.2, color = "white") + 
@@ -648,42 +592,58 @@ plot <- ggplot(perf, aes(x = Estimate, y = Probability, color = Status )) +
 plot
 
 fig_results(plot = plot, name = 'logit-status', 
-            caption = "Probability predicted by the LR using PRQ data vs true Status")
+            caption = "Probability predicted by the best logistic regression model using \acrshort{cbarq} data vs true Status")
 
-# calculate accuracy
-sensitivity = 0.9577    # TPR -> true fail flagged as fail
-specificity = 0.3636    # TNR -> true success flagged as success 
-prevalence = 11/63      # percentage of fail
-accuracy = (sensitivity) * (prevalence) + (specificity) * (1 - prevalence)
-cat('Accuracy:', accuracy)
-
-
-print("Estimate per training outcome status")
-perf %>% group_by(Status) %>% dplyr::summarize(Mean = mean(Estimate, na.rm=TRUE))
+print("Estimate and Probabilities per training outcome status")
+df_perf %>% group_by(Status) %>% dplyr::summarize(Mean = mean(Estimate, na.rm=TRUE))
+df_perf %>% group_by(Status) %>% dplyr::summarize(Mean = mean(Probability, na.rm=TRUE))
 
 cat("Predicted probability <", th_success, " -> Green flag ")
 print("Dogs flagged green are likely to SUCCEED, true outcome count and status proportion:")
-table(perf %>% filter(Probability < th_success) %>% pull(Outcome))
-prop.table(table(perf %>% filter(Probability < th_success) %>% pull(Status)))
+table(df_perf %>% filter(Probability < th_success) %>% pull(Outcome))
+prop.table(table(df_perf %>% filter(Probability < th_success) %>% pull(Status)))
 
 cat("Predicted probability >", th_fail, "-> Yellow flag")
 print("Dogs flagged green are likely to FAIL, true outcome count and status proportion:")
-table(perf %>% filter(Probability > th_fail) %>% pull(Outcome))
-prop.table(table(perf %>% filter(Probability > th_fail) %>% pull(Status)))
+table(df_perf %>% filter(Probability > th_fail) %>% pull(Outcome))
+prop.table(table(df_perf %>% filter(Probability > th_fail) %>% pull(Status)))
+
+cat(th_success, " < Predicted probability <", th_fail, "-> no flags")
+table(df_perf %>% filter(Probability > th_success & Probability < th_fail) %>% pull(Status))
+```
+
+## Interpretation
+
+The best Logistic Regression model is used to investigate the effect of the principal components on the training outcome.
+The estimates were exponentiated to get the Odds Ratio (OR). The 95% Confident Interval (CI) of the ORs was also calculated. 
+The OR for PC01 is 0.44, this means that the probability of withdrawal decreases by (0.44-1) 66% for every unit increase of PC1.
+We are 95% confident that a unit increase in PC01 results in a 33 to 75% (0.25-1 = 0.75, 0.67-1 = 0.33) less odds of being withdrawn from training.
+
+```{r, echo = FALSE}
+results_reduced <- as.data.frame(coef(summary(model_rfe$fit)))
+results_reduced$OR <- exp(results_reduced$Estimate)
+results_reduced <- cbind(results_reduced, exp(confint(model_rfe$fit, level = 0.95)))
+print("Results from the model created with the reduced feature set")
+print(results_reduced)
+
+# save csv and print latex code
+tab_results(results_reduced,
+    caption = "Best logistic regression model using selected by RFE",
+    name = "rfe-lr")
 ```
 
 ## Feature Importance
 
 ### Explained Variance
 ```{r, echo = FALSE}
-# tidy(recipe steps, number = select pca step, type = coef or variance
-dc_pca_var <- as.data.frame(tidy(data_prep, number = 3, type = "variance"))
+# PCA variance
+dc_pca_var <- as.data.frame(tidy(model_rfe$recipe, number = 3, type = "variance"))
 dc_pca_var <- dc_pca_var %>% spread(key = "terms", value = value) %>% select(-c(id))
 dc_pca_var$component <- mapvalues(dc_pca_var$component, from = 1:12, 
     to = c('PC01', 'PC02', 'PC03', 'PC04', 'PC05', 'PC06', 'PC07', 'PC08', 'PC09', 'PC10', 'PC11', 'PC12'))
 colnames(dc_pca_var) <- make.names(names(dc_pca_var)) # fixing column names with space
 
-cat("PCA features kept in the final model after RFE: ", coef)
+
 print("Explained Variance per Principal Component (Scree Plot)")
 dc_pca_var$Included = factor(c("Yes", "No", "No", "No", "No", "No", "No", "No", "No", "No", "No", "No"))
 plot <- ggplot(dc_pca_var, aes(x = component, y = percent.variance)) + #, fill = Included)
@@ -701,34 +661,33 @@ fig_results(plot = plot, name = 'pc-explained-variance',
 Analysis of the principal component loadings that were used in the best Multivariate Logistic Regression Model.
 
 The 5 highest loading values in PC1 come from the variables 
-"F_12 Excitability"
-"F_04 Dog directed fear"
-"F_09.Nonsocial.fear"
-"F_10 Separation related problems"
-"I_27.Toward.cats.squirrels.or.other.small.animals.entering.your.yard".
+"F_11 Excitability"
+"F_08 Dog directed fear"
+"F_06 Nonsocial fear"
+"F_10 Separation related behaviour"
+"I_27 Toward cats squirrels or other small animals entering your yard" 
 This indicates that this principal component places most variation in these variables. 
 
 ```{r, echo = FALSE}
-# model prep is the recipe steps, select pca -> number = 3, because it's the 3rd step
-df_pca_reduced <- as.data.frame(tidy(data_prep, number = 3, type = "coef"))
-# creating another dataframe with PC1 values for the analysis
-df_pcs_reduced <- df_pca_reduced  %>% filter(component == 'PC1') %>% select(terms, value) 
+# PCA coefficients
+df_pca_coef <- as.data.frame(tidy(model_rfe$recipe, number = 3, type = "coef"))  %>% 
+                filter(component == 'PC1') %>% select(terms, value) 
 
-plot <- ggplot(df_pcs_reduced, aes(x=unlist(lapply(strsplit(terms,"[.]"), function(x) x[1])), y=value)) +
+plot <- ggplot(df_pca_coef, aes(x=unlist(lapply(strsplit(terms,"[.]"), function(x) x[1])), y=value)) +
     geom_bar(stat='identity', position='dodge', width = 0.8) +
     xlab("C-BARQ items and factors - Predictor Variables") +
-    ylab("Principal components") +
-    theme(axis.text.x = element_text(angle = 45))
+    ylab("Principal components") 
 plot    
 
 fig_results(plot = plot, name = 'pc-loading',
             caption = "PC01 coefficient loading from original items and factors")
-# figuring out the righest loading items for the PC1
-df_pcs_reduced %>% arrange(desc(abs(value))) %>% select(terms, value)
 
 # save csv and print latex code
-tab_results(df_pcs_reduced %>% remove_rownames %>% column_to_rownames(var="terms"), 
+tab_results(df_pca_coef %>% remove_rownames %>% column_to_rownames(var="terms"), 
             name = 'pc-loading', caption = 'PC01 coefficient loading from original items and factors')
+
+# figuring out the righest loading items for the PC1
+df_pca_coef %>% arrange(desc(abs(value))) %>% select(terms, value)
 ```
 
 # Conclusion

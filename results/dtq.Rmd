@@ -116,7 +116,6 @@ table(dtq$Breed)
 ```
 
 Analysing age at arrival to the training centre and age at assessment when the questionnaire was completed:
-
 ```{r, echo = FALSE}
 n <- dim(dtq)[1]
 
@@ -491,7 +490,6 @@ tab_results(results_reduced,
     caption = "Best logistic regression model using selected by RFE",
     name = "rfe-lr")
 ```
-
 
 ```{r, echo = FALSE}
 coef <- predictors(rfe_reduced)

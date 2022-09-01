@@ -32,7 +32,6 @@ library(xtable) # latex table output
 library(mlbench)
 library(caret)
 library(recipes)
-library(pROC)   # calculates the roc
 library(PRROC)  # calculates precision recall curve
 
 ```
@@ -469,7 +468,6 @@ Logistic Regression was used to model the dataset and Leave One Subject Out Cros
 [Example RFE + RF as predictor](https://towardsdatascience.com/effective-feature-selection-recursive-feature-elimination-using-r-148ff998e4f7), 
 [RFE + ROC as metric](https://stackoverflow.com/questions/18242692/r-package-caret-rfe-function-how-to-customize-metric-to-use-auc).
 
-
 ```{r, echo = FALSE}
 # GLM predicts the SECOND class -> make sure Fail is second class
 data_reduced$Outcome <- relevel(data_reduced$Outcome, ref = "Success")
@@ -481,12 +479,14 @@ model_recipe <- recipe(Outcome ~ ., data = data_reduced )  %>%
         step_pca(all_predictors(), threshold = 0.95)
 
 # Setting ROC as the metric for the Logistic Regression function
-lrFuncs$summary <- twoClassSummary # prSummary # 
+# lrFuncs$summary <- twoClassSummary 
+lrFuncs$summary <- prSummary 
 set.seed(42)
 
 ctrl <- rfeControl(functions = lrFuncs,         # Logistic Regression
                 method = "cv",                  # Cross Validation
                 number = 63,                    # Number of folds
+                # method = "LOOCV",
                 saveDetails = TRUE,
                 returnResamp = "all",
                 allowParallel = FALSE,
@@ -498,14 +498,14 @@ model_rfe <- rfe(model_recipe,                 # predict Outcome using all other
                 data = data_reduced,           # selecting the features from univariate lr
                 sizes = 1:10,                  # from 1 to 10 variables
                 rfeControl = ctrl,
-                metric = "Sens",               # optimising Specificity to avoid False Failures -> sens/spec are swapped in RFE
+                # metric = "Sens",               # optimising Specificity to avoid False Failures -> sens/spec are swapped in RFE
+                metric = "F",
                 maximize = TRUE)
 
 warnings()
-# print(model_rfe)
+print(model_rfe)
 model <- summary(model_rfe$fit)
 print(model)
-
 ```
 
 Model fitness with deviance analysis. Performance metrics ROC and PR curves. 
@@ -642,7 +642,6 @@ dc_pca_var <- dc_pca_var %>% spread(key = "terms", value = value) %>% select(-c(
 dc_pca_var$component <- mapvalues(dc_pca_var$component, from = 1:12, 
     to = c('PC01', 'PC02', 'PC03', 'PC04', 'PC05', 'PC06', 'PC07', 'PC08', 'PC09', 'PC10', 'PC11', 'PC12'))
 colnames(dc_pca_var) <- make.names(names(dc_pca_var)) # fixing column names with space
-
 
 print("Explained Variance per Principal Component (Scree Plot)")
 dc_pca_var$Included = factor(c("Yes", "No", "No", "No", "No", "No", "No", "No", "No", "No", "No", "No"))

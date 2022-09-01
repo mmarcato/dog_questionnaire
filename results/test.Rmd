@@ -326,3 +326,52 @@ confusionMatrix(data = factor(round(pred)), reference = dat$Class, positive = "C
 
 
 ```
+
+
+Example from the internet
+```{r, echo = FALSE}
+data(PimaIndiansDiabetes)
+require(caret)
+require(pROC)
+
+rfFuncs$summary <- twoClassSummary
+ctrl <- rfeControl(functions = rfFuncs,
+                   method = "repeatedcv",
+                   number = 10,
+                   repeats = 3,
+                   saveDetails = TRUE,
+                   returnResamp = "all")
+
+trainctrl <- trainControl(classProbs= TRUE,
+                          verboseIter = TRUE,
+                          summaryFunction = twoClassSummary, 
+                          method = "cv", 
+                          number = 10 ,
+                          returnResamp = "final", 
+                          returnData = TRUE)
+set.seed(12)
+tunegrid <- expand.grid(.mtry=c(1:10))
+rfe_rf <- rfe(PimaIndiansDiabetes[,1:8], PimaIndiansDiabetes[,9], sizes=c(1:8),
+           method="rf",
+           rfeControl = ctrl, 
+           metric = "ROC", 
+           trControl = trainctrl,
+           tuneGrid = tunegrid,
+           preProc = c("center", "scale"))
+rfe_rf
+selectedIndices <- rfe_rf$pred$Variables == rfe_rf$optsize
+require(pROC)
+table(rfe_rf$pred$obs)
+ROC = plot.roc(rfe_rf$pred$obs[selectedIndices],rfe_rf$pred$neg[selectedIndices], )
+ROC$auc
+# predicting positives
+levels(PimaIndiansDiabetes[,9])
+colnames(rfe_rf$pred)
+
+df_perf <- rfe_rf$pred %>% filter(Variables == 8) %>% select(pos, obs)
+
+levels(rfe_rf$pred$obs)
+
+roc.curve(scores.class0 = df_perf$pos, weights.class0 = abs(as.numeric(df_perf$obs)-1), curve = TRUE)
+ROC$auc
+```

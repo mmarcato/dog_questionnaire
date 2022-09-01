@@ -28,9 +28,9 @@ Saves as 'Date-DTQ_MCPQ-R.csv' and 'Date-PRQ_C-BARQ.csv' files.
 
 ## results folder
 
-prq = Puppy raiser questionnaire analysis results (C-BARQ)
-dtq = Dog Trainer questionnaire analysis results (MCPQ-R)
+- prq = Puppy raiser questionnaire analysis results (C-BARQ)
+- dtq = Dog Trainer questionnaire analysis results (MCPQ-R)
 
-2_outcomes considers (Fail, Success)
+- 2_outcomes considers (Success, Fail)
 
 

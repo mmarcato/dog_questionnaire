@@ -21,9 +21,21 @@ idx <- 1:63
 idxs <- list()
 for (i in 1:63) {idxs[i] <- list(idx[-i])}
 
+if using trControl
+
+# I could calculate several performance metrics on crossvalidation
+MySummary  <- function(data, lev = NULL, model = NULL){
+  a1 <- defaultSummary(data, lev, model)
+  b1 <- twoClassSummary(data, lev, model)
+  c1 <- prSummary(data, lev, model)
+  out <- c(a1, b1, c1)
+  out}
 trControl = trainControl(
         savePredictions = FALSE,
-        classProbs = TRUE),
+        classProbs = TRUE, 
+        summaryFunction = MySummary
+        ),
+
 I included this in rfecontrol
 index = idxs,
 indexOut = NULL,
@@ -63,7 +75,9 @@ model_rfe <- rfe(model_recipe,                 # predict Outcome using all other
                 sizes = c(1:10),                # from 1 to 10 variables
                 rfeControl = ctrl,
                 metric = "ROC",                # optmising specificity
-                maximize = TRUE)
+                maximize = TRUE,
+                preProc = c("center", "scale")# apparently rfe can also preprocess data? I didn't try this!
+                )
 
 warnings()
 print(model_rfe)

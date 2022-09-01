@@ -933,6 +933,38 @@ Missing data is also analysed.</p>
 <p>Feature selection was performed using the caret packages rfe function. Logistic Regression was used to model the dataset and Leave One Subject Out Cross Validation was employed to validate the results. <a href="https://search.r-project.org/CRAN/refmans/caret/html/rfe.html">Caret RFE</a>, <a href="https://search.r-project.org/CRAN/refmans/caret/html/rfeControl.html">Caret RFE Control</a>, <a href="http://topepo.github.io/caret/recursive-feature-elimination.html#rferecipes">Examples using RFE with Recipes</a> <a href="https://towardsdatascience.com/effective-feature-selection-recursive-feature-elimination-using-r-148ff998e4f7">Example RFE + RF as predictor</a>, <a href="https://stackoverflow.com/questions/18242692/r-package-caret-rfe-function-how-to-customize-metric-to-use-auc">RFE + ROC as metric</a>.</p>
 <pre><code>## predicting second class: Success Fail</code></pre>
 <pre><code>## 
+## Recursive feature selection
+## 
+## Outer resampling method: Cross-Validated (63 fold) 
+## 
+## Resampling performance over subset size:
+## 
+##  Variables AUC Precision Recall F AUCSD PrecisionSD RecallSD FSD Num_Resamples
+##          1 NaN    0.8750 0.9423 1    NA      0.3337   0.2354   0            63
+##          2 NaN    0.8704 0.9038 1    NA      0.3390   0.2977   0            63
+##          3 NaN    0.8571 0.9231 1    NA      0.3531   0.2691   0            63
+##          4 NaN    0.8750 0.9423 1    NA      0.3337   0.2354   0            63
+##          5 NaN    0.8571 0.9231 1    NA      0.3531   0.2691   0            63
+##          6 NaN    0.8571 0.9231 1    NA      0.3531   0.2691   0            63
+##          7 NaN    0.8571 0.9231 1    NA      0.3531   0.2691   0            63
+##          8 NaN    0.8571 0.9231 1    NA      0.3531   0.2691   0            63
+##          9 NaN    0.8571 0.9231 1    NA      0.3531   0.2691   0            63
+##         10 NaN    0.8571 0.9231 1    NA      0.3531   0.2691   0            63
+##  Selected
+##         *
+##          
+##          
+##          
+##          
+##          
+##          
+##          
+##          
+##          
+## 
+## The top 1 variables (out of 1):
+##    PC01</code></pre>
+<pre><code>## 
 ## Call:
 ## glm(formula = Class ~ ., family = &quot;binomial&quot;, data = tmp)
 ## 

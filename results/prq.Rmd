@@ -499,7 +499,7 @@ model_rfe <- rfe(model_recipe,                 # predict Outcome using all other
                 sizes = 1:10,                  # from 1 to 10 variables
                 rfeControl = ctrl,
                 # metric = "Sens",               # optimising Specificity to avoid False Failures -> sens/spec are swapped in RFE
-                metric = "F",
+                metric = "Precision",
                 maximize = TRUE)
 
 warnings()

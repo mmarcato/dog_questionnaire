@@ -696,34 +696,65 @@ Other potential variables for inclusion in the model:
 <p><a href="https://towardsdatascience.com/effective-feature-selection-recursive-feature-elimination-using-r-148ff998e4f7">Example with RF</a>, <a href="https://stackoverflow.com/questions/18242692/r-package-caret-rfe-function-how-to-customize-metric-to-use-auc">ROC as metric</a>.</p>
 <pre><code>## predicting second class: Success Fail</code></pre>
 <pre><code>## 
+## Recursive feature selection
+## 
+## Outer resampling method: Cross-Validated (89 fold) 
+## 
+## Resampling performance over subset size:
+## 
+##  Variables AUC Precision Recall F AUCSD PrecisionSD RecallSD FSD Num_Resamples
+##          1 NaN    0.8519 0.9718 1    NA      0.3575   0.1666   0            89
+##          2 NaN    0.8701 0.9437 1    NA      0.3384   0.2322   0            89
+##          3 NaN    0.8590 0.9437 1    NA      0.3503   0.2322   0            89
+##          4 NaN    0.8571 0.9296 1    NA      0.3522   0.2577   0            89
+##          5 NaN    0.8667 0.9155 1    NA      0.3422   0.2801   0            89
+##          6 NaN    0.8649 0.9014 1    NA      0.3442   0.3002   0            89
+##          7 NaN    0.8649 0.9014 1    NA      0.3442   0.3002   0            89
+##          8 NaN    0.8649 0.9014 1    NA      0.3442   0.3002   0            89
+##          9 NaN    0.8649 0.9014 1    NA      0.3442   0.3002   0            89
+##  Selected
+##          
+##         *
+##          
+##          
+##          
+##          
+##          
+##          
+##          
+## 
+## The top 2 variables (out of 2):
+##    PC1, PC9</code></pre>
+<pre><code>## 
 ## Call:
 ## glm(formula = Class ~ ., family = &quot;binomial&quot;, data = tmp)
 ## 
 ## Deviance Residuals: 
 ##     Min       1Q   Median       3Q      Max  
-## -2.2228  -0.5692  -0.3301  -0.1621   2.3153  
+## -2.4330  -0.5371  -0.3099  -0.1076   2.2300  
 ## 
 ## Coefficients:
 ##             Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)  -1.8632     0.3687  -5.054 4.32e-07 ***
-## PC1           0.7738     0.1957   3.953 7.71e-05 ***
+## (Intercept)  -1.9936     0.4012  -4.970 6.71e-07 ***
+## PC1           0.8995     0.2350   3.828 0.000129 ***
+## PC9          -1.5386     0.7202  -2.136 0.032662 *  
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## (Dispersion parameter for binomial family taken to be 1)
 ## 
 ##     Null deviance: 89.623  on 88  degrees of freedom
-## Residual deviance: 63.579  on 87  degrees of freedom
-## AIC: 67.579
+## Residual deviance: 58.401  on 86  degrees of freedom
+## AIC: 64.401
 ## 
-## Number of Fisher Scoring iterations: 5</code></pre>
+## Number of Fisher Scoring iterations: 6</code></pre>
 <p>Model fitness with deviance analysis. Performance metrics ROC and PR curves.</p>
 <pre><code>## 
-## deviance difference:  26.04418</code></pre>
+## deviance difference:  31.22283</code></pre>
 <pre><code>## 
-## df difference:  1</code></pre>
+## df difference:  2</code></pre>
 <pre><code>## 
-## level of significance:  3.33694e-07</code></pre>
+## level of significance:  1.65977e-07</code></pre>
 <pre><code>## 
 ## the model is a good fit:  TRUE</code></pre>
 <pre><code>## Confusion Matrix and Statistics
@@ -856,12 +887,14 @@ Three variables showed some level of statistical significance, namely:
 - "Motivation.Persevering" (p<0.01), each unit increase the OR was smaller by 0.418 (less likely to be withdrawn)
 - "Amicability.Easy.going" (p<0.1), each unit increase the OR was smaller by 0.531 (less likely to be withdrawn) -->
 <pre><code>## [1] &quot;Results from the model created with the reduced feature set&quot;</code></pre>
-<pre><code>##               Estimate Std. Error   z value     Pr(&gt;|z|)        OR      2.5 %
-## (Intercept) -1.8631981  0.3686527 -5.054075 4.324819e-07 0.1551756 0.06928684
-## PC1          0.7737642  0.1957285  3.953252 7.709631e-05 2.1679113 1.54286458
+<pre><code>##              Estimate Std. Error   z value     Pr(&gt;|z|)        OR      2.5 %
+## (Intercept) -1.993591  0.4011595 -4.969572 6.710093e-07 0.1362055 0.05575766
+## PC1          0.899537  0.2350163  3.827552 1.294243e-04 2.4584647 1.64802182
+## PC9         -1.538585  0.7202399 -2.136211 3.266218e-02 0.2146847 0.04593318
 ##                97.5 %
-## (Intercept) 0.2998665
-## PC1         3.3689748</code></pre>
+## (Intercept) 0.2763203
+## PC1         4.1952573
+## PC9         0.8143714</code></pre>
 <pre><code>## dataframe saved to  results/dtq/rfe-lr.csv</code></pre>
 </div>
 <div id="feature-importance" class="section level2" number="3.5">

@@ -32,7 +32,6 @@ library(mlbench) # remove?
 library(recipes)
 library(caret)
 library(PRROC)  # calculates precision recall curve
-
 ```
 
 ```{r output, include = FALSE, results = "hide", message = FALSE}
@@ -391,7 +390,8 @@ model_recipe <- recipe(Outcome ~ ., data = data_reduced )  %>%
         step_pca(all_predictors(), threshold = 0.95)
 
 # Setting ROC as the metric for the Logistic Regression function
-lrFuncs$summary <- twoClassSummary # prSummary # 
+# lrFuncs$summary <- twoClassSummary 
+lrFuncs$summary <- prSummary 
 set.seed(42)
 
 ctrl <- rfeControl(functions = lrFuncs,         # Logistic Regression
@@ -409,11 +409,12 @@ model_rfe <- rfe(model_recipe,                 # predict Outcome using all other
                 data = data_reduced,           # selecting the features from univariate lr
                 sizes = 1:10,                  # from 1 to 10 variables
                 rfeControl = ctrl,
-                metric = "Sens",               # optimising Specificity to avoid False Failures -> sens/spec are swapped in RFE
+                # metric = "Sens",               # optimising Specificity to avoid False Failures -> sens/spec are swapped in RFE
+                metric = "Precision",
                 maximize = TRUE)
 
 warnings()
-# print(model_rfe)
+print(model_rfe)
 model <- summary(model_rfe$fit)
 print(model)
 ```

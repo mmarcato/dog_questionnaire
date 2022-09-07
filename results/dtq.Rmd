@@ -285,7 +285,7 @@ Removing features with more than 0.75 correlation
 # calculate correlation matrix
 correlationMatrix <- round(abs(cor(data_2 %>% select(-c("Outcome")), use = "pairwise.complete.obs")),2)
 plot <- ggplot(data = melt(correlationMatrix), aes(x=Var1, y=Var2, fill=value)) + 
-        geom_tile() + theme(axis.text.x = element_text(angle = 45, vjust = 0.5)) +
+        geom_tile() + theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
         xlab("Variables") + ylab(NULL)
 plot
 
@@ -381,7 +381,9 @@ This methodology was implemented in R using [rfe](https://search.r-project.org/C
 [Example with RF](https://towardsdatascience.com/effective-feature-selection-recursive-feature-elimination-using-r-148ff998e4f7), [ROC as metric](https://stackoverflow.com/questions/18242692/r-package-caret-rfe-function-how-to-customize-metric-to-use-auc).
 ```{r, echo = FALSE}
 # GLM predicts the SECOND class -> make sure Fail is second class
-data_reduced$Outcome <- relevel(data_reduced$Outcome, ref = "Success")
+# data_reduced$Outcome <- relevel(data_reduced$Outcome, ref = "Success")
+# RFE calculates the metrics on the FIRST class -> make sure Fail is first class
+data_reduced$Outcome <- relevel(data_reduced$Outcome, ref = "Fail")
 cat('predicting second class:', levels(data_reduced$Outcome))
 
 model_recipe <- recipe(Outcome ~ ., data = data_reduced )  %>%
@@ -407,7 +409,7 @@ ctrl <- rfeControl(functions = lrFuncs,         # Logistic Regression
 # Recursive Feature Elimination with feat_lr
 model_rfe <- rfe(model_recipe,                 # predict Outcome using all other variables
                 data = data_reduced,           # selecting the features from univariate lr
-                sizes = 1:10,                  # from 1 to 10 variables
+                sizes = 1:9,                  # from 1 to 10 variables
                 rfeControl = ctrl,
                 # metric = "Sens",               # optimising Specificity to avoid False Failures -> sens/spec are swapped in RFE
                 metric = "Precision",
@@ -415,6 +417,7 @@ model_rfe <- rfe(model_recipe,                 # predict Outcome using all other
 
 warnings()
 print(model_rfe)
+# Estimate, z-value signs need to be swapped 
 model <- summary(model_rfe$fit)
 print(model)
 ```
@@ -439,7 +442,7 @@ df_perf <- model_rfe$pred %>%
 confusionMatrix(data = df_perf$Predicted, reference = df_perf$Outcome, positive = "Fail")
 
 roc_curve <- roc.curve(scores.class0 = df_perf$Probability,
-             weights.class0 = abs(as.numeric(df_perf$Outcome)-1),
+             weights.class0 = abs(as.numeric(df_perf$Outcome)-2),
              curve=TRUE)
 roc_curve
 png('results/dtq/roc-curve.png')
@@ -450,7 +453,7 @@ dev.off()
 confusionMatrix(data = df_perf$Predicted, reference = df_perf$Outcome, positive = "Fail", mode = "prec_recall")
 
 pr_curve <- pr.curve(scores.class0 = df_perf$Probability,
-             weights.class0 = abs(as.numeric(df_perf$Outcome)-1),
+             weights.class0 = abs(as.numeric(df_perf$Outcome)-2),
              curve=TRUE)
 pr_curve
 
@@ -481,7 +484,7 @@ plot <- ggplot(df_perf, aes(x = Estimate, y = Probability, group = Outcome ))  +
     geom_rect(aes(xmin = y(th_fail), xmax = Inf, ymin = th_fail, ymax = 1), 
             fill = "#ffff99", alpha = 0.2, color = "white") +  
     theme(legend.position = c(0.14,0.88), text = element_text(size = 20)) +
-    geom_point(aes(shape=Outcome, color=Outcome))
+    geom_point(aes(shape=Outcome, color=Outcome), size = 5)
 plot
 
 fig_results(plot = plot, name = 'logit-outcome', 
@@ -498,7 +501,7 @@ plot <- ggplot(df_perf, aes(x = Estimate, y = Probability, color = Status )) +
     geom_rect(aes(xmin = y(th_fail), xmax = Inf, ymin =  th_fail, ymax = 1), 
             fill = "#ffff99", alpha = 0.2, color = "white") +  
     theme(legend.position = c(0.14,0.88), text = element_text(size = 20)) +
-    geom_point(aes(shape=Status, color=Status))
+    geom_point(aes(shape=Status, color=Status), size = 5)
 plot
 
 fig_results(plot = plot, name = 'logit-status', 

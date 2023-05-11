@@ -23,7 +23,7 @@ library(dplyr)
 library(tidyverse)
 library(reshape2) # remove?
 
-library(ggsci)  # colors for the graphs - npg for nature
+library(ggsci)  # colors for the graphs - png colours for nature
 library(broom)  # convert r output into tibbles
 library(xtable) # latex table output
 
@@ -66,7 +66,7 @@ fig_results <- function(plot, name, caption = NULL, label = NULL){
     # save png
     suppressMessages(ggsave(filename = path, 
                 plot = plot + theme(text = element_text(size = 20)),
-                width = 12, height = 8))
+                width = 8, height = 8))
     cat("Image saved at", path)
 
     # latex code for image
@@ -398,7 +398,7 @@ set.seed(42)
 
 ctrl <- rfeControl(functions = lrFuncs,         # Logistic Regression
                 method = "cv",                  # Cross Validation
-                number = 89,                    # Number of folds
+                number = nrow(data_reduced),   # Number of folds
                 # method = "LOOCV",
                 saveDetails = TRUE,
                 returnResamp = "all",
@@ -409,7 +409,7 @@ ctrl <- rfeControl(functions = lrFuncs,         # Logistic Regression
 # Recursive Feature Elimination with feat_lr
 model_rfe <- rfe(model_recipe,                 # predict Outcome using all other variables
                 data = data_reduced,           # selecting the features from univariate lr
-                sizes = 1:9,                  # from 1 to 10 variables
+                sizes = 1:(ncol(data_reduced)-1), # from 1 to 10 variables
                 rfeControl = ctrl,
                 # metric = "Sens",               # optimising Specificity to avoid False Failures -> sens/spec are swapped in RFE
                 metric = "Precision",
@@ -422,7 +422,7 @@ model <- summary(model_rfe$fit)
 print(model)
 ```
 
-Model fitness with deviance analysis. Performance metrics ROC and PR curves. 
+Model fitness with deviance analysis. 
 ```{r, echo = FALSE}
 # model fitness
 dev = model$null.deviance - model$deviance
@@ -431,35 +431,48 @@ cat('\ndeviance difference: ', dev)
 cat('\ndf difference: ', deg)
 cat('\nlevel of significance: ', pchisq(dev, deg, lower.tail = FALSE))
 cat('\nthe model is a good fit: ', pchisq(dev, deg, lower.tail = FALSE) < 0.05)
+```
 
-# cross validated predictions for perfromance analysis
+Performance metrics ROC and PR curves. 
+```{r, echo = FALSE}
+# cross validated predictions for performance analysis
 df_perf <- model_rfe$pred %>% 
-            filter(Variables == 1) %>% 
+            filter(Variables == model_rfe$optsize) %>% 
             select(rowIndex, Fail, pred, obs) %>% 
             rename("Probability" = "Fail", "Predicted" = "pred", "Outcome" = "obs")
-
-# calculate performance metrics ROC
-confusionMatrix(data = df_perf$Predicted, reference = df_perf$Outcome, positive = "Fail")
 
 roc_curve <- roc.curve(scores.class0 = df_perf$Probability,
              weights.class0 = abs(as.numeric(df_perf$Outcome)-2),
              curve=TRUE)
-roc_curve
-png('results/dtq/roc-curve.png')
-plot(roc_curve, xlab = "Specificity")
-dev.off()
+plot(roc_curve)
 
-# calculate performance metrics PR
-confusionMatrix(data = df_perf$Predicted, reference = df_perf$Outcome, positive = "Fail", mode = "prec_recall")
+png('results/dtq/roc-curve.png')
+plot(roc_curve, xlab = "1 - Specificity", auc.main = FALSE, col = 'blue',
+         main = paste('ROC Curve (AUC = ',toString(round(roc_curve$auc,2)),')',sep = ''), 
+         cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5)
+dev.off()
 
 pr_curve <- pr.curve(scores.class0 = df_perf$Probability,
              weights.class0 = abs(as.numeric(df_perf$Outcome)-2),
              curve=TRUE)
-pr_curve
+plot(pr_curve)
 
 png('results/dtq/pr-curve.png')
-plot(pr_curve)
+plot(pr_curve, auc.main = FALSE, col = 'blue',
+         main = paste('PR Curve (AUC = ',toString(round(pr_curve$auc.integral,2)),')',sep = ''), 
+         cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5)
 dev.off()
+
+# calculate performance metrics ROC
+cm <- confusionMatrix(data = df_perf$Predicted, reference = df_perf$Outcome, positive = "Fail")
+
+metrics <- data.frame(Accuracy = cm$overall['Accuracy'],
+                        ROC = roc_curve$auc,
+                        PR =  pr_curve$auc.integral, 
+                        t(cm$byClass))
+
+metrics %>% round(3) %>% select(Accuracy, ROC, PR, Precision, Recall, Sensitivity, Specificity, F1, Balanced.Accuracy)
+
 ```
 
 ```{r, echo = FALSE}
@@ -467,6 +480,7 @@ dev.off()
 y <- function(x){ return(log(1/( 1/x - 1))) }
 df_perf$Estimate <- y(df_perf$Probability)
 df_perf$Status <- dtq$Status
+levels(df_perf$Status)[levels(df_perf$Status) == "AD"] <- "SD"
 
 th_fail = 0.7
 th_success = 0.3
@@ -517,7 +531,7 @@ table(df_perf %>% filter(Probability < th_success) %>% pull(Outcome))
 prop.table(table(df_perf %>% filter(Probability < th_success) %>% pull(Status)))
 
 cat("Predicted probability >", th_fail, "-> Yellow flag")
-print("Dogs flagged green are likely to FAIL, true outcome count and status proportion:")
+print("Dogs flagged yellow are likely to FAIL, true outcome count and status proportion:")
 table(df_perf %>% filter(Probability > th_fail) %>% pull(Outcome))
 prop.table(table(df_perf %>% filter(Probability > th_fail) %>% pull(Status)))
 

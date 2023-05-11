@@ -24,7 +24,7 @@ library(dplyr)
 library(tidyverse)
 library(reshape2)
 
-library(ggsci)  # colors for the graphs - npg for nature
+library(ggsci)  # colors for the graphs - png colours for nature
 library(broom)  # convert r output into tibbles
 library(xtable) # latex table output
 
@@ -68,7 +68,7 @@ fig_results <- function(plot, name, caption = NULL, label = NULL){
     # save png
     suppressMessages(ggsave(filename = path, 
                 plot = plot + theme(text = element_text(size = 20)),
-                width = 12, height = 8))
+                width = 8, height = 8))
     cat("Image saved at", path)
 
     # latex code for image
@@ -108,7 +108,6 @@ table(prq$Outcome)
 
 Analysing categorical demographic data: Sex, Breed. There was only one German Shepherd and Golden Doodle dogs in the sample, their breeds were relabeled as "Other" for the data analysis.
 ```{r, echo = FALSE}
-print(table(prq$Sex))
 print("Original classes")
 table(prq$Breed)
 # merging breed categories
@@ -116,6 +115,9 @@ levels(prq$Breed)[levels(prq$Breed) == "LRx"] <- "LRxGR"
 levels(prq$Breed)[levels(prq$Breed) =="GS" | levels(prq$Breed) =="GRxPoodle"] <- "Other"
 print("Processed classes")
 table(prq$Breed)
+
+# Sex
+print(table(prq$Sex))
 ```
 
 Analysing age at arrival to the training centre and age at assessment when the questionnaire was completed:
@@ -323,12 +325,10 @@ cat("Reduced Feature Set with p<0.05 and < 5% missing data\t", dim(data_4))
 ```
 
 ### Criterion 5: Correlation
-
 Removing features with more than 0.75 correlation (i.e. F_07)
 ```{r, echo = FALSE}
 # change col names for the plot
 colnames(data_4) <- unlist(lapply(strsplit(colnames(data_4),"[.]"), function(x) x[1]))
-
 # calculate correlation matrix
 correlationMatrix <- round(abs(cor(data_4 %>% select(-c("Outcome")), use = "pairwise.complete.obs")),2)
 plot <- ggplot(data = melt(correlationMatrix), aes(x=Var1, y=Var2, fill=value)) + 
@@ -350,7 +350,7 @@ cat("Reduced Feature Set with p<0.05 and < 5% missing data and <75% correlated\t
 ```
 
 
-### Visualization
+## Visualization
 Plotting the items and factors that will be used for modelling.
 ```{r, echo = FALSE}
 plot_discrete <- function(var){
@@ -472,13 +472,14 @@ Logistic Regression was used to model the dataset and Leave One Subject Out Cros
 # GLM predicts the SECOND class -> make sure Fail is second class
 # data_reduced$Outcome <- relevel(data_reduced$Outcome, ref = "Success")
 # RFE calculates the metrics on the FIRST class -> make sure Fail is first class
+colnames(data_reduced)
 data_reduced$Outcome <- relevel(data_reduced$Outcome, ref = "Fail")
 cat('predicting second class:', levels(data_reduced$Outcome))
 
 model_recipe <- recipe(Outcome ~ ., data = data_reduced )  %>%
-        step_impute_mean(all_numeric()) %>%
-        step_normalize(all_numeric()) %>%
-        step_pca(all_predictors(), threshold = 0.95)
+                    step_impute_mean(all_numeric()) %>%
+                    step_normalize(all_numeric()) %>%
+                    step_pca(all_predictors(), threshold = 0.95)
 
 # Setting ROC as the metric for the Logistic Regression function
 # lrFuncs$summary <- twoClassSummary 
@@ -487,7 +488,7 @@ set.seed(42)
 
 ctrl <- rfeControl(functions = lrFuncs,         # Logistic Regression
                 method = "cv",                  # Cross Validation
-                number = 63,                    # Number of folds
+                number = nrow(data_reduced),                    # Number of folds
                 # method = "LOOCV",
                 saveDetails = TRUE,
                 returnResamp = "all",
@@ -498,7 +499,7 @@ ctrl <- rfeControl(functions = lrFuncs,         # Logistic Regression
 # Recursive Feature Elimination with feat_lr
 model_rfe <- rfe(model_recipe,                 # predict Outcome using all other variables
                 data = data_reduced,           # selecting the features from univariate lr
-                sizes = 1:10,                  # from 1 to 10 variables
+                sizes = 1:(ncol(data_reduced)-1), # from 1 to 10 variables
                 rfeControl = ctrl,
                 # metric = "Sens",               # optimising Specificity to avoid False Failures -> sens/spec are swapped in RFE
                 metric = "Precision",
@@ -507,11 +508,11 @@ model_rfe <- rfe(model_recipe,                 # predict Outcome using all other
 warnings()
 print(model_rfe)
 model <- summary(model_rfe$fit)
-# Estimate, z-value signs need to be swapped 
+# Estimate, z-value signs need to be swapped
 print(model)
 ```
 
-Model fitness with deviance analysis. Performance metrics ROC and PR curves. 
+Model fitness with deviance analysis. 
 ```{r, echo = FALSE}
 # model fitness
 dev = model$null.deviance - model$deviance
@@ -520,35 +521,47 @@ cat('\ndeviance difference: ', dev)
 cat('\ndf difference: ', deg)
 cat('\nlevel of significance: ', pchisq(dev, deg, lower.tail = FALSE))
 cat('\nthe model is a good fit: ', pchisq(dev, deg, lower.tail = FALSE) < 0.05)
+```
 
-# cross validated predictions for perfromance analysis
+Performance metrics ROC and PR curves. 
+```{r, echo = FALSE}
+# cross validated predictions for performance analysis
 df_perf <- model_rfe$pred %>% 
-            filter(Variables == 1) %>% 
+            filter(Variables == model_rfe$optsize) %>% 
             select(rowIndex, Fail, pred, obs) %>% 
             rename("Probability" = "Fail", "Predicted" = "pred", "Outcome" = "obs")
-
-# calculate performance metrics ROC
-confusionMatrix(data = df_perf$Predicted, reference = df_perf$Outcome, positive = "Fail")
 
 roc_curve <- roc.curve(scores.class0 = df_perf$Probability,
              weights.class0 = abs(as.numeric(df_perf$Outcome)-2),
              curve=TRUE)
-roc_curve
-png('results/prq/roc-curve.png')
-plot(roc_curve, xlab = "Specificity")
-dev.off()
+plot(roc_curve)
 
-# calculate performance metrics PR
-confusionMatrix(data = df_perf$Predicted, reference = df_perf$Outcome, positive = "Fail", mode = "prec_recall")
+png('results/prq/roc-curve.png')
+plot(roc_curve, xlab = "1 - Specificity", auc.main = FALSE, col = 'blue',
+         main = paste('ROC Curve (AUC = ',toString(round(roc_curve$auc,2)),')',sep = ''), 
+         cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5)
+dev.off()
 
 pr_curve <- pr.curve(scores.class0 = df_perf$Probability,
              weights.class0 = abs(as.numeric(df_perf$Outcome)-2),
              curve=TRUE)
-pr_curve
+plot(pr_curve)
 
 png('results/prq/pr-curve.png')
-plot(pr_curve)
+plot(pr_curve, auc.main = FALSE, col = 'blue',
+         main = paste('PR Curve (AUC = ',toString(round(pr_curve$auc.integral,2)),')',sep = ''), 
+         cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5)
 dev.off()
+
+# calculate performance metrics PR
+cm <- confusionMatrix(data = df_perf$Predicted, reference = df_perf$Outcome, positive = "Fail")
+
+metrics <- data.frame(Accuracy = cm$overall['Accuracy'],
+                        ROC = roc_curve$auc,
+                        PR =  pr_curve$auc.integral, 
+                        t(cm$byClass))
+
+metrics %>% round(3) %>% select(Accuracy, ROC, PR, Precision, Recall, Sensitivity, Specificity, F1, Balanced.Accuracy)
 
 ```
 
@@ -557,7 +570,7 @@ dev.off()
 y <- function(x){ return(log(1/( 1/x - 1))) }
 df_perf$Estimate <- y(df_perf$Probability)
 df_perf$Status <- prq$Status
-
+levels(df_perf$Status)[levels(df_perf$Status) == "AD"] <- "SD"
 
 th_fail = 0.7
 th_success = 0.3
@@ -580,7 +593,6 @@ plot
 
 fig_results(plot = plot, name = 'logit-outcome', 
             caption = "Probability predicted by the best logistic regression model using \acrshort{cbarq} data vs true Outcome")
-
 
 print("Probability predicted by the LR using PRQ data vs true Status")
 # plot Logit vs Status
@@ -639,7 +651,7 @@ tab_results(results_reduced,
 ## Feature Importance
 
 ### Explained Variance
-```{r, echo = FALSE}
+    ```{r, echo = FALSE}
 # PCA variance
 dc_pca_var <- as.data.frame(tidy(model_rfe$recipe, number = 3, type = "variance"))
 dc_pca_var <- dc_pca_var %>% spread(key = "terms", value = value) %>% select(-c(id))

@@ -1,5 +1,7 @@
 .vscode/
 venv/
+data_old/
+results_old/
 **/__pycache__/
 **/cachedir/
 results_old/2nd-prediction/prq-dt-1.txt

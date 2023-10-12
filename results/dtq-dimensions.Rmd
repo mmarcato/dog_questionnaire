@@ -468,27 +468,9 @@ prop.table(table(df_perf %>% filter(Probability > th_fail) %>% pull(Status)))
 cat(th_success, " < Predicted probability <", th_fail, "-> no flags")
 table(df_perf %>% filter(Probability > th_success & Probability < th_fail) %>% pull(Status))
 ```
-<!-- 
-RFE chose 6 variables when optimizing for AUC-ROC, namely:
-"Training.Trainable", "Amicability.Friendly", "Motivation.Persevering", "Training.Biddable", "Extraversion.Hyperactive", "Amicability.Easy.going".
-Analysing deviance of full model compared to the null model. 
-Reduction in deviance must be significant (chi-squared test) for the model to be considered a good fit. -->
 
 
 ## Interpretation
-
-The best Logistic Regression model is used to investigate the effect of the principal components on the training outcome.
-The estimates were exponentiated to get the Odds Ratio (OR). The 95% Confident Interval (CI) of the ORs was also calculated. 
-RFE chose 1 principal components, PC1. 
-The OR for PC1 is 2.16, this means that the probability of withdrawal increases by (2.16-1 = 1.16) 116% for every unit increase of PC1.
-We are 95% confident that a unit increase in PC1 results in a 54 to 236% (1.54-1 = 0.54, 3.36-1 = 2.36) more odds of being withdrawn from training.
-
-<!-- 
-Three variables showed some level of statistical significance, namely:
-- "Training.Trainable" (p<0.05), for each unit increase the OR was smaller by 0.228 (less likely to be withdrawn)
-- "Motivation.Persevering" (p<0.01), each unit increase the OR was smaller by 0.418 (less likely to be withdrawn)
-- "Amicability.Easy.going" (p<0.1), each unit increase the OR was smaller by 0.531 (less likely to be withdrawn) -->
-
 ```{r, echo = FALSE}
 results_reduced <- as.data.frame(coef(summary(model_rfe$fit)))
 results_reduced$OR <- exp(results_reduced$Estimate)

@@ -555,7 +555,7 @@ dev.off()
 
 # calculate performance metrics PR
 cm <- confusionMatrix(data = df_perf$Predicted, reference = df_perf$Outcome, positive = "Fail")
-
+cm
 metrics <- data.frame(Accuracy = cm$overall['Accuracy'],
                         ROC = roc_curve$auc,
                         PR =  pr_curve$auc.integral, 
